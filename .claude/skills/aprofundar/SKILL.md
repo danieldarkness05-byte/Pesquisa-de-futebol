@@ -33,11 +33,12 @@ O esforço alto vai **só** nos candidatos pedidos. Para economizar créditos:
 5. **Perto do jogo** (≤ 75 min): confira se `confirmed` é `true` em
    `https://api.sofascore.com/api/v1/event/<id>/lineups`. O `dossie.py` mostra isso em "escalação confirmada".
    - Uma baixa que muda a tese derruba o pick.
-6. **Resposta curta:**
+6. **Resposta curta, SÓ com o que passou no critério** (regra do Daniel):
    - ⭐ OURO ranqueado. Uma linha por pick: jogo · hora · mercado · prob. · odd mínima Betano ·
      odd/EV bet365 · evidência · motivo.
-   - Descartados, uma linha cada, com a chance estimada.
    - O que conferir antes de entrar e "Dados pesquisados até HH:MM".
+   - **Não** liste descartados nem "quase" na mensagem: eles ficam só no arquivo do passo 7.
+   - Sem ouro: só "Nenhuma oportunidade de ouro hoje."
 7. **Salve** em `analises/AAAA-MM-DD-aprofundar.md` e faça commit e push na branch da sessão.
 8. **Com OURO** → `PushNotification`: "⭐ OURO 14:45 San Lorenzo x Riestra -6.5 cartões, odd mín 1.62".
    Sem ouro, não notifique.

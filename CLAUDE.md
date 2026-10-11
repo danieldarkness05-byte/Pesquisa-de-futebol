@@ -70,11 +70,14 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
 
 ## Formato da resposta
 
+- **Só mande ao Daniel jogos que passam no critério** (⭐ OURO: prob ≥ 60% e EV ≥ 3%, pelos `criterios`).
+  Candidatos da peneira, descartados, "quase" e "mais próximos" ficam só no arquivo da análise, a não
+  ser que ele peça. Sem ouro: uma linha, "Nenhuma oportunidade de ouro hoje." (sem notificação).
 - Comece pelo resultado: lista de ⭐ OURO ranqueada, ou "nenhuma oportunidade".
 - Cada pick em 1–2 linhas: jogo · horário · mercado · prob · odd mínima · odd casa
   (se houver) · EV · motivo curto.
-- Depois, descartados em uma linha cada, com o motivo (chuva, < 60%, sem valor,
-  dado faltando, RISCO).
+- Descartados (com o motivo: chuva, < 60%, sem valor, dado faltando, RISCO) vão para o arquivo da
+  análise; na mensagem, só se o Daniel pedir.
 - Fontes no final. Sem textos longos.
 
 ## Banca e registro

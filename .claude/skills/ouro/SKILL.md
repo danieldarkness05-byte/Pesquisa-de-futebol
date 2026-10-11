@@ -14,12 +14,12 @@ Fora do workflow: sem WebSearch, sem subagentes avulsos e sem ler arquivos além
 1. **Peneira:** rode `python3 ferramentas/varredura.py --curto` em primeiro plano (Bash `timeout: 600000`).
    - Se o Daniel passou uma data, use `--data`.
    - Se a saída avisar falhas, rode **uma** vez de novo (o cache acelera).
-   - Sem candidatos: responda "Nenhum jogo de valor na peneira de hoje." e pare, sem notificar e sem gravar arquivo.
+   - Sem candidatos: responda só "Nenhuma oportunidade de ouro hoje." e pare, sem notificar e sem gravar arquivo.
 2. **Dossiê (de graça):**
    - Rode `python3 ferramentas/dossie.py` (resumo).
    - Depois rode `python3 ferramentas/dossie.py --json > <scratchpad>/dossie.json`.
    - Se o Daniel pediu números, use `--numeros`. Sem números, entram os N primeiros do config; jogos a menos de 20 min do início ficam fora.
-   - Nenhum candidato `vivo`: responda em até 4 linhas com o motivo de cada um e pare, sem agentes.
+   - Nenhum candidato `vivo`: responda só "Nenhuma oportunidade de ouro hoje." e pare, sem agentes.
 3. **Workflow:** leia o JSON e chame
    `Workflow({scriptPath: ".claude/workflows/aprofundar.js", args: <objeto do dossiê>})`.
    - `args` vai como objeto JSON, não como string.
@@ -37,11 +37,12 @@ Fora do workflow: sem WebSearch, sem subagentes avulsos e sem ler arquivos além
    - **Stake:** Kelly × `banca.kelly_fracao`, com teto em `banca.stake_max_pct`. Se `valor_banca` for 0, mostre em % da banca.
 5. **Salvar:** grave `analises/AAAA-MM-DD-ouro.md` e faça commit e push na branch atual.
    - O arquivo é curto: resultado, uma seção por candidato (modelo → ajuste e motivo → prob. final → mercado → veredito), fontes e "Dados pesquisados até HH:MM".
-6. **Resposta curta**, no formato do CLAUDE.md:
+6. **Resposta curta, SÓ com o que passou no critério** (regra do Daniel):
    - ⭐ OURO ranqueado, uma linha por pick: jogo · hora · mercado · prob. · odd mínima Betano · odd/EV bet365 · evidência · motivo.
-   - Descartados, uma linha cada com o motivo.
    - O que conferir antes de entrar: escalação oficial cerca de 1 h antes e a odd na Betano ≥ mínima.
-   - Termine com quantos agentes o workflow usou.
+   - **Não** liste descartados, candidatos nem "quase": isso fica só no arquivo do passo 5.
+   - Sem ouro: só "Nenhuma oportunidade de ouro hoje."
+   - Termine com quantos agentes o workflow usou, em uma linha curta.
 7. **Notificação:**
    - Com OURO: `PushNotification` "⭐ OURO HH:MM <jogo> <mercado>, odd mín X.XX".
    - Sem ouro: não notifique.

@@ -2,7 +2,7 @@
 name: peneira
 description: Peneira barata do dia — roda ferramentas/varredura.py, que varre todos os jogos das competições do config.json e devolve só os mercados com valor (prob ≥ triagem, EV ≥ mínimo, robustos, sem chuva). Use quando o Daniel pedir a peneira, a varredura rápida ou os jogos de valor do dia, e na rotina diária. Não pesquisa notícias (isso é o /aprofundar).
 argument-hint: "[hoje | amanhã | AAAA-MM-DD] [IDs de torneios]"
-allowed-tools: Bash(python3 ferramentas/*) PushNotification
+allowed-tools: Bash(python3 ferramentas/*)
 ---
 
 Peneira: **$ARGUMENTS** (vazio = hoje).
@@ -18,8 +18,9 @@ subagentes e não use WebSearch/WebFetch. Não leia arquivos do repositório al�
      segunda rodada rápida.
 2. **Repasse a saída como está**, sem a linha `NOTIFICAR:`. Ela já vem no formato de celular.
    Não reescreva e não acrescente análise.
-3. Se houver a linha `NOTIFICAR: <texto>`, mande `PushNotification` com esse texto.
-   Sem candidatos, não notifique.
+3. **Não notifique.** Os candidatos da peneira ainda não passaram no critério final, e o Daniel só
+   quer receber jogos que passam. Notificação só no /ouro ou no /aprofundar, e só com OURO.
+   Deixe claro na resposta que é triagem: "candidatos, ainda não são OURO".
 4. Não grave arquivo nem faça commit. O script já salva o resultado em
    `dados/cache/sofascore/peneira-AAAA-MM-DD.json`, que o /aprofundar reaproveita.
 
