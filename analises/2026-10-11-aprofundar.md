@@ -91,3 +91,81 @@ python3 ferramentas/valor.py --prob 0.601 --odd 1.727 --mercado-odds 1.727,2.01
 - Portal Sportinguista (fórum, 10/10, só para Duñabeitia): https://www.portalsportinguista.com/viewtopic.php?t=3012&p=814051
 
 Dados pesquisados até 10:25 (Brasília).
+
+---
+
+# /aprofundar dos outros candidatos (1, 2, 4, 5, 6) · reavaliação às 10:28
+
+## Resultado
+
+⭐ **OURO (1):**
+
+| # | Jogo | Hora | Mercado | Prob. | Odd mín. Betano | bet365 / EV | Stake | Evidência |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Real Betis x Osasuna (LaLiga) | 13:30 | Menos de 4.5 gols | 86.6% | 1.19 | 1.20 / +3.9% | 2% da banca (teto) | MODERADA |
+
+**Descartados:**
+- **4) Motherwell x Celtic (08:00):** já tinha começado na hora do /aprofundar.
+- **5) Teplice x Sigma Olomouc (10:00):** já tinha começado na hora do /aprofundar.
+- **2) Concepción x La Calera, 1X:** caiu pela regra 8 na reavaliação (modelo 84.6% contra 73.7% do mercado). A pesquisa não achou o que o mercado sabe. Com o ajuste, dá cerca de 80%, sem margem de valor.
+- **6) San Lorenzo x Riestra, menos de 8.5 escanteios:** 59.3%, abaixo do corte de 60%. O contexto não justifica ajuste para cima.
+
+## 1) Real Betis x Osasuna · Menos de 4.5 gols · ⭐ OURO
+
+- **Jogo:** 13:30 (Brasília), Estadio de la Cartuja, Sevilha. Sem chuva (peneira). Árbitro Carlos Muñiz Muñoz.
+- **Modelo da peneira:** gols esperados Betis 1.66 × Osasuna 0.87 (total 2.53) → **88.6%**.
+  - Variantes: 84.6% a 90.1%.
+  - Frequência nas amostras: 18/20 (Betis em casa 10/10, Osasuna fora 8/10). Sofascore, últimos 10 na condição.
+- **Ajuste:** −2 p.p. → **86.6%**.
+  - Contra o under: o Betis está sem os dois laterais (Firpo e Ruibal), e o Osasuna sofreu 13 gols nos últimos 6 jogos (Herrando e Del Castillo fora).
+  - A favor do under: o ataque do Osasuna está sem Oroz, Barja e Moro (6 gols em 7 jogos; 1 ponto em 12 sem Oroz).
+- **Mercado:**
+  - Sem margem, dá 78.9% → nosso número fica +7.7 p.p. acima (regra 8 ok).
+  - Contra nós: desde a abertura, o mercado foi para mais gols (under 4.5 de 1.143 para 1.20; sem margem, de 82.8% para 78.9%).
+  - A média da LaLiga 26/27 é 2.89 gols por jogo, com 80.5% dos jogos em até 4 gols (n = 133).
+- **A favor:** nenhum dos últimos 6 confrontos passou de 3 gols. 3 dos últimos 6 jogos do Betis foram 1-0. O Betis joga a Champions na quarta (Porto) e pode rodar o time.
+- **Contra:** é o 1º jogo depois da data FIFA. O Betis levou 5-2 do Levante. O Osasuna levou 5-2 do Alavés e 4-0 do Atlético fora.
+- **Por que MODERADA:** o pick é robusto no modelo e nas amostras, mas a odd é baixa e a margem é fina (odd mínima 1.19 contra bet365 1.20), e o mercado vem se movendo contra.
+- **Conferir antes de entrar:**
+  - Odd Betano ≥ 1.19; se for 1.18 ou menos, não entre.
+  - Escalações oficiais por volta das 12:30.
+
+## 2) Deportes Concepción x Unión La Calera · 1X · DESCARTADO
+
+- **Modelo:** 1.72 × 0.72 gols esperados → 84.6%. Frequência nas amostras: 16/20.
+- **Mercado:** sem margem, 73.7% (1X 1.286; 1 1.96, X 3.40, 2 3.60) → +10.9 p.p.: regra 8 acionada.
+- **Pesquisa (imprensa chilena):** nenhum desfalque relevante no Concepción. Saldías, da La Calera, está fora desde março por embolia pulmonar; Caseres é só rumor.
+- **Contra o pick:**
+  - O Concepción vem abalado: eliminado da Copa Chile pelo O'Higgins (0-1 e 0-2), crise interna com a diretoria e 3 jogos sem vencer.
+  - A La Calera tem técnico novo (John Armijo, desde 14/09) e chega descansada, sem jogar desde 26/09.
+  - Ela está em último por causa de −6 pontos de punição (mantida pelo TAS) e ganhou o jogo do 1º turno por 1-0.
+- **Com o ajuste (−4 p.p.):** 80.6%, EV +3.7% a 1.286 e odd mínima 1.28. Fica no fio da navalha, e o motivo da divergência com o mercado não foi encontrado. Chance estimada: cerca de 80% (faixa 74–85%).
+
+## 6) San Lorenzo x Deportivo Riestra · Menos de 8.5 escanteios · DESCARTADO
+
+- **Modelo:** média esperada de cerca de 8.0 escanteios → 59.3%, abaixo do corte final de 60%. EV +6.7% a 1.80. Sem margem, o mercado dá 51.5%.
+- **Amostras:** 11/20 jogos abaixo de 8.5 (San Lorenzo em casa 5/10, Riestra fora 6/10).
+- **Contexto:**
+  - O San Lorenzo escalou 3 atacantes e precisa vencer (Insúa fez 1 de 9 pontos, 12º na zona). Isso puxa para mais escanteios, não para menos.
+  - O Riestra está em 28º na tabela anual, brigando contra o rebaixamento.
+  - Sem chuva prevista; árbitro Bruno Amiconi.
+- Nada justifica ajuste para cima, e rebaixar o corte seria forçar. Chance estimada: cerca de 57–59%.
+
+## Fontes (outros candidatos)
+
+- Sofascore API (eventos 16421054, 15353146 e 16667358): odds bet365, amostras, desfalques e classificação, consultado 11/10 10:28.
+- **Betis:**
+  - https://www.comuniate.com/noticias/38336/onces-probables-del-betis-osasuna-segun-la-prensa-deportiva-especializada
+  - https://comuniate.com/noticias/38371/aimar-oroz-sera-baja-para-el-partido-ante-el-betis
+  - https://www.elgoldigital.com/futbol/real-betis-balompie/pellegrini-internacionales-betis-osasuna-firpo-ruibal-fidalgo/
+  - https://www.sportsmole.co.uk/football/betis/preview/betis-vs-osasuna-prediction-team-news-lineups_606591.html
+- **Concepción:**
+  - https://www.alairelibre.cl/futbol/concepcion-vs-union-la-calera-formaciones-horario-canal-campeonato-nacional-2026/
+  - https://www.alairelibre.cl/futbol/campeonato-nacional/union-la-calera-john-armijo-nuevo-dt/
+  - https://www.emol.com/noticias/Deportes/2026/09/30/1212857/lacalera-tas-resta-puntos-anfp.html
+- **San Lorenzo:**
+  - https://vamosciclon.com/san-lorenzo-equipo-confirmado-cuatro-cambios-riestra/
+  - https://www.lanacion.com.ar/deportes/futbol/a-que-hora-juega-san-lorenzo-y-deportivo-riestra-y-por-donde-se-puede-ver-en-vivo-nid11102026/
+  - https://elintransigente.com/2026/10/san-lorenzo-arbitro-riestra/
+
+Dados pesquisados até 10:36 (Brasília).
