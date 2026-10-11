@@ -623,6 +623,8 @@ def analisar_jogo(api: Sofascore, e: dict, cfg: dict, cache_liga: dict) -> dict:
     if min(len(xgh), len(xga)) >= minimo:
         variantes["amostra_geral"] = avaliar(odds, gols_esperados(xgh, xga, liga, k, geral=True),
                                              conts(xgh, xga), casa, fora, rho0, 0.0, ev_min)
+    # o dossie.py usa as duas para explicar por que um candidato caiu
+    info["variantes"], info["amostras"], info["taxa_base"] = variantes, (xh, xa), base
     info["candidatos"], info["descartes_mercado"] = filtrar(variantes, xh, xa, v, ev_min, base)
     if not info["candidatos"]:
         info["motivo"] = info["descartes_mercado"] or MOTIVOS[0]

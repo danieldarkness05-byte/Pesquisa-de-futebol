@@ -101,5 +101,12 @@
       "851": "Amistosos internacionais",
       "1468": "Brasileirão Feminino"
     }
+  },
+  "aprofundar": {
+    "_leia": "Usado pelo dossie.py e pelo workflow .claude/workflows/aprofundar.js (/ouro e /aprofundar). max_candidatos = quantos candidatos da peneira vão para a pesquisa com agentes (cada um custa 1 pesquisador + 1 cético; 0 desliga a pesquisa automática do /ouro). cetico = false economiza 1 agente por candidato. modelo_agentes = modelo dos agentes de pesquisa (sonnet é mais barato).",
+    "max_candidatos": 3,
+    "min_minutos_antes": 20,
+    "cetico": true,
+    "modelo_agentes": "sonnet"
   }
 }

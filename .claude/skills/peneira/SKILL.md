@@ -25,3 +25,5 @@ subagentes e n찾o use WebSearch/WebFetch. N찾o leia arquivos do reposit처rio al�
 
 Corte da peneira: `varredura.prob_triagem` (59%), um pouco abaixo do corte final
 (`criterios.prob_minima`, 60%), para n찾o perder candidatos na borda. Detalhes em `docs/metodologia.md`.
+
+Para a rotina completa (peneira + pesquisa com agentes s처 nos melhores candidatos), use `/ouro`.

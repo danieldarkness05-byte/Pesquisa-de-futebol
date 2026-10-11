@@ -9,6 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ferramentas"))
 
 import clima  # noqa: E402
+import dossie  # noqa: E402
 import historico  # noqa: E402
 import nucleo as n  # noqa: E402
 import registro  # noqa: E402
@@ -159,6 +160,42 @@ class TestRegistro(unittest.TestCase):
             txt = registro.resumo(de_novo)
             self.assertIn("Acerto: 1/2", txt)
             self.assertIn("CLV", txt)
+
+
+class TestDossie(unittest.TestCase):
+    def test_selecionar(self):
+        cands = [{"x": i} for i in range(5)]
+        self.assertEqual([i for i, _ in dossie.selecionar(cands, None, 3)], [1, 2, 3])
+        self.assertEqual([i for i, _ in dossie.selecionar(cands, [5, 2, 9], 3)], [5, 2])
+
+    def test_gols_por_jogador_ignora_gol_contra_e_adversario(self):
+        inc = [[{"incidentType": "goal", "isHome": True, "player": {"id": 7, "shortName": "A"}},
+                {"incidentType": "goal", "isHome": False, "player": {"id": 9, "shortName": "Rival"}},
+                {"incidentType": "goal", "isHome": True, "incidentClass": "ownGoal", "player": {"id": 9}},
+                {"incidentType": "card", "isHome": True, "player": {"id": 7}}],
+               [{"incidentType": "goal", "isHome": False, "player": {"id": 7, "shortName": "A"}}]]
+        gols, total, nomes = dossie.gols_por_jogador(inc, [True, False])
+        self.assertEqual(total, 3)
+        self.assertEqual(gols, {7: 2})
+        self.assertEqual(nomes[7], "A")
+
+    def test_odds_escolha(self):
+        odds = {"markets": [{"marketName": "Double chance", "choiceGroup": None, "choices": [
+            {"name": "X2", "fractionalValue": "4/5", "initialFractionalValue": "1/2"}]}]}
+        self.assertEqual(dossie.odds_escolha(odds, ("Double chance", None, "X2")), [1.5, 1.8])
+        self.assertIsNone(dossie.odds_escolha(odds, ("Double chance", None, "1X")))
+
+    def test_motivo_queda_regra8(self):
+        cfg = dossie.config()
+        k = ("Double chance", None, "X2")
+        item = {"mercado": "Double chance", "linha": None, "escolha": "X2", "p": 0.65, "dev": 0.0,
+                "ev": 0.17, "odd": 1.8, "justa_mercado": 0.53}
+        info = {"variantes": {v: {k: dict(item)} for v in ("base", "incerteza", "dixon_coles")},
+                "amostras": ([], []), "taxa_base": None}
+        motivo, base = dossie.motivo_queda(info, k, cfg)
+        self.assertIn("regra 8", motivo)
+        self.assertEqual(base["odd"], 1.8)
+        self.assertIn("não está mais", dossie.motivo_queda(info, ("Double chance", None, "1X"), cfg)[0])
 
 
 if __name__ == "__main__":

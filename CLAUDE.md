@@ -42,16 +42,19 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/sistema.py --sel ... --tamanhos 2` | simula Sistema (Duplas/Triplas) |
 | `python3 ferramentas/registro.py add/resolver/resumo` | registro de apostas e balanço |
 | `python3 ferramentas/varredura.py [--data D]` | peneira do dia: todos os jogos do Sofascore → só mercados com valor |
+| `python3 ferramentas/dossie.py [--numeros 1,3] [--json]` | dossiê dos candidatos: odds de agora e da abertura, vivo/caiu, desfalques com gols, forma, chuva |
 
 Cada script tem `--help` com exemplos. Use `--json` quando for processar a saída.
 Detalhes dos modelos e limitações: `docs/metodologia.md`.
 
 ## Fluxo diário (economia de esforço)
 
-1. **`/peneira`** (rotina diária, barata): só roda `varredura.py`. Não pesquisa notícias.
-   Avisa o Daniel (notificação) quando há candidatos.
-2. **`/aprofundar`** (quando o Daniel mandar): esforço alto **só** nos candidatos. Envolve escalação,
-   desfalques, ajuste explícito e veredito final pelos `criterios`.
+1. **`/ouro`** (rotina diária às 06:52): peneira (script) → dossiê (script) → workflow
+   `.claude/workflows/aprofundar.js` só nos N melhores candidatos **vivos** → veredito pelas
+   ferramentas → notifica só com OURO. Agentes só dentro do workflow: 1 pesquisador + 1 cético por
+   candidato, no modelo de `config.json → aprofundar` (`max_candidatos: 0` desliga).
+2. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
+3. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
 
 ## Fluxo padrão de análise
 
