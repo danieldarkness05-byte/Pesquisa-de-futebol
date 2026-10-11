@@ -212,3 +212,21 @@ Dados pesquisados até 12:20 (Brasília).
 - **Correção na peneira:** as coordenadas do estádio só valem se ficarem a até 100 km da cidade; caso contrário, vale a cidade.
 
 Dados pesquisados até 19:40 (Brasília).
+
+---
+
+# Chance de vitória nos jogos restantes (pedido do Daniel, 19:45)
+
+Fontes: probabilidade sem margem do 1X2 da bet365 (via Sofascore), modelo da peneira com Dixon-Coles ρ −0,10, campanha casa/fora nos últimos 10 jogos de liga, tabela, desfalques e escalação do Sofascore, chuva pelo clima.py.
+
+| Time | Jogo | Hora | Mercado (s/ margem) | Modelo | Campanha | Chuva | Odd bet365 | Odd mín. p/ EV 3% |
+|---|---|---|---|---|---|---|---|---|
+| **Bolívar** | x Blooming | 20:30 | 88% | 65–73% | Bolívar 8V 1E 1D em casa; Blooming 1V 3E 6D fora e 5 jogos sem vencer | seco (La Paz) | 1.05 | ~1.21 (p ≈ 85%) |
+| **St. Louis City** | x LA Galaxy | 20:00 | 66% | 57–69% | St. Louis 7V 2E 1D em casa, 2º no Oeste, 4V nos últimos 5; Galaxy 3V 2E 5D fora | seco | 1.45 | ~1.66 (p ≈ 62%) |
+| América de Cali | x Medellín | 22:15 | 54% | 45–62% | 8V 1E 1D em casa, 1º do Finalización | **CHUVA** (82%) | 1.75 | fora (regra 3) |
+
+- Nenhum outro time passa de 56% no mercado.
+- O Pachuca dá 56%, mas o modelo dá 39%, ele tem 4 desfalques e há chuva o dia todo.
+- Os dois favoritos claros **não têm valor** com as odds atuais. O preço já embute a alta probabilidade, então não são OURO.
+
+Dados pesquisados até 19:45 (Brasília).
