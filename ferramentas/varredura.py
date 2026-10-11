@@ -131,12 +131,15 @@ def listar_jogos(api: Sofascore, data: str, torneios: set[int]) -> list[dict]:
     cats = api.get(f"sport/football/{data}/-10800/categories").get("categories", [])
     alvo = [c["category"]["id"] for c in cats if torneios & set(c.get("uniqueTournamentIds") or [])]
     vistos, jogos = set(), []
-    for res in em_paralelo(lambda cid: api.get(f"category/{cid}/scheduled-events/{data}"), alvo):
+    agora = time.time()
+    # calendário sempre na hora: o status (não começou / em andamento) muda ao longo do dia
+    for res in em_paralelo(lambda cid: api.get(f"category/{cid}/scheduled-events/{data}", cache=None), alvo):
         for e in res.get("events", []):
             if e["id"] in vistos or torneio_id(e) not in torneios:
                 continue
             vistos.add(e["id"])
-            if hora_br(e["startTimestamp"]).date().isoformat() == data and e["status"]["type"] == "notstarted":
+            if (hora_br(e["startTimestamp"]).date().isoformat() == data and e["status"]["type"] == "notstarted"
+                    and e["startTimestamp"] > agora):
                 jogos.append(e)
     return sorted(jogos, key=lambda e: e["startTimestamp"])
 
@@ -808,7 +811,7 @@ def main() -> None:
 
     if a.jogos:
         jogos = [ev for ev in (api.get(f"event/{x.strip()}", cache=None).get("event")
-                               for x in a.jogos.split(",") if x.strip()) if ev and ev["status"]["type"] == "notstarted"]
+                               for x in a.jogos.split(",") if x.strip()) if ev and ev["status"]["type"] == "notstarted" and ev["startTimestamp"] > time.time()]
     else:
         jogos = listar_jogos(api, data, torneios)
     cache_liga: dict = {}
