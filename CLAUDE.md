@@ -41,9 +41,17 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/clima.py --cidade X --data D --hora H` | previsão de chuva (Open-Meteo) |
 | `python3 ferramentas/sistema.py --sel ... --tamanhos 2` | simula Sistema (Duplas/Triplas) |
 | `python3 ferramentas/registro.py add/resolver/resumo` | registro de apostas e balanço |
+| `python3 ferramentas/varredura.py [--data D]` | peneira do dia: todos os jogos do Sofascore → só mercados com valor |
 
 Cada script tem `--help` com exemplos. Use `--json` quando for processar a saída.
 Detalhes dos modelos e limitações: `docs/metodologia.md`.
+
+## Fluxo diário (economia de esforço)
+
+1. **`/peneira`** (rotina diária, barata): só roda `varredura.py`. Não pesquisa notícias.
+   Avisa o Daniel (notificação) quando há candidatos.
+2. **`/aprofundar`** (quando o Daniel mandar): esforço alto **só** nos candidatos. Envolve escalação,
+   desfalques, ajuste explícito e veredito final pelos `criterios`.
 
 ## Fluxo padrão de análise
 

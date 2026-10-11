@@ -71,3 +71,31 @@ Combinar seleções sem valor não cria valor.
   mostra se as estimativas estão calibradas: use `registro.py resumo`.
 - **CLV** (sua odd vs. odd de fechamento) positivo de forma consistente é o melhor sinal
   de que a vantagem é real. Anote a odd de fechamento ao resolver as apostas.
+
+## Peneira diária (`varredura.py`)
+
+Triagem automática de todos os jogos das competições em `config.json → varredura`.
+Usa a API pública do Sofascore: calendário, estatísticas por jogo, árbitro e odds da bet365.
+
+- **Amostra:** últimos `jogos_amostra` (10) jogos **da mesma liga na condição** (mandante em casa,
+  visitante fora). Com menos de `amostra_minima` (5), o jogo fica de fora.
+- **Gols:** método de força com 50% gols + 50% xG (quando há xG em ≥ 70% dos jogos). As médias são
+  encolhidas para a média da liga (peso de `encolhimento_jogos`). Médias da liga: temporada atual +
+  anterior.
+- **Escanteios e cartões:** `media_confronto`, com dispersão medida nas amostras. Os cartões entram
+  misturados com a média de carreira do árbitro (≥ 15 jogos).
+- **Todos os mercados com odd:** 1X2, dupla chance, empate anula, ambas marcam, mais/menos de gols,
+  handicap asiático, 1º tempo, primeiro a marcar, escanteios e cartões.
+- **Passa só o que tiver prob ≥ `prob_triagem` e EV ≥ `ev_minimo`:**
+  - na base, com incerteza nas médias (σ = `incerteza_sigma`) e com Dixon-Coles `rho_variante`;
+  - nas demais variantes (sem os 2 últimos jogos, amostra geral, só gols, só xG), com tolerância de
+    `tolerancia_variantes`;
+  - sem divergência > `regra8_pp` com o mercado sem margem (regra 8);
+  - com frequência real nas amostras ≥ triagem − `tolerancia_frequencia`;
+  - com a taxa-base da liga a favor. O 1/2/12/empate anula é refeito com a taxa real de empates,
+    porque a Poisson subestima empates. Gols com prob ≥ 80% precisam acontecer na liga em pelo menos
+    (prob − 10 p.p.).
+  - Linhas com odd < `odd_minima_mercado` (ex.: menos de 5.5 a 1.10) são ignoradas: a cauda do modelo
+    é pouco confiável e a margem é grande.
+- **Chuva:** `clima.py`, só para os jogos que passaram.
+- É **triagem**: não vê escalação nem notícia. O veredito vem do `/aprofundar`.

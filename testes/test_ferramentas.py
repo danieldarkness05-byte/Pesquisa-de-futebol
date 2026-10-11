@@ -13,6 +13,7 @@ import historico  # noqa: E402
 import nucleo as n  # noqa: E402
 import registro  # noqa: E402
 import sistema  # noqa: E402
+import varredura as vr  # noqa: E402
 
 CFG = n.carregar_config()
 
@@ -162,3 +163,101 @@ class TestRegistro(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestVarredura(unittest.TestCase):
+    V = {**vr.VARREDURA_PADRAO}
+
+    def amostra(self, placares):
+        return [{"gf": a, "ga": b} for a, b in placares]
+
+    def test_odd_e_dupla_chance_sem_margem(self):
+        self.assertAlmostEqual(vr.odd_decimal("9/20"), 1.45)
+        dc = vr.sem_margem("Double chance", [1.25, 1.833, 1.286])
+        self.assertAlmostEqual(sum(dc), 2.0, places=9)
+        self.assertAlmostEqual(sum(vr.sem_margem("Full time", [1.86, 3.5, 3.75])), 1.0, places=9)
+
+    def test_matriz_com_incerteza_soma_um_e_alarga_cauda(self):
+        pura = vr.matriz(1.5, 1.2)
+        mista = vr.matriz(1.5, 1.2, sigma=0.15)
+        self.assertAlmostEqual(sum(map(sum, mista)), 1.0, places=6)
+        self.assertGreater(vr.total_gols(mista, 5.5, "over")[0], vr.total_gols(pura, 5.5, "over")[0])
+
+    def test_totais_e_handicap(self):
+        m = vr.matriz(1.4, 1.0)
+        r = n.mercados_gols(1.4, 1.0)
+        self.assertAlmostEqual(vr.total_gols(m, 2.5, "under")[0], r["under2.5"], places=9)
+        # handicap 0 = empate anula
+        vit, dev = vr.handicap_asiatico(m, 0.0, "casa")
+        self.assertAlmostEqual(vit, r["1"], places=9)
+        self.assertAlmostEqual(dev, r["X"], places=9)
+        # -0.25 = metade em 0 e metade em -0.5
+        vit, dev = vr.handicap_asiatico(m, -0.25, "casa")
+        self.assertAlmostEqual(vit, r["1"], places=9)
+        self.assertAlmostEqual(dev, r["X"] / 2, places=9)
+        # +1 do visitante: vence se não perder por 2+, devolve se perder por 1
+        vit, dev = vr.handicap_asiatico(m, 1.0, "fora")
+        um_gol = sum(m[i][i - 1] for i in range(1, len(m)))
+        self.assertAlmostEqual(vit + dev, 1 - (r["1"] - um_gol), places=9)
+        self.assertAlmostEqual(dev, um_gol, places=9)
+
+    def test_le_estatisticas_e_linha_do_time(self):
+        d = {"statistics": [{"period": "ALL", "groups": [{"statisticsItems": [
+            {"key": "expectedGoals", "homeValue": 1.8, "awayValue": 0.6},
+            {"key": "yellowCards", "homeValue": 2, "awayValue": 3},
+            {"key": "redCards", "homeValue": 0, "awayValue": 1},
+            {"key": "cornerKicks", "home": "7", "away": "2"}]}]}]}
+        est = vr.ler_estatisticas(d)
+        ev = {"startTimestamp": 1, "homeTeam": {"id": 1, "name": "A"}, "awayTeam": {"id": 2, "name": "B"},
+              "homeScore": {"normaltime": 2}, "awayScore": {"normaltime": 1}}
+        fora = vr.linha_do_time(ev, est, 2)
+        self.assertEqual((fora["gf"], fora["ga"]), (1, 2))
+        self.assertEqual((fora["xg_f"], fora["xg_a"]), (0.6, 1.8))
+        self.assertEqual((fora["cart_f"], fora["cart_a"]), (4, 2))
+        self.assertEqual((fora["esc_f"], fora["esc_a"]), (2.0, 7.0))
+
+    def test_frequencia(self):
+        xh = self.amostra([(2, 1), (0, 0), (3, 2)])   # mandante em casa
+        xa = self.amostra([(1, 1), (0, 2), (2, 0)])   # visitante fora (gf = do visitante)
+        under = {"mercado": "Match goals", "linha": "3.5", "escolha": "Under"}
+        self.assertAlmostEqual(vr.frequencia(under, xh, xa), 5 / 6)
+        um_x = {"mercado": "Double chance", "linha": None, "escolha": "1X"}
+        # casa: V, E, V | visitante fora: E, D (vitória do mandante), V (do visitante)
+        self.assertAlmostEqual(vr.frequencia(um_x, xh, xa), 5 / 6)
+        ambas = {"mercado": "Both teams to score", "linha": None, "escolha": "Yes"}
+        self.assertAlmostEqual(vr.frequencia(ambas, xh, xa), 3 / 6)
+
+    def test_ajuste_empate(self):
+        item = {"mercado": "Double chance", "escolha": "12", "p": 0.79, "dev": 0.0}
+        self.assertAlmostEqual(vr.ajuste_empate(item, 0.21, 0.30)[0], 0.70)
+        um = {"mercado": "Full time", "escolha": "1", "p": 0.50, "dev": 0.0}
+        self.assertAlmostEqual(vr.ajuste_empate(um, 0.20, 0.28)[0], 0.50 * 0.72 / 0.80)
+        self.assertEqual(vr.ajuste_empate(um, 0.30, 0.28), (0.50, 0.0))
+
+    def item(self, p, odd, justa, dev=0.0):
+        return {"mercado": "Match goals", "linha": "3.5", "escolha": "Under", "rotulo": "Menos de 3.5 gols",
+                "p": p, "dev": dev, "odd": odd, "ev": n.ev(p, odd, dev), "justa_mercado": justa,
+                "odd_justa": n.odd_justa(p, dev), "odd_minima": n.odd_minima(p, 0.03, dev)}
+
+    def test_filtro(self):
+        chave = ("Match goals", "3.5", "Under")
+        xs = self.amostra([(1, 1)] * 10)
+        bom = {k: {chave: self.item(0.65, 1.70, 0.58)} for k in
+               ("base", "incerteza", "dixon_coles", "sem_2_ultimos", "so_gols", "so_xg")}
+        cands, motivo = vr.filtrar(bom, xs, xs, self.V, 0.03)
+        self.assertEqual(len(cands), 1)
+        self.assertIsNone(motivo)
+        # uma variante derruba
+        fraco = {**bom, "so_xg": {chave: self.item(0.52, 1.70, 0.58)}}
+        self.assertEqual(vr.filtrar(fraco, xs, xs, self.V, 0.03)[0], [])
+        # regra 8: 18 p.p. acima do mercado
+        r8 = {k: {chave: self.item(0.72, 1.70, 0.54)} for k in bom}
+        cands, motivo = vr.filtrar(r8, xs, xs, self.V, 0.03)
+        self.assertEqual(cands, [])
+        self.assertTrue(motivo.startswith("regra 8"))
+        # frequência real baixa: 10 jogos com 4 gols
+        cheio = self.amostra([(2, 2)] * 10)
+        self.assertEqual(vr.filtrar(bom, cheio, cheio, self.V, 0.03)[0], [])
+        # linha curta demais
+        curta = {k: {chave: self.item(0.95, 1.10, 0.90)} for k in bom}
+        self.assertEqual(vr.filtrar(curta, xs, xs, self.V, 0.03)[0], [])
