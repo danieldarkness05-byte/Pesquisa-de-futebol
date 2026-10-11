@@ -169,3 +169,9 @@ Dados pesquisados até 10:25 (Brasília).
   - https://elintransigente.com/2026/10/san-lorenzo-arbitro-riestra/
 
 Dados pesquisados até 10:36 (Brasília).
+
+## Segunda opinião no Betis (workflow `aprofundar`, 11:00)
+
+- **Ajuste:** pesquisador −1 p.p. e cético −1.5 p.p. → **86.2%**. EV +3.4% a 1.20, com **odd mínima 1.20** (antes, 1.19).
+- **Cético (Sports Mole 11/10):** não refutou. Confirmou que o Osasuna está sem Herrando, Moro e Del Castillo, mas as fontes divergem sobre Oroz (Comuniate: fora; Sports Mole: volta).
+- **Veredito:** continua ⭐ OURO marginal. Só entre com odd Betano ≥ 1.20, depois da escalação oficial.
