@@ -49,7 +49,7 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
 
 ## Fluxo diário (economia de esforço)
 
-1. **`/ouro`** (rotina diária às 06:52): peneira (script) → dossiê (script) → workflow
+1. **`/ouro`** (rotina diária às 06:52 e às 17:52, só jogos que ainda não começaram): peneira (script) → dossiê (script) → workflow
    `.claude/workflows/aprofundar.js` só nos N melhores candidatos **vivos** → veredito pelas
    ferramentas → notifica só com OURO. Agentes só dentro do workflow: 1 pesquisador + 1 cético por
    candidato, no modelo de `config.json → aprofundar` (`max_candidatos: 0` desliga).
