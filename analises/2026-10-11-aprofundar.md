@@ -198,3 +198,17 @@ Dados pesquisados até 10:36 (Brasília).
 - A divergência com o mercado foi explicada, e a explicação vai contra o pick.
 
 Dados pesquisados até 12:20 (Brasília).
+
+---
+
+# Reavaliação das 19:27 (11 jogos restantes) · nenhuma oportunidade de ouro
+
+- **Peneira:** 0 candidatos (4 não robustos, 4 pela regra 8, 3 sem valor).
+- **Regra 8 investigada** (o que o mercado sabe):
+  - **Bolívar x Blooming (20:30):** os unders e o +3 do Blooming foram descartados. O mercado paga 1.06 no Bolívar e põe a linha de −3, ou seja, espera goleada. O Bolívar vem com o time titular, joga na altitude e briga pelo título. Nos 5 últimos jogos de liga ele teve média de 4,8 gols por partida, e o modelo, encolhido para a média da liga, subestima isso.
+  - **Atlético San Luis x Santos Laguna (20:00), menos de 5.5 cartões:** descartado pela **chuva** (regra 3). Em San Luis Potosí há 78% de chance de chuva no dia. Pela manhã tinha dado "seco" porque o Sofascore põe o estádio no Missouri (EUA).
+  - Os dados de cartões da Liga MX no Sofascore também estão incompletos: América x Santos aparece com 1 cartão na estatística e 3 nos lances, e vários jogos têm só 1 cartão.
+  - **Boyacá x Cúcuta e Pumas x Cruz Azul:** descartados pela chuva.
+- **Correção na peneira:** as coordenadas do estádio só valem se ficarem a até 100 km da cidade; caso contrário, vale a cidade.
+
+Dados pesquisados até 19:40 (Brasília).

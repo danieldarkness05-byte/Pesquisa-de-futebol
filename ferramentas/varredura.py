@@ -697,18 +697,38 @@ def filtrar(variantes: dict[str, dict], xh: list[dict], xa: list[dict], v: dict,
 # Chuva (só para quem passou na peneira)
 # ---------------------------------------------------------------------------
 
+def distancia_km(a: tuple[float, float], b: tuple[float, float]) -> float:
+    la1, lo1, la2, lo2 = map(math.radians, (*a, *b))
+    h = math.sin((la2 - la1) / 2) ** 2 + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2
+    return 2 * 6371 * math.asin(math.sqrt(h))
+
+
+def localizar(loc: dict, geocodificar) -> tuple[float, float] | None:
+    """Coordenadas para a previsão. O Sofascore às vezes traz coordenadas erradas
+    (ex.: estádio de San Luis Potosí no Missouri, lat/lon trocadas em Linz):
+    com a cidade conhecida, só usa as coordenadas do estádio se estiverem a até
+    100 km dela; senão usa a cidade."""
+    c = loc.get("coord") or {}
+    coord = ((c["latitude"], c["longitude"]) if "latitude" in c and abs(c["latitude"]) <= 90
+             and abs(c["longitude"]) <= 180 else None)
+    if loc.get("cidade"):
+        try:
+            g = geocodificar(loc["cidade"], loc.get("pais") or "BR")
+            cidade = (g["lat"], g["lon"])
+        except Exception:
+            return coord
+        return coord if coord and distancia_km(coord, cidade) <= 100 else cidade
+    return coord
+
+
 def checar_chuva(info: dict, data: str, cfg: dict) -> dict:
     import clima
     loc = info.get("local") or {}
-    c = loc.get("coord") or {}
     try:
-        if "latitude" in c and abs(c["latitude"]) <= 90 and abs(c["longitude"]) <= 180:
-            lat, lon = c["latitude"], c["longitude"]
-        elif loc.get("cidade"):
-            g = clima.geocodificar(loc["cidade"], loc.get("pais") or "BR")
-            lat, lon = g["lat"], g["lon"]
-        else:
+        lat_lon = localizar(loc, clima.geocodificar)
+        if not lat_lon:
             return {"status": "não verificada", "detalhe": "estádio sem localização"}
+        lat, lon = lat_lon
         for tentativa in range(3):
             try:
                 prev = clima.buscar_previsao(lat, lon, data)

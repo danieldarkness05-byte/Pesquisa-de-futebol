@@ -298,3 +298,12 @@ class TestVarredura(unittest.TestCase):
         # linha curta demais
         curta = {k: {chave: self.item(0.95, 1.10, 0.90)} for k in bom}
         self.assertEqual(vr.filtrar(curta, xs, xs, self.V, 0.03)[0], [])
+
+    def test_localizar_descarta_coordenada_errada(self):
+        geo = lambda cidade, pais: {"lat": 22.15, "lon": -100.98}   # San Luis Potosí
+        errada = {"cidade": "San Luis de Potosi", "pais": "MX", "coord": {"latitude": 37.93, "longitude": -90.78}}
+        self.assertEqual(vr.localizar(errada, geo), (22.15, -100.98))
+        certa = {"cidade": "San Luis de Potosi", "pais": "MX", "coord": {"latitude": 22.16, "longitude": -100.97}}
+        self.assertEqual(vr.localizar(certa, geo), (22.16, -100.97))
+        self.assertEqual(vr.localizar({"coord": {"latitude": 1.0, "longitude": 2.0}}, geo), (1.0, 2.0))
+        self.assertIsNone(vr.localizar({}, geo))
