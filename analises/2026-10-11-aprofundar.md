@@ -175,3 +175,26 @@ Dados pesquisados até 10:36 (Brasília).
 - **Ajuste:** pesquisador −1 p.p. e cético −1.5 p.p. → **86.2%**. EV +3.4% a 1.20, com **odd mínima 1.20** (antes, 1.19).
 - **Cético (Sports Mole 11/10):** não refutou. Confirmou que o Osasuna está sem Herrando, Moro e Del Castillo, mas as fontes divergem sobre Oroz (Comuniate: fora; Sports Mole: volta).
 - **Veredito:** continua ⭐ OURO marginal. Só entre com odd Betano ≥ 1.20, depois da escalação oficial.
+
+---
+
+# Reavaliação das 12:11 (peneira com o calendário corrigido: 70 jogos ainda por começar)
+
+- **Bug corrigido:** a peneira listava jogos que já tinham começado, porque usava o calendário da manhã guardado no cache. Agora consulta na hora.
+- **Candidatos:** Betis −4.5 (já aprofundado acima, ⭐ OURO marginal, odd mín 1.20), San Lorenzo −8.5 escanteios (59,3%, fora) e um novo, Real Potosí x The Strongest 1X.
+
+## Real Potosí x The Strongest · Dupla chance 1X · DESCARTADO
+
+- **Jogo:** 16:00 (Brasília), Estádio Víctor Agustín Ugarte, Potosí (~4.000 m). Sem chuva (clima.py: 0%).
+- **Modelo:** 72,5% (variantes de 70% a 79%; sem xG suficiente na Bolívia). Frequência nas amostras: 12/20 = 60%.
+  - Real Potosí em casa: 5V 3E 2D. The Strongest fora: 6V 3E 1D.
+- **Mercado:** 1X a 1.50 e "2" a 2.45. Sem margem, 62,0%, então o modelo fica +10,5 p.p. acima (regra 8).
+- **Pesquisa (Diez, Erbol, RSSSF, 11/10):**
+  - The Strongest: 5 vitórias seguidas na liga, **elenco completo** (Erbol), 3º com 42 pts, a 3 da liderança, na briga pelo título. Técnico Zago desde agosto.
+  - Real Potosí: 5º com 32 pts, briga por Sul-Americana. Técnico Umaña desde setembro.
+  - Retrospecto: The Strongest 10V e 1E em 11 jogos; o Real Potosí nunca venceu.
+  - Nenhum desfalque relevante reportado. Nenhum dos dois tem Copa no meio da semana (as quartas são em 21/10).
+- **Ajuste: −5 p.p.** (teto). Motivos: forma e elenco completo do The Strongest, motivação de título, retrospecto 10-1-0 e frequência real de só 60%. Fica **67,5%**, EV +1,3% a 1.50, odd mínima 1.53 → **sem valor**.
+- A divergência com o mercado foi explicada, e a explicação vai contra o pick.
+
+Dados pesquisados até 12:20 (Brasília).
