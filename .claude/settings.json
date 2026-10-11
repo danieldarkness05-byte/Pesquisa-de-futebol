@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 ferramentas/*)",
+      "Bash(python3 -m unittest *)",
+      "WebSearch",
+      "WebFetch",
+      "Edit(analises/**)"
+    ]
+  }
+}

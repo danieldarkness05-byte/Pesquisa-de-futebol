@@ -1,0 +1,38 @@
+{
+  "_leia": "Parâmetros usados pelas ferramentas. Veja docs/metodologia.md para o que cada um faz.",
+  "criterios": {
+    "prob_minima": 0.60,
+    "ev_minimo": 0.03
+  },
+  "banca": {
+    "valor_banca": 0,
+    "kelly_fracao": 0.25,
+    "stake_max_pct": 0.02
+  },
+  "chuva": {
+    "janela": "dia",
+    "prob_limiar": 50,
+    "mm_limiar": 1.0,
+    "horas_antes": 1,
+    "horas_depois": 3
+  },
+  "modelos": {
+    "duracao_partida_min": 95,
+    "rho_dixon_coles": 0.0,
+    "peso_arbitro_cartoes": 0.5,
+    "dispersao_padrao": {
+      "escanteios": 1.0,
+      "cartoes": 1.0,
+      "chutes": 1.0
+    }
+  },
+  "competicoes": [
+    "Brasileirão Série A",
+    "Brasileirão Série B",
+    "Brasileirão Série C",
+    "Copa Libertadores",
+    "Copa do Nordeste",
+    "Amistosos internacionais"
+  ],
+  "casa_de_apostas": "Betano"
+}
