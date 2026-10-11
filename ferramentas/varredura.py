@@ -15,7 +15,11 @@ Exemplos:
   python3 ferramentas/varredura.py                    # hoje
   python3 ferramentas/varredura.py --data 2026-10-12
   python3 ferramentas/varredura.py --torneios 325,390  # só Série A e B
+  python3 ferramentas/varredura.py --curto            # resumo de celular (rotina diária)
+  python3 ferramentas/varredura.py --jogos 16421054    # reavalia só esses jogos (/aprofundar)
   python3 ferramentas/varredura.py --json > /tmp/peneira.json
+
+O resultado completo fica salvo em dados/cache/sofascore/peneira-AAAA-MM-DD.json.
 
 Odds: bet365 via Sofascore — NÃO são odds da Betano. Use a odd mínima de cada
 candidato para conferir no app.
@@ -749,12 +753,46 @@ def imprimir(res: dict) -> None:
           "Estimativas estatísticas: um pick de 60% perde 40% das vezes.")
 
 
+CURTO_MOTIVO = {MOTIVOS[0]: "sem valor", MOTIVOS[1]: "somem na incerteza", MOTIVOS[2]: "não robustos",
+                MOTIVOS[3]: "regra 8", MOTIVOS[4]: "frequência baixa", MOTIVOS[5]: "taxa-base contra",
+                "amostra curta": "amostra curta", "sem odds": "sem odds", "sem médias da liga": "sem liga"}
+
+
+def imprimir_curto(res: dict) -> None:
+    """Resumo para celular. A última linha (NOTIFICAR:) é o texto da notificação."""
+    c = res["contagem"]
+    dia = "/".join(reversed(res["data"].split("-")[1:]))
+    cands = res["candidatos"]
+    print(f"⚽ Peneira {dia} ({res['consultado']}) — {c['jogos']} jogos, {len(cands)} com valor")
+    for i, k in enumerate(cands, 1):
+        chuva = "" if k["chuva"] == "seco" else " · ⚠️ chuva não verificada"
+        print(f"{i}) {k['hora']} {k['jogo']} · {k['rotulo']} · {k['p']:.0%} · odd mín {n.fmt_odd(k['odd_minima'])}"
+              f" · bet365 {k['odd']:.2f} (EV {k['ev'] * 100:+.0f}%){chuva}")
+    fora = [f"{q} {CURTO_MOTIVO.get(m, m)}" for m, q in sorted(res["descartes"].items(), key=lambda x: -x[1])]
+    if res["chuva_excluidos"]:
+        fora.append(f"{len(res['chuva_excluidos'])} chuva")
+    if fora:
+        print("Fora: " + " · ".join(fora))
+    if res["falhas_rede"]:
+        print(f"⚠️ {res['falhas_rede']} consultas falharam — rode de novo.")
+    if cands:
+        print("Odds bet365, não Betano: entre só com odd ≥ mínima. Triagem — mande /aprofundar (todos ou os números).")
+        itens = [f"{k['hora']} {k['jogo'].split(' x ')[0]} {k['rotulo'].replace('Menos de ', '-').replace('Mais de ', '+')} mín {n.fmt_odd(k['odd_minima'])}"
+                 for k in cands[:4]]
+        msg = f"⚽ Peneira: {len(cands)} de valor — " + "; ".join(itens)
+        print("NOTIFICAR: " + (msg if len(msg) <= 190 else msg[:187] + "…"))
+    else:
+        print("Nenhum jogo de valor na peneira de hoje.")
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--data", help="AAAA-MM-DD (padrão: hoje, horário de Brasília)")
     p.add_argument("--torneios", help="IDs do Sofascore separados por vírgula (padrão: config.json)")
     p.add_argument("--sem-chuva", action="store_true", help="não consulta a previsão do tempo")
     p.add_argument("--sem-cache", action="store_true")
+    p.add_argument("--jogos", help="IDs de jogos do Sofascore (reavalia só esses, ignora a lista de torneios)")
+    p.add_argument("--curto", action="store_true", help="resumo de celular + linha NOTIFICAR")
     p.add_argument("--json", action="store_true")
     a = p.parse_args()
 
@@ -768,7 +806,11 @@ def main() -> None:
         sys.exit("Nenhum torneio configurado (config.json → varredura.torneios_sofascore).")
     api = Sofascore(None if a.sem_cache else CACHE_PADRAO, data)
 
-    jogos = listar_jogos(api, data, torneios)
+    if a.jogos:
+        jogos = [ev for ev in (api.get(f"event/{x.strip()}", cache=None).get("event")
+                               for x in a.jogos.split(",") if x.strip()) if ev and ev["status"]["type"] == "notstarted"]
+    else:
+        jogos = listar_jogos(api, data, torneios)
     cache_liga: dict = {}
     infos = em_paralelo(lambda e: analisar_jogo(api, e, cfg, cache_liga), jogos, 4)
 
@@ -795,8 +837,13 @@ def main() -> None:
         "candidatos": candidatos, "chuva_excluidos": excl_chuva, "descartes": descartes,
         "falhas_rede": api.falhas,
     }
+    if not a.jogos and not a.sem_cache:
+        CACHE_PADRAO.mkdir(parents=True, exist_ok=True)
+        (CACHE_PADRAO / f"peneira-{data}.json").write_text(json.dumps(res, ensure_ascii=False, default=str), encoding="utf-8")
     if a.json:
         print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+    elif a.curto:
+        imprimir_curto(res)
     else:
         imprimir(res)
 

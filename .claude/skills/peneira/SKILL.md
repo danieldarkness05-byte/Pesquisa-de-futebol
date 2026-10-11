@@ -7,24 +7,20 @@ allowed-tools: Bash(python3 ferramentas/*) PushNotification
 
 Peneira: **$ARGUMENTS** (vazio = hoje).
 
-O objetivo é gastar pouco: **não pesquise notícias, não chame subagentes, não use WebSearch.**
-Todo o trabalho pesado está no script.
+**Modo econômico.** O trabalho pesado está no script. Não pesquise notícias, não chame
+subagentes e não use WebSearch/WebFetch. Não leia arquivos do repositório além desta skill.
 
-1. Rode `python3 ferramentas/varredura.py` (hoje) ou `--data AAAA-MM-DD`. Para "amanhã", use a
-   data de amanhã em Brasília. Se pedir competições específicas, use `--torneios` com os IDs do
-   `config.json → varredura.torneios_sofascore`.
-   - Leva ~3 min sem cache. Se a saída avisar de falhas de rede, rode uma vez de novo: o cache
-     deixa a segunda rodada rápida.
-2. Responda **curto** (o Daniel lê no celular):
-   - Candidatos em tabela: hora · jogo · mercado · prob. · **odd mínima** (para a Betano) ·
-     odd e EV na bet365 · chuva.
-   - Descartes: uma linha por motivo, com a quantidade.
-   - Avise que as odds são da bet365, não da Betano.
-   - Diga que é **triagem**: para o veredito, ele manda `/aprofundar` (todos ou os números escolhidos).
-3. **Nenhum candidato** → "Nenhum jogo de valor na peneira de hoje." Não notifique e não force.
-4. **Com candidatos** → mande `PushNotification` (uma linha, < 200 caracteres), com os jogos e a odd
-   mínima. Exemplo: "⚽ Peneira: 3 de valor — Betis x Osasuna -4.5 gols (mín 1.16), Cádiz x Gijón X2 (mín 1.58)… /aprofundar"
-5. Não grave arquivo nem faça commit: a peneira é triagem. O registro fica para o /aprofundar.
+1. Rode `python3 ferramentas/varredura.py --curto`. Para outra data, use `--data AAAA-MM-DD`
+   ("amanhã" é a data de amanhã em Brasília). Para competições específicas, use `--torneios` com os
+   IDs de `config.json → varredura.torneios_sofascore`.
+   - Leva de 2 a 3 min. Se a saída avisar de falhas, rode **uma** vez de novo: o cache deixa a
+     segunda rodada rápida.
+2. **Repasse a saída como está**, sem a linha `NOTIFICAR:`. Ela já vem no formato de celular.
+   Não reescreva e não acrescente análise.
+3. Se houver a linha `NOTIFICAR: <texto>`, mande `PushNotification` com esse texto.
+   Sem candidatos, não notifique.
+4. Não grave arquivo nem faça commit. O script já salva o resultado em
+   `dados/cache/sofascore/peneira-AAAA-MM-DD.json`, que o /aprofundar reaproveita.
 
 Corte da peneira: `varredura.prob_triagem` (59%), um pouco abaixo do corte final
 (`criterios.prob_minima`, 60%), para não perder candidatos na borda. Detalhes em `docs/metodologia.md`.
