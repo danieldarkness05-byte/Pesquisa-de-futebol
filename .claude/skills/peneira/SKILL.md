@@ -10,7 +10,8 @@ Peneira: **$ARGUMENTS** (vazio = hoje).
 **Modo econômico.** O trabalho pesado está no script. Não pesquise notícias, não chame
 subagentes e não use WebSearch/WebFetch. Não leia arquivos do repositório além desta skill.
 
-1. Rode `python3 ferramentas/varredura.py --curto`. Para outra data, use `--data AAAA-MM-DD`
+1. Rode `python3 ferramentas/varredura.py --curto` em primeiro plano, com tempo limite de 10 min
+   (Bash `timeout: 600000`). Assim não vai para segundo plano nem gasta um turno extra. Para outra data, use `--data AAAA-MM-DD`
    ("amanhã" é a data de amanhã em Brasília). Para competições específicas, use `--torneios` com os
    IDs de `config.json → varredura.torneios_sofascore`.
    - Leva de 2 a 3 min. Se a saída avisar de falhas, rode **uma** vez de novo: o cache deixa a
