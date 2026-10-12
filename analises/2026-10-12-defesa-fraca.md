@@ -89,3 +89,12 @@
   - Polônia: Flashscore.pl, ekstraklasa.org.
   - Bolívia: Visión 360, La Patria, El Deber/Diez.
 - Open-Meteo (`clima.py`), apenas como informação.
+
+## Varredura em todas as ligas do Sofascore (18:40)
+
+- Restavam 40 jogos não iniciados, quase todos amadores ou NCAA. Destes, 9 tinham tabela casa/fora e amostra mínima.
+- Passaram de novo só **Novorizontino x Ponte Preta** e **Nacional x Recoleta**.
+- **Não encaixaram:**
+  - Bragantino x Cruzeiro, Botafogo-SP x Ceará e Capiatá x B. Aceval: defesa do azarão na média.
+  - Criciúma x América-MG: ataque do favorito fraco.
+  - Jamaica e Peru (Liga 2): 1–2 jogos por time na condição.
