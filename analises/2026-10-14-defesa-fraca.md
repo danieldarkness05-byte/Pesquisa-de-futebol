@@ -20,7 +20,7 @@
 
 | Jogo | Hora | Azarão sofre (condição) | Mercado | Prob. | Odd mínima |
 |---|---|---|---|---|---|
-| **Nashville SC x Sporting KC** (MLS) | 21:30 | SKC fora: 2,79/j (2º pior da MLS); últimos 10 fora 2,9/j, xG cedido 1,86 | **Nashville marca 2+ gols** | **~68%** | **1.51** |
+| **Nashville SC x Sporting KC** (MLS) | 21:30 | SKC fora: 2,79/j (2º pior da MLS); últimos 10 fora 2,9/j, xG cedido 1,86 | **Nashville marca 2+ gols** | **~68%** | **1.52** |
 
 ### Nashville SC x Sporting KC
 
@@ -42,8 +42,8 @@
   - O mercado implica ~79%: o modelo está abaixo, então a regra 8 está ok.
 - **Vitória do Nashville:** 62% pelo modelo conservador e ~77% pelo mercado. A 1.19, não tem valor
   (EV −26%).
-- **Valor:** a odd mínima é 1.51. Com o mercado em ~79%, a Betano provavelmente paga menos que isso.
-  **Só entra com odd ≥ 1.51.**
+- **Valor:** a odd mínima é 1.52. Com o mercado em ~79%, a Betano provavelmente paga menos que isso.
+  **Só entra com odd ≥ 1.52.**
 
 ## Não passaram
 
