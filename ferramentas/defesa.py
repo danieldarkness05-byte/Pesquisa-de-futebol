@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import statistics
 import sys
 import time
@@ -121,10 +122,12 @@ def eh_risco(gols_azarao_cond: float, rank_ataque: tuple[int, int] | None, d: di
     return False
 
 
-def nivel_base(textos: list[str], palavras: list[str]) -> bool:
-    """Liga amadora, universitária, de base, feminina ou time reserva."""
-    alvo = " ".join(t for t in textos if t)
-    return any(p.lower() in alvo.lower() for p in palavras) or " II" in alvo
+def nivel_base(textos: list[str], palavras: list[str], times: list[str] = ()) -> bool:
+    """Liga amadora, universitária, de base, feminina ou time reserva (" II"/" B"
+    no fim do NOME DO TIME; numeral na liga, como "NB II", não conta)."""
+    alvo = " ".join(t for t in list(textos) + list(times) if t).lower()
+    return (any(p.lower() in alvo for p in palavras)
+            or any(re.search(r"\s(II|B)$", t or "") for t in times))
 
 
 def frequencias(fav: list[dict], az: list[dict]) -> dict:
@@ -135,14 +138,26 @@ def frequencias(fav: list[dict], az: list[dict]) -> dict:
         a = [x["ga"] >= k for x in az]
         out[f"fav_{k}"] = sum(f) / len(f) if f else None
         out[f"az_{k}"] = sum(a) / len(a) if a else None
+    out["fav_vence"] = sum(x["gf"] > x["ga"] for x in fav) / len(fav) if fav else None
+    out["az_perde"] = sum(x["ga"] > x["gf"] for x in az) / len(az) if az else None
+    out["fav_nao_perde"] = sum(x["gf"] >= x["ga"] for x in fav) / len(fav) if fav else None
+    out["az_nao_vence"] = sum(x["ga"] >= x["gf"] for x in az) / len(az) if az else None
     out["mediana_ga_az"] = statistics.median([x["ga"] for x in az]) if az else None
     out["mediana_gf_fav"] = statistics.median([x["gf"] for x in fav]) if fav else None
     return out
 
 
-def freq_mercado(freq: dict, k: int) -> float | None:
-    """Frequência de referência do mercado 'favorito marca k+': média das duas pontas."""
-    vals = [x for x in (freq.get(f"fav_{k}"), freq.get(f"az_{k}")) if x is not None]
+FREQ_CHAVES = {"fav_marca_1": ("fav_1", "az_1"), "fav_marca_2": ("fav_2", "az_2"), "fav_marca_3": ("fav_3", "az_3"),
+               "fav_vence": ("fav_vence", "az_perde"), "fav_dc": ("fav_nao_perde", "az_nao_vence")}
+
+
+def freq_mercado(freq: dict, chave: str | int) -> float | None:
+    """Frequência de referência do mercado: média das duas pontas (favorito na
+    condição dele e azarão na condição dele). `chave` int = 'favorito marca k+'."""
+    if isinstance(chave, int):
+        chave = f"fav_marca_{chave}"
+    vals = [freq.get(k) for k in FREQ_CHAVES.get(chave, ())]
+    vals = [x for x in vals if x is not None]
     return sum(vals) / len(vals) if vals else None
 
 
@@ -163,46 +178,39 @@ def prob_conservadora(variantes: list[float], freq: float | None, tol: float) ->
     return p, False
 
 
-def odd_minima(p: float, ev_min: float) -> float:
-    return round((1 + ev_min) / p, 2) if p > 0 else float("inf")
+def odd_minima(p: float, ev_min: float) -> float | None:
+    return round((1 + ev_min) / p, 2) if p > 0 else None
 
 
-def lambdas_mercado(p1x2: list[float], p_over25: float | None, total_ref: float) -> tuple[float, float]:
-    """λ (mandante, visitante) que reproduzem o 1X2 sem margem e, se houver, o
-    over 2.5 sem margem (busca em grade, Poisson simples). Sem over, fixa o total
-    em `total_ref` (média da liga)."""
+def ajuste_empate_vitoria(p_vence: float, p_empate: float, empates_liga: float | None) -> float:
+    """A Poisson subestima empates: com a taxa real da liga maior, reescala a vitória."""
+    if empates_liga is None or empates_liga <= p_empate or p_empate >= 1:
+        return p_vence
+    return p_vence * (1 - empates_liga) / (1 - p_empate)
+
+
+def lambdas_mercado(p1x2: list[float], p_overs: dict[float, float] | None = None) -> tuple[float, float]:
+    """λ (mandante, visitante) que reproduzem o 1X2 sem margem e as linhas de gols
+    sem margem que houver (`p_overs` = {linha: P(over)}). Busca em grade 2D com
+    Poisson simples; o 1X2 sozinho já identifica os dois λ."""
+    linhas = sorted((p_overs or {}).items())
+
     def erro(lh, la):
         m = n.matriz_placar(lh, la, 0.0, 10)
         r = v.resultado(m)
         e = (r["1"] - p1x2[0]) ** 2 + (r["X"] - p1x2[1]) ** 2 + (r["2"] - p1x2[2]) ** 2
-        if p_over25 is not None:
-            e += (v.total_gols(m, 2.5, "over")[0] - p_over25) ** 2
+        for linha, po in linhas:
+            e += (v.total_gols(m, linha, "over")[0] - po) ** 2
         return e
 
-    melhor = None
     passos = [x / 10 for x in range(1, 51)]
-    if p_over25 is None:
-        cand = [(lh, total_ref - lh) for lh in passos if 0.1 <= total_ref - lh]
-    else:
-        cand = [(lh, la) for lh in passos for la in passos]
-    for lh, la in cand:
-        e = erro(lh, la)
-        if melhor is None or e < melhor[0]:
-            melhor = (e, lh, la)
-    _, lh, la = melhor
-    # refinamento fino ao redor do melhor ponto
-    for _ in range(2):
-        passo = 0.02
-        viz = [(lh + a * passo, la + b * passo) for a in range(-5, 6) for b in range(-5, 6)
-               if lh + a * passo > 0.05 and la + b * passo > 0.05]
-        if p_over25 is None:
-            viz = [(x, total_ref - x) for x, _ in viz if total_ref - x > 0.05]
-        for x, y in viz:
-            e = erro(x, y)
-            if e < melhor[0]:
-                melhor = (e, x, y)
+    melhor = min((erro(lh, la), lh, la) for lh in passos for la in passos)
+    for passo in (0.02, 0.005):  # refinamento ao redor do melhor ponto
         _, lh, la = melhor
-    return round(lh, 3), round(la, 3)
+        viz = [(lh + a * passo, la + b * passo) for a in range(-6, 7) for b in range(-6, 7)
+               if lh + a * passo > 0.02 and la + b * passo > 0.02]
+        melhor = min([melhor] + [(erro(x, y), x, y) for x, y in viz])
+    return round(melhor[1], 3), round(melhor[2], 3)
 
 
 def tendencia(xs: list[dict], chave: str, ultimos: int = 5) -> tuple[float | None, float | None]:
@@ -222,8 +230,8 @@ def calendario(eventos_passados: list[dict], eventos_futuros: list[dict], inicio
     """Jogos do favorito na janela de `dias` em volta deste (antes e depois)."""
     janela = dias * 86400
     antes = [e for e in eventos_passados
-             if e.get("status", {}).get("type") == "finished" and 0 < inicio_ts - e["startTimestamp"] <= janela]
-    depois = [e for e in eventos_futuros if 0 < e["startTimestamp"] - inicio_ts <= janela]
+             if e.get("status", {}).get("type") == "finished" and 0 < inicio_ts - e["startTimestamp"] < janela]
+    depois = [e for e in eventos_futuros if 0 < e["startTimestamp"] - inicio_ts < janela]
     ult = max((e["startTimestamp"] for e in eventos_passados
                if e.get("status", {}).get("type") == "finished" and e["startTimestamp"] < inicio_ts), default=None)
     prox = min((e["startTimestamp"] for e in eventos_futuros if e["startTimestamp"] > inicio_ts), default=None)
@@ -262,8 +270,10 @@ def alertas_estatisticos(info: dict, d: dict) -> list[str]:
         al.append(f"favorito parado há {cal['dias_desde_ultimo']:.0f} dias: falta de ritmo")
     if az.get("expulsoes", 0) >= d["expulsoes_alerta"]:
         al.append(f"azarão teve expulsão em {az['expulsoes']} dos jogos da amostra (gols sofridos inflados)")
-    if info.get("regra8"):
-        al.append(info["regra8"])
+    for r8 in info.get("regra8_mercados") or []:
+        al.append(r8)
+    if info.get("motivo"):
+        al.append(info["motivo"])
     if not info.get("odds"):
         al.append("sem odds no Sofascore (favorito pela tabela)")
     return al
@@ -298,11 +308,26 @@ def listar(api: v.Sofascore, data: str, torneios: set[int] | None) -> list[dict]
     return sorted(vistos.values(), key=lambda e: e["startTimestamp"])
 
 
-def tabela(api: v.Sofascore, ut: int, s: int, tipo: str) -> dict[int, dict]:
-    rows = {}
-    for g in api.get(f"unique-tournament/{ut}/season/{s}/standings/{tipo}").get("standings", []):
-        for r in g.get("rows", []):
-            rows[r["team"]["id"]] = r
+def grupos_tabela(api: v.Sofascore, ut: int, s: int, tipo: str) -> list[dict]:
+    """[{nome, rows: {time: linha}}] — uma liga pode ter vários grupos ou fases."""
+    return [{"nome": g.get("name"), "rows": {r["team"]["id"]: r for r in g.get("rows", [])}}
+            for g in api.get(f"unique-tournament/{ut}/season/{s}/standings/{tipo}").get("standings", [])]
+
+
+def escolher_grupo(grupos: list[dict], times: tuple[int, int], nome_torneio: str | None = None) -> dict[int, dict]:
+    """Linhas do grupo em que os DOIS times do jogo já jogaram (no empate, o de nome
+    igual ao do torneio ou o de mais jogos). Sem grupo comum: junta ficando com a
+    linha de mais jogos de cada time — nunca a do último grupo listado."""
+    comuns = [g for g in grupos if all(g["rows"].get(t, {}).get("matches", 0) > 0 for t in times)]
+    if comuns:
+        def chave(g):
+            return (g["nome"] == nome_torneio, sum(r.get("matches", 0) for r in g["rows"].values()))
+        return max(comuns, key=chave)["rows"]
+    rows: dict[int, dict] = {}
+    for g in grupos:
+        for t, r in g["rows"].items():
+            if t not in rows or r.get("matches", 0) > rows[t].get("matches", 0):
+                rows[t] = r
     return rows
 
 
@@ -351,14 +376,21 @@ def amostra(api: v.Sofascore, eventos: list[dict], tid: int, ut: int, em_casa: b
     return out
 
 
+def expulsao_relevante(i: dict, casa: bool, minuto_max: int = 80) -> bool:
+    """Vermelho (direto ou 2º amarelo) de JOGADOR do time, não anulado, até `minuto_max`
+    (expulsão nos acréscimos não infla os gols sofridos; técnico não conta)."""
+    return (i.get("incidentType") == "card" and i.get("incidentClass") in ("red", "yellowRed")
+            and i.get("isHome") == casa and not i.get("rescinded") and "manager" not in i
+            and (i.get("player") is not None or "playerName" in i) and (i.get("time") or 0) <= minuto_max)
+
+
 def expulsoes(api: v.Sofascore, xs: list[dict], tid_casa: dict[int, bool]) -> int:
-    """Jogos da amostra em que o time levou cartão vermelho (direto ou 2º amarelo)."""
+    """Jogos da amostra em que o time teve jogador expulso até os 80'."""
     tot = 0
     for x in xs:
         inc = api.get(f"event/{x['id']}/incidents", cache="fixo").get("incidents", [])
         casa = tid_casa[x["id"]]
-        if any(i.get("incidentType") == "card" and i.get("incidentClass") in ("red", "yellowRed")
-               and i.get("isHome") == casa for i in inc):
+        if any(expulsao_relevante(i, casa) for i in inc):
             tot += 1
     return tot
 
@@ -385,9 +417,10 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
         motivos["sem torneio/temporada"] += 1
         return None
     if (ut, s) not in cache:
-        cache[(ut, s)] = tuple(tabela(api, ut, s, t) for t in ("home", "away", "total"))
-    th, ta, tt = cache[(ut, s)]
+        cache[(ut, s)] = tuple(grupos_tabela(api, ut, s, t) for t in ("home", "away", "total"))
     h, a = e["homeTeam"]["id"], e["awayTeam"]["id"]
+    nome_t = e["tournament"].get("name")
+    th, ta, tt = (escolher_grupo(g, (h, a), nome_t) for g in cache[(ut, s)])
     if not th or not ta or h not in th or a not in ta:
         motivos["sem tabela casa/fora (copa, amistoso, seleção)"] += 1
         return None
@@ -397,6 +430,8 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
         return None
     lh = sum(r["scoresFor"] for r in th.values()) / jogos
     la = sum(r["scoresAgainst"] for r in th.values()) / jogos
+    tot_j = sum(r.get("matches", 0) for r in tt.values())
+    empates = (sum(r.get("draws", 0) for r in tt.values()) / tot_j) if tot_j else None
     odds = odds_evento(api, e["id"])
     ppg = lambda t: (tt[t]["points"] / tt[t]["matches"]) if tt.get(t, {}).get("matches") else None  # noqa: E731
     fav_casa, crit = escolher_favorito(odds.get("1x2"), ppg(h), ppg(a), d["diferenca_ppg_sem_odds"])
@@ -427,7 +462,8 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
         "casa": casa, "fora": fora, "ids": {"casa": h, "fora": a},
         "fav_casa": fav_casa, "favorito": casa if fav_casa else fora, "azarao": fora if fav_casa else casa,
         "favorito_por": crit, "odds": odds.get("1x2"), "odds_ini": odds.get("1x2_ini"), "mercado_odds": odds,
-        "liga": {"casa": round(lh, 3), "fora": round(la, 3)},
+        "liga": {"casa": round(lh, 3), "fora": round(la, 3),
+                 "empates": round(empates, 3) if empates is not None else None},
         "tabela": {"casa": {k: rh[k] for k in ("matches", "scoresFor", "scoresAgainst")},
                    "fora": {k: ra[k] for k in ("matches", "scoresFor", "scoresAgainst")}},
         "az_ga": round(az_ga, 2), "az_gf": round(az_gf, 2), "fav_gf": round(fav_gf, 2),
@@ -436,7 +472,7 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
         "rank_ataque_az": rank_az,
         "risco": eh_risco(az_gf, rank_az, d),
         "amostra_pequena": min(fv["matches"], az["matches"]) < d["amostra_boa"],
-        "nivel_base": nivel_base([cat, e["tournament"].get("name"), casa, fora], d["palavras_base"]),
+        "nivel_base": nivel_base([cat, e["tournament"].get("name")], d["palavras_base"], [casa, fora]),
     }
     info["pontuacao"] = pontuacao(info, d)
     return info
@@ -448,6 +484,7 @@ def matriz_e_probs(lh: float, la: float, fav_casa: bool, rho: float, sigma: floa
     out = {f"fav_marca_{k}": prob_time_marca(m, fav_casa, k) for k in (1, 2, 3)}
     out["fav_vence"] = r["1"] if fav_casa else r["2"]
     out["fav_dc"] = r["1X"] if fav_casa else r["X2"]
+    out["empate"] = r["X"]
     out["over_1.5"] = v.total_gols(m, 1.5, "over")[0]
     out["over_2.5"] = v.total_gols(m, 2.5, "over")[0]
     return out
@@ -486,40 +523,36 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d: dict, data: str, chuv
                 variantes[modo] = (lam, matriz_e_probs(*lam, fav_casa, rho, sig))
     info["lambdas"] = {k: [round(x, 2) for x in lam] for k, (lam, _) in variantes.items()}
 
-    # mercado (regra 8)
+    # mercado: λ implícito do 1X2 + linhas de gols (regra 8); vitória/DC direto do 1X2/DC sem margem
     mo = info["mercado_odds"]
     p_merc = None
     if mo.get("1x2"):
         inv = [1 / x for x in mo["1x2"]]
         p1x2 = [x / sum(inv) for x in inv]
-        ov = mo["over"].get(2.5)
-        p_ov = (1 / ov[0]) / (1 / ov[0] + 1 / ov[1]) if ov else None
-        lm = lambdas_mercado(p1x2, p_ov, lg["casa"] + lg["fora"])
+        p_ov = {float(lin): (1 / o) / (1 / o + 1 / u) for lin, (o, u) in mo["over"].items()}
+        lm = lambdas_mercado(p1x2, p_ov)
         p_merc = matriz_e_probs(*lm, fav_casa, 0.0, 0.0)
+        p_merc["fav_vence"] = p1x2[0 if fav_casa else 2]
+        p_merc["fav_dc"] = p1x2[0 if fav_casa else 2] + p1x2[1]
         info["lambdas"]["mercado"] = list(lm)
 
-    # mercados do favorito
+    # mercados do favorito (todos com o teto da frequência real)
     ev_min = cfg["criterios"]["ev_minimo"]
+    empates_liga = lg.get("empates")
     mercados = []
-    for chave, rot, k in MERCADOS:
-        vals = [pr[chave] for _, pr in variantes.values()]
-        if not vals:
-            continue
-        fr = freq_mercado(info["frequencias"], k)
+    rotulos = {c: r for c, r, _ in MERCADOS}
+    rotulos.update({"fav_vence": "vitória do {fav}", "fav_dc": "dupla chance {fav}"})
+    for chave, rot in rotulos.items():
+        if not variantes:
+            break
+        vals = []
+        for _, pr in variantes.values():
+            val = pr[chave]
+            if chave == "fav_vence":   # a Poisson subestima empates
+                val = ajuste_empate_vitoria(val, pr["empate"], empates_liga)
+            vals.append(val)
+        fr = freq_mercado(info["frequencias"], chave)
         p, limitada = prob_conservadora(vals, fr, d["tolerancia_frequencia"])
-        item = {"chave": chave, "mercado": rot.format(fav=info["favorito"]), "prob": round(p, 3),
-                "variantes": {nome: round(pr[chave], 3) for nome, (_, pr) in variantes.items()},
-                "frequencia": round(fr, 3) if fr is not None else None, "limitada_pela_frequencia": limitada,
-                "odd_minima": odd_minima(p, ev_min), "odd_casa": None, "ev": None}
-        if p_merc:
-            item["prob_mercado"] = round(p_merc[chave], 3)
-        mercados.append(item)
-    # vitória e dupla chance com odd real
-    for chave, rot in (("fav_vence", "vitória do {fav}"), ("fav_dc", "dupla chance {fav}")):
-        vals = [pr[chave] for _, pr in variantes.values()]
-        if not vals:
-            continue
-        p = min(vals)
         odd = None
         if chave == "fav_vence" and mo.get("1x2"):
             odd = mo["1x2"][0 if fav_casa else 2]
@@ -527,30 +560,34 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d: dict, data: str, chuv
             odd = mo["dc"].get("1X" if fav_casa else "X2")
         item = {"chave": chave, "mercado": rot.format(fav=info["favorito"]), "prob": round(p, 3),
                 "variantes": {nome: round(pr[chave], 3) for nome, (_, pr) in variantes.items()},
+                "frequencia": round(fr, 3) if fr is not None else None, "limitada_pela_frequencia": limitada,
                 "odd_minima": odd_minima(p, ev_min), "odd_casa": odd,
-                "ev": round(p * odd - 1, 3) if odd else None}
+                "ev": round(p * odd - 1, 3) if odd else None, "prob_mercado": None, "regra8": False}
         if p_merc:
             item["prob_mercado"] = round(p_merc[chave], 3)
+            item["regra8"] = p - p_merc[chave] > d["regra8_pp"]
         mercados.append(item)
     info["mercados"] = mercados
 
     crit = cfg["criterios"]
-    passam = [x for x in mercados if x["prob"] >= crit["prob_minima"]
-              and (x["odd_casa"] is None or x["ev"] >= crit["ev_minimo"])]
+    passam = mercados_que_passam(info, crit["prob_minima"], crit["ev_minimo"])
     gol = [x for x in passam if x["chave"].startswith("fav_marca")]
     info["melhor_mercado"] = (max(gol, key=lambda x: x["chave"]) if gol else (passam[0] if passam else None))
-    mm = info["melhor_mercado"]
-    info["regra8"] = None
-    if mm and mm.get("prob_mercado") is not None and mm["prob"] - mm["prob_mercado"] > d["regra8_pp"]:
-        info["regra8"] = (f"regra 8: modelo {mm['prob']:.0%} x mercado {mm['prob_mercado']:.0%} "
-                          f"(+{(mm['prob'] - mm['prob_mercado']) * 100:.0f} p.p.) — procurar o que o mercado sabe")
+    info["regra8_mercados"] = [
+        f"regra 8 ({x['mercado'].replace(info['favorito'], 'fav')}): modelo {x['prob']:.0%} x mercado "
+        f"{x['prob_mercado']:.0%} (+{(x['prob'] - x['prob_mercado']) * 100:.0f} p.p.) — procurar o que o mercado sabe"
+        for x in passam if x.get("regra8")]
+    # dado faltando (regra 6): sem amostra de últimos jogos não há teto de frequência nem λ encolhido
+    info["motivo"] = None
+    if min(len(xf), len(xa)) < 3 or freq_mercado(info["frequencias"], 1) is None:
+        info["motivo"] = f"dado faltando: só {len(xf)}/{len(xa)} jogos recentes na condição"
     det = api.get(f"event/{eid}").get("event", {})
     venue = det.get("venue") or {}
     info["local"] = {"estadio": venue.get("name"), "cidade": (venue.get("city") or {}).get("name"),
                      "pais": (venue.get("country") or {}).get("alpha2"), "coord": venue.get("venueCoordinates")}
     info["chuva"] = v.checar_chuva(info, data, cfg) if chuva else {"status": "não consultada"}
     info["alertas"] = alertas_estatisticos(info, d)
-    info["passa"] = mm is not None
+    info["passa"] = info["melhor_mercado"] is not None and info["motivo"] is None
     return info
 
 
@@ -566,10 +603,10 @@ def mercados_que_passam(x: dict, prob_min: float, ev_min: float) -> list[dict]:
 def linha_curta(i: int, x: dict, prob_min: float = 0.6, ev_min: float = 0.03) -> str:
     if x.get("erro"):
         return f"{i}) {x['hora']} {x['jogo']} — erro ao aprofundar: {x['erro']}"
-    ms = mercados_que_passam(x, prob_min, ev_min)
-    merc = (" · ".join(f"{m['mercado'].replace(x['favorito'], 'fav')} {m['prob']:.0%} (mín {m['odd_minima']:.2f}"
+    ms = mercados_que_passam(x, prob_min, ev_min) if x.get("passa") else []
+    merc = (" · ".join(f"{m['mercado'].replace(x['favorito'], 'fav')} {m['prob']:.0%} (mín {m['odd_minima'] or 0:.2f}"
                        + (f", bet365 {m['odd_casa']:.2f} EV {m['ev']:+.0%}" if m.get("odd_casa") else "") + ")"
-                       for m in ms) if ms else "nenhum mercado ≥ 60%")
+                       for m in ms) if ms else (x.get("motivo") or "nenhum mercado ≥ 60%"))
     az = x["azarao_amostra"]
     return (f"{i}) {x['hora']} {x['jogo']} [{x['pais']} · {x['competicao']}]\n"
             f"   azarão {x['azarao']} sofre {x['az_ga']:.2f}/j (×{x['ind_def']}; últimos {az['n']}: {az['ga']}, "
@@ -597,21 +634,24 @@ def main() -> None:
     if a.ids:
         jogos = [api.get(f"event/{i}", cache=None).get("event") for i in a.ids.split(",")]
         jogos = [e for e in jogos if e]
+        if not a.data and jogos:  # sem --data, o rótulo e o arquivo seguem a data do jogo
+            data = v.hora_br(jogos[0]["startTimestamp"]).date().isoformat()
     else:
         tc = cfg.get("varredura", {}).get("torneios_sofascore", {})
         torneios = {int(k) for k in tc} if (a.config or not d["todas_as_ligas"]) else None
         jogos = listar(api, data, torneios)
     total = len(jogos)
 
+    # --ids: sem corte da triagem (aprofunda o que foi pedido), mas o resto usa o d original
+    d_triagem = dict(d, indice_defesa_min=0, indice_ataque_min=0, amostra_minima_tabela=1) if a.ids else d
+
     def seguro_triar(e):
         try:
-            return triar(api, e, d, motivos, cache)
+            return triar(api, e, d_triagem, motivos, cache)
         except Exception as exc:  # um jogo com dado quebrado não derruba a varredura
             motivos[f"erro {type(exc).__name__}"] += 1
             return None
 
-    if a.ids:  # sem corte da triagem: aprofunda o que foi pedido
-        d = dict(d, indice_defesa_min=0, indice_ataque_min=0, amostra_minima_tabela=1)
     triados = [x for x in v.em_paralelo(seguro_triar, jogos, 6) if x]
     # profissional e com amostra boa primeiro: amador/base com índice enorme não toma a vaga
     triados.sort(key=lambda x: (x["nivel_base"], x["amostra_pequena"], -x["pontuacao"]))
@@ -619,15 +659,21 @@ def main() -> None:
 
     def seguro_aprof(x):
         try:
-            return aprofundar(api, x, cfg, d, data, chuva=not a.sem_chuva)
+            dia = v.hora_br(x["inicio"]).date().isoformat()   # no --ids o jogo pode ser de outro dia
+            return aprofundar(api, x, cfg, d, dia, chuva=not a.sem_chuva)
         except Exception as exc:
             x["erro"] = f"{type(exc).__name__}: {exc}"[:200]
             x["passa"] = False
             return x
 
     res = v.em_paralelo(seguro_aprof, alvo, 4)
-    res.sort(key=lambda x: (not x.get("passa"), x.get("risco", False), x.get("nivel_base", False),
-                            -((x.get("melhor_mercado") or {}).get("prob") or 0), -x["pontuacao"]))
+    # ordem comparável entre jogos: prob. de "favorito marca 1+" e quantos mercados passam
+    def p_marca1(x):
+        return next((m["prob"] for m in x.get("mercados", []) if m["chave"] == "fav_marca_1"), 0)
+
+    crit = cfg["criterios"]
+    res.sort(key=lambda x: (not x.get("passa"), x.get("risco", False), x.get("nivel_base", False), -p_marca1(x),
+                            -len(mercados_que_passam(x, crit["prob_minima"], crit["ev_minimo"])), -x["pontuacao"]))
     for i, x in enumerate(res, 1):
         x["n"] = i
     saida = {"data": data, "gerado": datetime.now(v.FUSO_BR).strftime("%Y-%m-%d %H:%M"),
@@ -636,11 +682,12 @@ def main() -> None:
              "fora_do_corte": [{"jogo": x["jogo"], "hora": x["hora"], "pontuacao": x["pontuacao"]}
                                for x in triados[len(alvo):]],
              "falhas_rede": api.falhas}
-    arq = v.CACHE_PADRAO / f"defesa-{data}.json"
+    arq = v.CACHE_PADRAO / (f"defesa-{data}-ids.json" if a.ids else f"defesa-{data}.json")
     arq.parent.mkdir(parents=True, exist_ok=True)
-    arq.write_text(json.dumps(saida, ensure_ascii=False, indent=1), encoding="utf-8")
+    texto = json.dumps(saida, ensure_ascii=False, indent=1, allow_nan=False)
+    arq.write_text(texto, encoding="utf-8")
     if a.json:
-        print(json.dumps(saida, ensure_ascii=False, indent=1))
+        print(texto)
         return
     passam = [x for x in res if x.get("passa")]
     print(f"Defesa fraca x ataque forte — {data} ({'ligas do config' if a.config else 'todas as ligas'})")

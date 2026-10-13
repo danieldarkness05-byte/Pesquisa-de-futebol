@@ -69,6 +69,34 @@ def avaliar(mercado: str, lado: str, gols_casa: int, gols_fora: int) -> bool | N
     return None
 
 
+LADOS = {"casa": "casa", "fora": "fora", "home": "casa", "away": "fora", "mandante": "casa", "visitante": "fora"}
+
+
+def normalizar(novo: dict) -> dict:
+    """Valida e padroniza um pick (lado, listas, prob, mercado). Levanta ValueError."""
+    nv = {k: val for k, val in novo.items() if k in CAMPOS and val is not None}
+    for k, val in list(nv.items()):
+        if isinstance(val, (list, tuple)):
+            nv[k] = "; ".join(str(x) for x in val)
+    nv["analise"] = str(nv.get("analise") or "defesa").strip()
+    lado = str(nv.get("lado") or "").strip().lower()
+    mercado = str(nv.get("mercado") or "").strip()
+    precisa_lado = not mercado.startswith(("over_", "under_"))
+    if precisa_lado and lado not in LADOS:
+        raise ValueError(f"lado deve ser casa ou fora (veio {nv.get('lado')!r}) no mercado {mercado}")
+    nv["lado"] = LADOS.get(lado, "casa")
+    nv["mercado"] = mercado
+    if avaliar(mercado, nv["lado"], 0, 0) is None:
+        raise ValueError(f"mercado desconhecido: {mercado}")
+    for k in ("data", "evento", "jogo", "prob"):
+        if not str(nv.get(k, "")).strip():
+            raise ValueError(f"falta o campo {k}")
+    prob = float(nv["prob"])
+    if not 0 < prob <= 1:
+        raise ValueError(f"prob deve estar entre 0 e 1 (veio {prob})")
+    return nv
+
+
 def adicionar(linhas: list[dict], novo: dict) -> dict:
     # mesmo evento + mercado + lado + análise = mesma previsão (atualiza em vez de duplicar)
     for x in linhas:
@@ -161,7 +189,8 @@ def main() -> None:
     ad = sub.add_parser("add")
     for campo in ("data", "hora", "evento", "jogo", "competicao", "nivel", "analise", "mercado", "lado",
                   "prob", "odd-minima", "odd-casa", "alertas", "obs"):
-        ad.add_argument(f"--{campo}", required=campo in ("data", "evento", "jogo", "mercado", "prob"))
+        ad.add_argument(f"--{campo}", required=campo in ("data", "evento", "jogo", "mercado", "prob"),
+                        **({"choices": sorted(LADOS)} if campo == "lado" else {}))
     aj = sub.add_parser("add-json")
     aj.add_argument("--arquivo", required=True)
     sub.add_parser("resolver")
@@ -177,18 +206,14 @@ def main() -> None:
     if a.cmd in ("add", "add-json"):
         novos = ([{k.replace("-", "_"): val for k, val in vars(a).items() if k not in ("cmd",)}]
                  if a.cmd == "add" else json.loads(Path(a.arquivo).read_text(encoding="utf-8")))
-        for nv in novos:
-            nv = {k: val for k, val in nv.items() if k in CAMPOS}
-            nv["analise"] = nv.get("analise") or "defesa"
-            nv["lado"] = nv.get("lado") or "casa"
-            prob = float(nv["prob"])
-            if not 0 < prob <= 1:
-                sys.exit(f"prob deve estar entre 0 e 1 (veio {prob})")
-            if avaliar(nv["mercado"], nv["lado"], 0, 0) is None:
-                sys.exit(f"mercado desconhecido: {nv['mercado']}")
-            x = adicionar(linhas, nv)
-            print(f"#{x['id']} {x['data']} {x['jogo']} — {x['mercado']} ({x['lado']}) {float(x['prob']):.0%}")
+        try:  # valida TUDO antes de gravar: ou entra a lista inteira, ou nada
+            validos = [normalizar(nv) for nv in novos]
+        except (ValueError, TypeError) as exc:
+            sys.exit(f"Nada foi gravado: {exc}")
+        feitos = [adicionar(linhas, nv) for nv in validos]
         salvar(linhas)
+        for x in feitos:
+            print(f"#{x['id']} {x['data']} {x['jogo']} — {x['mercado']} ({x['lado']}) {float(x['prob']):.0%}")
         return
     if a.cmd == "resolver":
         feitos = resolver(linhas, _buscar_sofascore())

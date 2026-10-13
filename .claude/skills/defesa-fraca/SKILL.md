@@ -31,20 +31,23 @@ Regras específicas desta análise (pedido dele em 12/10):
 
 Rode `python3 ferramentas/defesa.py --data <D> --curto` (Bash `timeout: 900000`). Com "amanhã", use `--data`.
 
-- Se avisar falhas de rede, rode **uma** vez de novo (o cache acelera).
-- Depois rode `python3 ferramentas/defesa.py --data <D> --json > <scratchpad>/defesa.json`.
-  O cache torna isso rápido; para não refazer a chuva, use `--sem-chuva` nessa segunda chamada.
+- Rode **uma vez só**. O resumo vai para a tela e o JSON completo é gravado em
+  `dados/cache/sofascore/defesa-<D>.json`. Esse é o arquivo que vai para o workflow.
+  Não rode de novo com `--json`: as odds e a lista mudam, e a numeração deixaria de bater.
+- Só rode de novo (uma vez) se o resumo avisar falhas de rede.
 - **Nenhum candidato com `passa`:** responda só "Nenhum jogo com defesa fraca x ataque forte hoje."
   Salve o arquivo do passo 5 com a triagem e pare.
 
 ## 2. Pesquisa (workflow, os créditos vão aqui)
 
-Chame `Workflow({scriptPath: ".claude/workflows/defesa.js", args: <objeto do defesa.json>})`.
+Leia `dados/cache/sofascore/defesa-<D>.json` e chame
+`Workflow({scriptPath: ".claude/workflows/defesa.js", args: <objeto desse JSON>})`.
 
 - `args` vai como objeto JSON, não como string.
 - Ele pega os `defesa.max_pesquisa` melhores com `passa` e sem RISCO. Para escolher outros, passe `args.ids`.
 - Espere a notificação; não pesquise em paralelo.
-- Se agentes falharem por limite de uso, retome depois com `resumeFromRunId` (os que terminaram ficam em cache).
+- Resultado com `status` diferente de `ok` (pesquisa ou cético falhou): o jogo **não** entra sem pesquisa.
+  Retome com `resumeFromRunId` (os que terminaram ficam em cache) ou diga que ficou sem pesquisa.
 
 ## 3. Veredito (ferramentas, não palpite)
 
@@ -61,8 +64,10 @@ Para cada resultado:
    - Se houver odd real (bet365 no JSON, ou a que o Daniel colar), rode
      `python3 ferramentas/valor.py --prob <p> --odd <odd>`.
 5. **⚠️ RISCO** (o azarão também ataca bem) não entra como pick. Pode aparecer como aviso.
-6. **Regra 8 no JSON** (modelo > mercado + 10 p.p.): só passa se o pesquisador explicou o que o mercado
-   sabe. Senão, desconte até 5 p.p. ou derrube.
+6. **Regra 8 do mercado final:** compare o `p` final com `mercados[chave].prob_mercado` do JSON. Para a
+   vitória e a dupla chance é o 1X2/DC sem margem; para os gols, o λ implícito do 1X2 e das linhas de gols.
+   - Se `p` passar do mercado em mais de 10 p.p., só entra se o pesquisador explicou o que o mercado sabe.
+   - Senão, desconte até 5 p.p. ou derrube.
 7. **Ordem:** profissional antes de amador, depois maior p, depois menos alertas.
 
 ## 4. Salvar, registrar e evoluir
@@ -77,8 +82,10 @@ Para cada resultado:
    numa lista com `data, hora, evento, jogo, competicao, nivel (pro|base), analise: "defesa", mercado,
    lado, prob, odd_minima, odd_casa, alertas`.
    - Mercados: `marca_1`, `marca_2`, `marca_3` (gols do favorito), `vence`, `dupla_chance`.
-   - `lado`: `casa` ou `fora`, o lado do favorito no Sofascore. Se o mando foi invertido, siga o Sofascore,
-     porque é ele que resolve o placar.
+   - `lado`: `casa` ou `fora`, **obrigatório**: é o lado do favorito no Sofascore (`fav_casa` no JSON).
+     Se o mando foi invertido, siga o Sofascore, porque é ele que resolve o placar.
+   - `alertas` pode ir como lista.
+   - O `add-json` valida tudo antes de gravar: ou entra a lista inteira, ou nada.
 3. **Lições:** cada `cetico.licao` não vazia e nova vira um item em `docs/licoes.md`, com data e jogo.
 4. Faça commit e push na branch atual, com mensagem em português.
 

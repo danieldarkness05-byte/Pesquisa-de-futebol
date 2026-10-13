@@ -120,7 +120,15 @@ Análise diária pedida pelo Daniel em 12/10. Procura jogos em que o **azarão s
      - λ encolhido gols+xG.
      Todos com Dixon-Coles ρ e incerteza σ.
    - Depois, é **limitada pela frequência real + `tolerancia_frequencia`**, porque o Poisson exagera
-     quando a média vem de goleadas.
+     quando a média vem de goleadas. Na vitória, a frequência é a de vitórias do favorito e de derrotas do
+     azarão.
+   - Na vitória, a Poisson subestima empates: com a taxa real de empates da liga maior que a do modelo,
+     a vitória é reescalada.
+   - Tabela com vários grupos ou fases: vale o grupo em que os dois times jogaram.
+   - Sem amostra recente (menos de 3 jogos na condição): o jogo não passa (regra 6).
+   - **Regra 8 por mercado:**
+     - nos gols, compara com o λ implícito do 1X2 e das linhas de gols da bet365;
+     - na vitória e na dupla chance, com o 1X2/DC sem margem.
 4. **Alertas automáticos** (lições de `docs/licoes.md`):
    - ⚠️ RISCO (o azarão também marca);
    - amostra pequena; liga amadora/base;

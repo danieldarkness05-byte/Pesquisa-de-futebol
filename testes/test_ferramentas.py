@@ -330,9 +330,10 @@ class TestDefesa(unittest.TestCase):
 
     def test_nivel_base(self):
         pal = self.D["palavras_base"]
-        self.assertTrue(df.nivel_base(["England Amateur", "Wessex League", "Bashley FC", "Christchurch FC"], pal))
-        self.assertTrue(df.nivel_base(["Germany", "Regionalliga", "TSV Buchbach", "FC Augsburg II"], pal))
-        self.assertFalse(df.nivel_base(["Sweden", "Superettan", "IFK Norrköping", "GIF Sundsvall"], pal))
+        self.assertTrue(df.nivel_base(["England Amateur", "Wessex League"], pal, ["Bashley FC", "Christchurch FC"]))
+        self.assertTrue(df.nivel_base(["Germany", "Regionalliga"], pal, ["TSV Buchbach", "FC Augsburg II"]))
+        self.assertFalse(df.nivel_base(["Sweden", "Superettan"], pal, ["IFK Norrköping", "GIF Sundsvall"]))
+        self.assertFalse(df.nivel_base(["Hungary", "NB II"], pal, ["Kazincbarcika", "Vasas"]))   # numeral da liga
 
     def test_frequencia_e_mediana(self):
         fav = [{"gf": g, "ga": 0} for g in (2, 2, 1, 3, 0)]
@@ -342,6 +343,7 @@ class TestDefesa(unittest.TestCase):
         self.assertAlmostEqual(fr["az_2"], 2 / 6)
         self.assertEqual(fr["mediana_ga_az"], 1)
         self.assertAlmostEqual(df.freq_mercado(fr, 2), (0.6 + 2 / 6) / 2)
+        self.assertAlmostEqual(df.freq_mercado(fr, "fav_vence"), (4 / 5 + 5 / 6) / 2)   # venceu 4 de 5; azarão perdeu 5 de 6
 
     def test_prob_conservadora_limita_pela_frequencia(self):
         self.assertEqual(df.prob_conservadora([0.80, 0.72, 0.76], None, 0.05), (0.72, False))
@@ -349,6 +351,9 @@ class TestDefesa(unittest.TestCase):
         self.assertTrue(lim)
         self.assertAlmostEqual(p, 0.60)
         self.assertAlmostEqual(df.odd_minima(0.75, 0.03), 1.37)
+        self.assertIsNone(df.odd_minima(0.0, 0.03))      # nada de Infinity no JSON
+        self.assertAlmostEqual(df.ajuste_empate_vitoria(0.70, 0.20, 0.28), 0.70 * 0.72 / 0.80)
+        self.assertEqual(df.ajuste_empate_vitoria(0.70, 0.30, 0.25), 0.70)
 
     def test_prob_time_marca_bate_com_poisson(self):
         m = n.matriz_placar(2.0, 0.8, 0.0, 12)
@@ -361,12 +366,12 @@ class TestDefesa(unittest.TestCase):
         m = n.matriz_placar(2.1, 0.7, 0.0, 10)
         r = vr.resultado(m)
         over = vr.total_gols(m, 2.5, "over")[0]
-        lh, la = df.lambdas_mercado([r["1"], r["X"], r["2"]], over, 2.8)
-        self.assertAlmostEqual(lh, 2.1, delta=0.05)
-        self.assertAlmostEqual(la, 0.7, delta=0.05)
-        lh2, la2 = df.lambdas_mercado([r["1"], r["X"], r["2"]], None, 2.8)   # sem over: total fixo
-        self.assertAlmostEqual(lh2 + la2, 2.8, delta=0.01)
-        self.assertGreater(lh2, la2)
+        lh, la = df.lambdas_mercado([r["1"], r["X"], r["2"]], {2.5: over})
+        self.assertAlmostEqual(lh, 2.1, delta=0.03)
+        self.assertAlmostEqual(la, 0.7, delta=0.03)
+        lh2, la2 = df.lambdas_mercado([r["1"], r["X"], r["2"]])   # só o 1X2 já identifica os dois λ
+        self.assertAlmostEqual(lh2, 2.1, delta=0.05)
+        self.assertAlmostEqual(la2, 0.7, delta=0.05)
 
     def test_calendario(self):
         dia = 86400
@@ -376,6 +381,9 @@ class TestDefesa(unittest.TestCase):
         futuros = [{"startTimestamp": t0 + 4 * dia}]
         c = df.calendario(passados, futuros, t0, 7)
         self.assertEqual(c["jogos_janela"], 3)
+        semanal = df.calendario([{"startTimestamp": t0 - 7 * dia, "status": {"type": "finished"}}],
+                                [{"startTimestamp": t0 + 7 * dia}], t0, 7)
+        self.assertEqual(semanal["jogos_janela"], 1)    # um jogo por semana não é calendário apertado
         self.assertEqual(c["dias_desde_ultimo"], 3.0)
         self.assertEqual(c["dias_ate_proximo"], 4.0)
 
@@ -385,10 +393,27 @@ class TestDefesa(unittest.TestCase):
                 "azarao_amostra": {"n": 10, "ga": 2.1, "xg_contra": 1.3, "ga_ultimos5": 1.2, "expulsoes": 3},
                 "favorito_amostra": {"n": 10, "gf": 2.4, "xg_pro": 1.6},
                 "frequencias": {"mediana_ga_az": 1},
-                "calendario_favorito": {"jogos_janela": 3, "dias_desde_ultimo": 2}}
+                "calendario_favorito": {"jogos_janela": 3, "dias_desde_ultimo": 2},
+                "regra8_mercados": ["regra 8 (fav vence): modelo 63% x mercado 52%"], "motivo": None}
         al = " | ".join(df.alertas_estatisticos(info, self.D))
-        for trecho in ("regressão provável", "acima do xG", "melhorando", "goleadas", "rodízio", "expulsão"):
+        for trecho in ("regressão provável", "acima do xG", "melhorando", "goleadas", "rodízio", "expulsão", "regra 8"):
             self.assertIn(trecho, al)
+
+    def test_escolher_grupo_da_fase_certa(self):
+        apertura = {"nome": "Torneo Final", "rows": {1: {"matches": 6}, 2: {"matches": 6}, 3: {"matches": 6}}}
+        copa = {"nome": "Qualifiers - Copa", "rows": {1: {"matches": 0}, 9: {"matches": 0}}}
+        self.assertIs(df.escolher_grupo([apertura, copa], (1, 2)), apertura["rows"])
+        junto = df.escolher_grupo([apertura, copa], (1, 9))    # sem grupo comum: linha de mais jogos
+        self.assertEqual(junto[1]["matches"], 6)
+
+    def test_expulsao_relevante(self):
+        jog = {"incidentType": "card", "incidentClass": "red", "isHome": True, "time": 30, "player": {"name": "X"}}
+        self.assertTrue(df.expulsao_relevante(jog, True))
+        self.assertFalse(df.expulsao_relevante(jog, False))                       # foi do outro time
+        self.assertFalse(df.expulsao_relevante(dict(jog, time=90), True))          # acréscimos
+        tec = {"incidentType": "card", "incidentClass": "red", "isHome": True, "time": 30, "manager": {"name": "T"}}
+        self.assertFalse(df.expulsao_relevante(tec, True))                        # técnico
+        self.assertFalse(df.expulsao_relevante(dict(jog, rescinded=True), True))
 
 
 class TestPrevisoes(unittest.TestCase):
@@ -425,3 +450,15 @@ class TestPrevisoes(unittest.TestCase):
             self.assertEqual((r["n"], r["acertos"], r["pendentes"]), (2, 1, 1))
             self.assertAlmostEqual(r["brier"], ((0.78 - 1) ** 2 + 0.84 ** 2) / 2)
             self.assertTrue(previsoes.avisos_calibracao(r))   # amostra pequena → aviso
+
+    def test_normalizar_valida_lado_e_listas(self):
+        base = {"data": "2026-10-13", "evento": 9, "jogo": "A x B", "mercado": "marca_1", "prob": 0.8}
+        self.assertEqual(previsoes.normalizar(dict(base, lado="Fora"))["lado"], "fora")
+        self.assertEqual(previsoes.normalizar(dict(base, lado="home"))["lado"], "casa")
+        with self.assertRaises(ValueError):
+            previsoes.normalizar(base)                         # sem lado num mercado do time
+        with self.assertRaises(ValueError):
+            previsoes.normalizar(dict(base, lado="casa", mercado="fav_dc"))
+        self.assertEqual(previsoes.normalizar(dict(base, mercado="over_2.5"))["lado"], "casa")   # total não precisa
+        self.assertEqual(previsoes.normalizar(dict(base, lado="casa", alertas=[]))["alertas"], "")
+        self.assertEqual(previsoes.normalizar(dict(base, lado="casa", alertas=["a", "b"]))["alertas"], "a; b")

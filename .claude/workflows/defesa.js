@@ -13,10 +13,15 @@ const D = args || {}
 const conf = D.defesa || {}
 const crit = D.criterios || { prob_minima: 0.6, ev_minimo: 0.03 }
 const modelo = conf.modelo_agentes || undefined
-const maxPesquisa = conf.max_pesquisa || 4
+const maxPesquisa = conf.max_pesquisa ?? 4
 const dia = D.data || ''
+if (maxPesquisa <= 0) { log('defesa.max_pesquisa = 0: pesquisa com agentes desligada'); return { resultados: [], agentes: 0 } }
 let alvo = (D.candidatos || []).filter(c => c.passa && !c.risco && !c.erro)
-if (Array.isArray(D.ids) && D.ids.length) alvo = (D.candidatos || []).filter(c => D.ids.includes(c.id) || D.ids.includes(c.n))
+const ids = (Array.isArray(D.ids) ? D.ids : String(D.ids || '').split(',')).map(Number).filter(Boolean)
+if (ids.length) {
+  alvo = (D.candidatos || []).filter(c => ids.includes(c.id) || ids.includes(c.n))
+  if (!alvo.length) { log(`Nenhum candidato com os ids/números ${ids.join(',')}`); return { resultados: [], agentes: 0, aviso: 'ids não encontrados' } }
+}
 const fora = alvo.slice(maxPesquisa)
 alvo = alvo.slice(0, maxPesquisa)
 if (fora.length) log(`Sem pesquisa (passou do teto de ${maxPesquisa}): ${fora.map(c => c.jogo).join(' | ')}`)
@@ -82,7 +87,7 @@ Pesquise A FUNDO, começando pelo Sofascore e depois imprensa local, site da lig
 4) Escalação (event/${c.id}/lineups) e o MANDO REAL do jogo (site da liga/clube).
 Nunca invente número: todo número com fonte e recorte. Sem dado → N/D.
 ${SOFA}`, { label: `pesq:${c.favorito}`, phase: 'Pesquisa', schema: PESQ, model: modelo }),
-  (p, c) => agent(`Você é o CÉTICO. Tente DERRUBAR a tese "${c.azarao} tem defesa extremamente fraca e ${c.favorito} tem ataque forte e deve marcar" no jogo ${c.jogo} (${c.pais} · ${c.competicao}), ${c.hora} de ${dia}, id Sofascore ${c.id}, ids ${JSON.stringify(c.ids)}.
+  (p, c) => !p ? { id: c.id, n: c.n, jogo: c.jogo, hora: c.hora, pesquisa: null, cetico: null, status: 'pesquisa falhou' } : agent(`Você é o CÉTICO. Tente DERRUBAR a tese "${c.azarao} tem defesa extremamente fraca e ${c.favorito} tem ataque forte e deve marcar" no jogo ${c.jogo} (${c.pais} · ${c.competicao}), ${c.hora} de ${dia}, id Sofascore ${c.id}, ids ${JSON.stringify(c.ids)}.
 ${LICOES}
 Dados do defesa.py: ${resumo(c)}
 Relatório do pesquisador: ${JSON.stringify(p)}
@@ -90,7 +95,9 @@ Confira por conta própria os pontos frágeis: amostra pequena; média inflada p
 Feche o mercado_final: o mais seguro com ≥ ${Math.round(crit.prob_minima * 100)}% depois do ajuste (pode rebaixar "marca 2+" para "marca 1+"), e o ajuste_final_pp (−5 a +5) sobre a prob. do defesa.py para ESSE mercado. Se a defesa do azarão for só mediana para a liga, refutado=true.
 Se o caso ensinar algo NOVO e geral que não esteja em docs/licoes.md, escreva em "licao".
 ${SOFA}`, { label: `cetico:${c.favorito}`, phase: 'Cético', schema: CET, model: modelo })
-    .then(t => ({ id: c.id, n: c.n, jogo: c.jogo, hora: c.hora, pesquisa: p, cetico: t })),
+    .then(t => ({ id: c.id, n: c.n, jogo: c.jogo, hora: c.hora, pesquisa: p, cetico: t, status: t ? 'ok' : 'cetico falhou' })),
 )
 const ok = res.filter(Boolean)
+const falhas = ok.filter(r => r.status !== 'ok')
+if (falhas.length) log(`Agentes falharam em: ${falhas.map(r => `${r.jogo} (${r.status})`).join(' | ')} — retome com resumeFromRunId`)
 return { resultados: ok, agentes: alvo.length * 2, sem_pesquisa: fora.map(c => c.jogo) }
