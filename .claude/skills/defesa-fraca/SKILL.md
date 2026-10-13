@@ -11,6 +11,9 @@ O Daniel quer **esse tipo de análise todo dia, o mais analítica possível e ev
 Regras específicas desta análise (pedido dele em 12/10):
 
 - **Chuva é só informativa.** Ela não exclui jogo aqui; a regra 3 continua valendo no /ouro.
+- **Forma do favorito (pedido de 13/10):** favorito com **mais derrotas que vitórias nos últimos 5 jogos
+  oficiais** (todas as competições, sem amistosos) **sai da lista**. O `defesa.py` já marca `passa = false`
+  com o motivo. Se o pesquisador achar jogo oficial mais recente que o Sofascore não tem, refaça a conta.
 - **Todas as ligas do Sofascore.** Ligas profissionais vêm primeiro. Amador, base e time B só entram se faltar caso profissional.
 - **Resposta:** até `defesa.max_resposta` jogos (padrão 4). Só os que passam: prob ≥ `criterios.prob_minima`
   depois do ajuste e cético sem refutar. **Nunca force:** se passarem 2, mande 2 e diga que o resto não fechou.

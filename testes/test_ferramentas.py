@@ -399,6 +399,21 @@ class TestDefesa(unittest.TestCase):
         for trecho in ("regressão provável", "acima do xG", "melhorando", "goleadas", "rodízio", "expulsão", "regra 8"):
             self.assertIn(trecho, al)
 
+    def test_forma_ultimos_oficiais(self):
+        def ev(ts, casa, gc, gf, torneio="Liga"):
+            return {"startTimestamp": ts, "status": {"type": "finished"}, "tournament": {"name": torneio},
+                    "homeTeam": {"id": 7 if casa else 8}, "awayTeam": {"id": 8 if casa else 7},
+                    "homeScore": {"normaltime": gc}, "awayScore": {"normaltime": gf}}
+        evs = [ev(1, True, 2, 0), ev(2, False, 1, 0), ev(3, True, 0, 1), ev(4, True, 3, 0, "Club Friendly Games"),
+               ev(5, False, 0, 0), ev(6, True, 1, 2), ev(7, False, 2, 1)]
+        f = df.forma(evs, 7, antes_ts=10, qtd=5, palavras_amistoso=self.D["palavras_amistoso"])
+        # sem o amistoso: (2) D, (3) D, (5) E, (6) D, (7) D  → 0V 1E 4D
+        self.assertEqual(f["seq"], "DDEDD")
+        self.assertEqual((f["v"], f["e"], f["d"], f["pts"]), (0, 1, 4, 1))
+        self.assertTrue(df.forma_negativa(f))
+        self.assertFalse(df.forma_negativa({"n": 5, "v": 2, "e": 1, "d": 2}))   # equilibrado fica
+        self.assertFalse(df.forma_negativa({"n": 0, "v": 0, "e": 0, "d": 0}))   # sem dado não tira
+
     def test_escolher_grupo_da_fase_certa(self):
         apertura = {"nome": "Torneo Final", "rows": {1: {"matches": 6}, 2: {"matches": 6}, 3: {"matches": 6}}}
         copa = {"nome": "Qualifiers - Copa", "rows": {1: {"matches": 0}, 9: {"matches": 0}}}

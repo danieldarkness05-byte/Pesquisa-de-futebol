@@ -126,6 +126,10 @@ Análise diária pedida pelo Daniel em 12/10. Procura jogos em que o **azarão s
      a vitória é reescalada.
    - Tabela com vários grupos ou fases: vale o grupo em que os dois times jogaram.
    - Sem amostra recente (menos de 3 jogos na condição): o jogo não passa (regra 6).
+   - **Forma do favorito** (pedido do Daniel em 13/10):
+     - conta os últimos `forma_jogos` (5) jogos **oficiais**, em todas as competições, sem amistosos, pelo placar dos 90 min;
+     - com **mais derrotas que vitórias**, o jogo sai da lista;
+     - o empate é neutro.
    - **Regra 8 por mercado:**
      - nos gols, compara com o λ implícito do 1X2 e das linhas de gols da bet365;
      - na vitória e na dupla chance, com o 1X2/DC sem margem.

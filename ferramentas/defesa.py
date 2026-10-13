@@ -69,6 +69,8 @@ DEFESA_PADRAO = {
     "dias_calendario": 7,
     "jogos_calendario": 3,
     "expulsoes_alerta": 2,
+    "forma_jogos": 5,
+    "palavras_amistoso": ["Friendly", "Friendlies", "Amistoso"],
     "chuva": "informativa",
     "palavras_base": ["Amateur", "NCAA", "U19", "U20", "U21", "U23", "U17", "Reserve", "Women",
                       "Youth", "Primavera", "Juniors"],
@@ -224,6 +226,32 @@ def tendencia(xs: list[dict], chave: str, ultimos: int = 5) -> tuple[float | Non
 def media_chave(xs: list[dict], chave: str, cobertura: float = 0.7) -> float | None:
     vals = [x[chave] for x in xs if x.get(chave) is not None]
     return sum(vals) / len(vals) if xs and len(vals) / len(xs) >= cobertura else None
+
+
+def forma(eventos: list[dict], tid: int, antes_ts: int, qtd: int, palavras_amistoso: list[str]) -> dict:
+    """Últimos `qtd` jogos OFICIAIS encerrados do time antes de `antes_ts` (todas as
+    competições, sem amistosos), do mais antigo ao mais recente. Placar dos 90 min."""
+    oficiais = []
+    for e in sorted(eventos, key=lambda e: e["startTimestamp"]):
+        torneio = " ".join(str(x) for x in ((e.get("tournament") or {}).get("name"),
+                                            ((e.get("tournament") or {}).get("uniqueTournament") or {}).get("name")))
+        if (e.get("status", {}).get("type") != "finished" or e["startTimestamp"] >= antes_ts
+                or any(p.lower() in torneio.lower() for p in palavras_amistoso)):
+            continue
+        hs, as_ = v.placar(e, "home"), v.placar(e, "away")
+        if hs is None or as_ is None:
+            continue
+        meu, dele = (hs, as_) if e["homeTeam"]["id"] == tid else (as_, hs)
+        oficiais.append("V" if meu > dele else "E" if meu == dele else "D")
+    seq = oficiais[-qtd:]
+    return {"seq": "".join(seq), "v": seq.count("V"), "e": seq.count("E"), "d": seq.count("D"),
+            "pts": 3 * seq.count("V") + seq.count("E"), "n": len(seq)}
+
+
+def forma_negativa(f: dict) -> bool:
+    """Regra do Daniel (13/10): favorito com mais derrotas que vitórias nos últimos
+    jogos oficiais sai da lista."""
+    return f.get("n", 0) > 0 and f["d"] > f["v"]
 
 
 def calendario(eventos_passados: list[dict], eventos_futuros: list[dict], inicio_ts: int, dias: int) -> dict:
@@ -504,6 +532,7 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d: dict, data: str, chuv
     info["frequencias"] = {k: (round(x, 3) if isinstance(x, float) else x) for k, x in frequencias(xf, xa).items()}
     prox = api.get(f"team/{fid}/events/next/0").get("events", [])
     info["calendario_favorito"] = calendario(evf, prox, info["inicio"], d["dias_calendario"])
+    info["forma_favorito"] = forma(evf, fid, info["inicio"], d["forma_jogos"], d["palavras_amistoso"])
 
     # variantes do modelo
     rho, sig = d["rho"], d["incerteza_sigma"]
@@ -581,6 +610,10 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d: dict, data: str, chuv
     info["motivo"] = None
     if min(len(xf), len(xa)) < 3 or freq_mercado(info["frequencias"], 1) is None:
         info["motivo"] = f"dado faltando: só {len(xf)}/{len(xa)} jogos recentes na condição"
+    fm = info["forma_favorito"]
+    if not info["motivo"] and forma_negativa(fm):
+        info["motivo"] = (f"fora pela forma: favorito com mais derrotas que vitórias nos últimos {fm['n']} "
+                          f"oficiais ({fm['v']}V {fm['e']}E {fm['d']}D: {fm['seq']})")
     det = api.get(f"event/{eid}").get("event", {})
     venue = det.get("venue") or {}
     info["local"] = {"estadio": venue.get("name"), "cidade": (venue.get("city") or {}).get("name"),
@@ -610,7 +643,8 @@ def linha_curta(i: int, x: dict, prob_min: float = 0.6, ev_min: float = 0.03) ->
     az = x["azarao_amostra"]
     return (f"{i}) {x['hora']} {x['jogo']} [{x['pais']} · {x['competicao']}]\n"
             f"   azarão {x['azarao']} sofre {x['az_ga']:.2f}/j (×{x['ind_def']}; últimos {az['n']}: {az['ga']}, "
-            f"xG contra {az['xg_contra']}) | {x['favorito']} marca {x['fav_gf']:.2f}/j (×{x['ind_atq']})\n"
+            f"xG contra {az['xg_contra']}) | {x['favorito']} marca {x['fav_gf']:.2f}/j (×{x['ind_atq']}), "
+            f"forma {(x.get('forma_favorito') or {}).get('seq') or 'N/D'}\n"
             f"   → {merc}" + (f"\n   alertas: {'; '.join(x['alertas'])}" if x.get("alertas") else ""))
 
 
