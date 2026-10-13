@@ -100,3 +100,4 @@ faixa e registre aqui.
 | 12/10 | Elfsborg x Halmstad (favoritos) | vence | 67% | 4-0 | ✅ | |
 | 12/10 | Atalanta x Venezia (favoritos, no limite) | vence | 60% | 3-1 | ✅ | |
 | 13/10 | Pakhtakor II x Aral | Aral 2+ (fora no Sofascore; mando real em Nukus) | 75% | 1-2 | ✅ | O Aral fez os 2 gols, apesar dos 22 dias sem jogo oficial. |
+| 13/10 | IFK Norrköping x GIF Sundsvall | Norrköping 1+ | 83% | 4-0 | ✅ | A pausa longa do Norrköping (lição 10) não pesou desta vez. |
