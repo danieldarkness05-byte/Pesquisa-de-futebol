@@ -99,3 +99,44 @@ Usa a API pública do Sofascore: calendário, estatísticas por jogo, árbitro e
     é pouco confiável e a margem é grande.
 - **Chuva:** `clima.py`, só para os jogos que passaram.
 - É **triagem**: não vê escalação nem notícia. O veredito vem do `/aprofundar`.
+
+## Defesa fraca x ataque forte (`defesa.py` + `/defesa-fraca`)
+
+Análise diária pedida pelo Daniel em 12/10. Procura jogos em que o **azarão sofre muito gol** e o
+**favorito marca muito**, em **todas** as ligas do Sofascore. Parâmetros em `config.json → defesa`.
+
+1. **Triagem:** todo jogo não iniciado com tabela casa/fora.
+   - Azarão = pior odd. Sem odds, é o que tem menos pontos por jogo, se a diferença for ≥ `diferenca_ppg_sem_odds`.
+   - Passa se o azarão sofre ≥ `indice_defesa_min` × a média da liga **na condição** e o favorito marca
+     ≥ `indice_ataque_min` × a média.
+   - Ligas profissionais com amostra boa são aprofundadas primeiro.
+2. **Estatística** dos `max_aprofundar` melhores: últimos `jogos_amostra` jogos de liga na condição,
+   com gols, xG, chutes, mediana, frequência de k+ gols, tendência dos últimos 5, expulsões, calendário,
+   odds bet365 e λ implícito do mercado (1X2 + over 2,5).
+3. **Probabilidade** dos mercados "favorito marca 1+/2+/3+", vitória e dupla chance:
+   - É o **menor** valor entre três caminhos:
+     - tabela da temporada (método de força);
+     - λ encolhido por gols;
+     - λ encolhido gols+xG.
+     Todos com Dixon-Coles ρ e incerteza σ.
+   - Depois, é **limitada pela frequência real + `tolerancia_frequencia`**, porque o Poisson exagera
+     quando a média vem de goleadas.
+4. **Alertas automáticos** (lições de `docs/licoes.md`):
+   - ⚠️ RISCO (o azarão também marca);
+   - amostra pequena; liga amadora/base;
+   - gols sofridos ≫ xG cedido; favorito acima do xG;
+   - defesa melhorando nos últimos 5; média inflada por goleadas;
+   - calendário apertado ou pausa longa; expulsões;
+   - defesa dos últimos jogos melhor que a da tabela;
+   - regra 8.
+5. **Pesquisa** (`.claude/workflows/defesa.js`), em até `max_pesquisa` candidatos:
+   - 1 pesquisador (Sofascore + imprensa + site da liga, incluindo o mando real);
+   - 1 cético, que fecha o mercado final e o ajuste (±5 p.p.) e escreve uma lição nova, se houver.
+6. **Aprendizado:**
+   - toda previsão entregue vai para `dados/previsoes.csv`;
+   - `previsoes.py resolver` busca o placar e `previsoes.py resumo` mostra a calibração por faixa;
+   - com ≥ 30 resolvidas numa faixa que acerta 5 p.p. ou mais abaixo do previsto, a análise fica mais
+     conservadora ali;
+   - o que cada caso ensina vai para `docs/licoes.md`, lido antes de cada análise.
+
+**Chuva:** aqui é só informativa (pedido do Daniel). No /ouro, a regra 3 continua valendo.

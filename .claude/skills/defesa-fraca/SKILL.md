@@ -1,25 +1,92 @@
 ---
 name: defesa-fraca
-description: Compara vários jogos e aponta quais azarões têm a defesa mais fraca, marcando RISCO quando o azarão também ataca bem. Use quando o Daniel pedir análise cruzada de defesa fraca de um lote de jogos.
-argument-hint: "[lista de jogos | data | competição]"
-allowed-tools: Bash(python3 ferramentas/*) WebSearch WebFetch Read
+description: Análise diária "defesa fraca do azarão x ataque forte do favorito" em TODAS as ligas do Sofascore — triagem e estatística por script (defesa.py), pesquisador + cético por candidato (workflow defesa.js), probabilidade conservadora, odd mínima, registro das previsões e aprendizado contínuo (previsoes.py + docs/licoes.md). Use quando o Daniel pedir jogos em que o azarão tem defesa muito fraca e o favorito ataca forte, e na rotina diária.
+argument-hint: "[hoje | amanhã | AAAA-MM-DD] [--config para só as ligas do config]"
+allowed-tools: Bash(python3 ferramentas/*) Bash(git *) Workflow Read Write Edit PushNotification
 ---
 
-Jogos: **$ARGUMENTS** (sem lista = jogos de hoje nas competições do `config.json`).
+Data: **$ARGUMENTS** (vazio = hoje; "amanhã" = data de amanhã em Brasília).
 
-1. Para cada jogo, identifique o **azarão** (pior odd para vencer; sem odds, pior
-   posição/forma) e a condição em que ele joga (casa ou fora).
-2. Colete do azarão, **na condição do jogo**, começando pelo Sofascore:
-   gols sofridos/jogo, chutes sofridos/jogo, xG contra (se houver), jogos sem sofrer gol,
-   e também gols marcados/jogo e chutes a favor (para medir o ataque).
-3. Monte o ranking das defesas mais fracas (gols sofridos/jogo, desempate por chutes
-   sofridos). Use pelo menos 5 jogos na condição; menos que isso → "amostra pequena".
-4. **⚠️ RISCO:** marque quando o azarão também marca ≥ 1,3 gol/jogo na condição ou está
-   entre os 30% melhores ataques da competição. Defesa fraca + ataque forte = jogo aberto,
-   o favorito pode sofrer gol.
-5. Exclua jogos com chuva (`clima.py`).
-6. Para os 3 melhores casos sem RISCO, rode `prob.py gols` e mostre os mercados que
-   passam no critério (ex.: favorito over 1.5 gols, vitória do favorito, dupla chance).
+O Daniel quer **esse tipo de análise todo dia, o mais analítica possível e evoluindo a cada pesquisa**.
+Regras específicas desta análise (pedido dele em 12/10):
 
-Resposta: tabela curta (azarão · jogo · gols sofridos · chutes sofridos · ataque · RISCO)
-seguida dos mercados de ouro, se houver. Fontes no final.
+- **Chuva é só informativa.** Ela não exclui jogo aqui; a regra 3 continua valendo no /ouro.
+- **Todas as ligas do Sofascore.** Ligas profissionais vêm primeiro. Amador, base e time B só entram se faltar caso profissional.
+- **Resposta:** até `defesa.max_resposta` jogos (padrão 4). Só os que passam: prob ≥ `criterios.prob_minima`
+  depois do ajuste e cético sem refutar. **Nunca force:** se passarem 2, mande 2 e diga que o resto não fechou.
+
+## 0. Aprender antes de analisar (barato)
+
+1. Rode `python3 ferramentas/previsoes.py resolver`. Ele busca no Sofascore o placar das previsões pendentes.
+2. Rode `python3 ferramentas/previsoes.py resumo --analise defesa --curto`.
+   - Se aparecer aviso de calibração (faixa com ≥ 30 picks acertando 5 p.p. ou mais abaixo), aplique
+     o desconto nessa faixa e registre em `docs/licoes.md`.
+3. Para cada previsão resolvida agora, acrescente uma linha na tabela "Resultados" de `docs/licoes.md`.
+   - Coluna "Lição": só quando o erro ou o acerto ensinar algo (por que errou? a tese falhou ou foi variância?).
+   - Se a lição se repetir em 3 ou mais casos, transforme-a em alerta automático em `ferramentas/defesa.py`
+     (com teste) ou em parâmetro de `config.json → defesa`.
+4. Leia `docs/licoes.md` inteiro. As lições valem para o passo 4.
+
+## 1. Triagem + estatística (script, não gasta créditos)
+
+Rode `python3 ferramentas/defesa.py --data <D> --curto` (Bash `timeout: 900000`). Com "amanhã", use `--data`.
+
+- Se avisar falhas de rede, rode **uma** vez de novo (o cache acelera).
+- Depois rode `python3 ferramentas/defesa.py --data <D> --json > <scratchpad>/defesa.json`.
+  O cache torna isso rápido; para não refazer a chuva, use `--sem-chuva` nessa segunda chamada.
+- **Nenhum candidato com `passa`:** responda só "Nenhum jogo com defesa fraca x ataque forte hoje."
+  Salve o arquivo do passo 5 com a triagem e pare.
+
+## 2. Pesquisa (workflow, os créditos vão aqui)
+
+Chame `Workflow({scriptPath: ".claude/workflows/defesa.js", args: <objeto do defesa.json>})`.
+
+- `args` vai como objeto JSON, não como string.
+- Ele pega os `defesa.max_pesquisa` melhores com `passa` e sem RISCO. Para escolher outros, passe `args.ids`.
+- Espere a notificação; não pesquise em paralelo.
+- Se agentes falharem por limite de uso, retome depois com `resumeFromRunId` (os que terminaram ficam em cache).
+
+## 3. Veredito (ferramentas, não palpite)
+
+Para cada resultado:
+
+1. **Mercado e probabilidade.**
+   - `mercado = cetico.mercado_final`. Se for `nenhum` ou `refutado = true`, o jogo cai.
+   - `p = prob do defesa.py para esse mercado + cetico.ajuste_final_pp/100`. O ajuste total vai de −5 a +5 p.p.
+   - Escreva o motivo do ajuste.
+2. **Mando invertido (`pesquisa.mando_invertido`):** rode de novo com os dados do mando real.
+   Use `prob.py gols` com as médias da tabela, trocando casa por fora, e fique com o menor valor.
+3. **Passa se** `p ≥ criterios.prob_minima` e não refutado.
+4. **Odd mínima** = (1 + `criterios.ev_minimo`) / p.
+   - Se houver odd real (bet365 no JSON, ou a que o Daniel colar), rode
+     `python3 ferramentas/valor.py --prob <p> --odd <odd>`.
+5. **⚠️ RISCO** (o azarão também ataca bem) não entra como pick. Pode aparecer como aviso.
+6. **Regra 8 no JSON** (modelo > mercado + 10 p.p.): só passa se o pesquisador explicou o que o mercado
+   sabe. Senão, desconte até 5 p.p. ou derrube.
+7. **Ordem:** profissional antes de amador, depois maior p, depois menos alertas.
+
+## 4. Salvar, registrar e evoluir
+
+1. **Análise:** grave `analises/AAAA-MM-DD-defesa-fraca.md` com:
+   - critério e dados (horário da consulta);
+   - tabela dos que passaram;
+   - nota por jogo (a favor, contra, ajuste e motivo);
+   - os que não passaram e por quê;
+   - fontes.
+2. **Previsões:** registre cada jogo que passou em `ferramentas/previsoes.py`. Pode ser com `add-json`,
+   numa lista com `data, hora, evento, jogo, competicao, nivel (pro|base), analise: "defesa", mercado,
+   lado, prob, odd_minima, odd_casa, alertas`.
+   - Mercados: `marca_1`, `marca_2`, `marca_3` (gols do favorito), `vence`, `dupla_chance`.
+   - `lado`: `casa` ou `fora`, o lado do favorito no Sofascore. Se o mando foi invertido, siga o Sofascore,
+     porque é ele que resolve o placar.
+3. **Lições:** cada `cetico.licao` não vazia e nova vira um item em `docs/licoes.md`, com data e jogo.
+4. Faça commit e push na branch atual, com mensagem em português.
+
+## 5. Resposta (curta, para celular)
+
+- **Tabela:** jogo · hora · liga · azarão (gols sofridos/jogo na condição) · mercado · prob · odd mínima (e bet365 se houver).
+- **Uma linha por jogo** com o motivo principal e o maior risco.
+- **Lembrete:** conferir a escalação cerca de 1 h antes e a odd na Betano ≥ mínima. Liga amadora quase nunca está na Betano.
+- **Uma linha de calibração**, se já houver previsões resolvidas: "Até agora: X/Y acertos (Z%) para W% previsto".
+- **Rotina diária:** com pelo menos 1 jogo, mande `PushNotification` "🛡️ Defesa fraca DD/MM: <jogo> <mercado> mín X.XX (+N)".
+  Sem jogo, não notifique.

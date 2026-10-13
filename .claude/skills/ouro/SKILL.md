@@ -11,15 +11,20 @@ Ouro do dia: **$ARGUMENTS** (vazio = hoje, candidatos automáticos).
 passo 3, só nos candidatos **vivos**, e no máximo `config.json → aprofundar.max_candidatos` (padrão 3).
 Fora do workflow: sem WebSearch, sem subagentes avulsos e sem ler arquivos além do necessário.
 
+0. **Aprender (sempre, barato):**
+   - Rode `python3 ferramentas/previsoes.py resolver` e depois `python3 ferramentas/previsoes.py resumo --curto`.
+   - Cada previsão resolvida agora vira uma linha na tabela "Resultados" de `docs/licoes.md`, com lição só
+     quando o caso ensinar algo.
+   - Leia `docs/licoes.md`.
 1. **Peneira:** rode `python3 ferramentas/varredura.py --curto` em primeiro plano (Bash `timeout: 600000`).
    - Se o Daniel passou uma data, use `--data`.
    - Se a saída avisar falhas, rode **uma** vez de novo (o cache acelera).
-   - Sem candidatos: responda só "Nenhuma oportunidade de ouro hoje." e pare, sem notificar e sem gravar arquivo.
+   - Sem candidatos: não há ouro. Não grave arquivo do ouro e pule para o passo 7 (de manhã) ou para a resposta.
 2. **Dossiê (de graça):**
    - Rode `python3 ferramentas/dossie.py` (resumo).
    - Depois rode `python3 ferramentas/dossie.py --json > <scratchpad>/dossie.json`.
    - Se o Daniel pediu números, use `--numeros`. Sem números, entram os N primeiros do config; jogos a menos de 20 min do início ficam fora.
-   - Nenhum candidato `vivo`: responda só "Nenhuma oportunidade de ouro hoje." e pare, sem agentes.
+   - Nenhum candidato `vivo`: não há ouro e nenhum agente roda aqui. Pule para o passo 7 (de manhã) ou para a resposta.
 3. **Workflow:** leia o JSON e chame
    `Workflow({scriptPath: ".claude/workflows/aprofundar.js", args: <objeto do dossiê>})`.
    - `args` vai como objeto JSON, não como string.
@@ -41,11 +46,21 @@ Fora do workflow: sem WebSearch, sem subagentes avulsos e sem ler arquivos além
    - ⭐ OURO ranqueado, uma linha por pick: jogo · hora · mercado · prob. · odd mínima Betano · odd/EV bet365 · evidência · motivo.
    - O que conferir antes de entrar: escalação oficial cerca de 1 h antes e a odd na Betano ≥ mínima.
    - **Não** liste descartados, candidatos nem "quase": isso fica só no arquivo do passo 5.
-   - Sem ouro: só "Nenhuma oportunidade de ouro hoje."
+   - Sem ouro e sem 🛡️ defesa fraca: só "Nenhuma oportunidade hoje."
+     Sem ouro, mas com defesa fraca: só a seção 🛡️.
    - Termine com quantos agentes o workflow usou, em uma linha curta.
-7. **Notificação:**
+7. **Defesa fraca (só na execução da MANHÃ, antes das 12:00):** siga `.claude/skills/defesa-fraca/SKILL.md`
+   para HOJE, em todas as ligas do Sofascore.
+   - Um workflow de cada vez: primeiro termine o do /ouro.
+   - A chuva é só informativa nessa análise.
+   - Os jogos que passarem entram na MESMA resposta, numa seção "🛡️ Defesa fraca" (até 4), e contam como
+     pick para a notificação, mesmo sem ⭐ OURO.
+   - O arquivo, o registro das previsões e as lições seguem a skill. Faça commit e push junto.
+8. **Notificação:**
    - Com OURO: `PushNotification` "⭐ OURO HH:MM <jogo> <mercado>, odd mín X.XX".
-   - Sem ouro: não notifique.
+   - Com 🛡️ Defesa fraca: `PushNotification` "🛡️ Defesa fraca DD/MM: <jogo> <mercado> mín X.XX (+N)".
+     Se houver os dois, junte numa notificação só.
+   - Sem ouro e sem defesa fraca: não notifique.
 
 Para gastar menos: em `config.json → aprofundar`, baixe `max_candidatos` ou use `cetico: false`.
 Com `max_candidatos: 0`, o /ouro vira só a peneira.

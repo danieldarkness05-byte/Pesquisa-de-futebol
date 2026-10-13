@@ -108,5 +108,33 @@
     "min_minutos_antes": 20,
     "cetico": true,
     "modelo_agentes": "sonnet"
+  },
+  "defesa": {
+    "_leia": "Análise diária defesa fraca do azarão x ataque forte do favorito (ferramentas/defesa.py + .claude/workflows/defesa.js, skill /defesa-fraca). Triagem: azarão sofre >= indice_defesa_min x a média da liga na condição e favorito marca >= indice_ataque_min x a média (com tolerancia_indice). max_aprofundar = quantos ganham estatística detalhada (Python, grátis); max_pesquisa = quantos vão para os agentes (1 pesquisador + 1 cético cada); max_resposta = quantos jogos no máximo na resposta. Probabilidade = menor entre tabela, λ por gols e λ gols+xG, limitada pela frequência real + tolerancia_frequencia. chuva = informativa (pedido do Daniel em 12/10). modelo_agentes null = mesmo modelo da sessão. Ajuste estes números quando o previsoes.py resumo mostrar faixa descalibrada (docs/licoes.md).",
+    "todas_as_ligas": true,
+    "indice_defesa_min": 1.4,
+    "indice_ataque_min": 1.15,
+    "tolerancia_indice": 0.02,
+    "amostra_minima_tabela": 4,
+    "amostra_boa": 5,
+    "jogos_amostra": 10,
+    "max_aprofundar": 12,
+    "max_pesquisa": 4,
+    "max_resposta": 4,
+    "diferenca_ppg_sem_odds": 0.4,
+    "risco_gols_azarao": 1.3,
+    "risco_top_ataque": 0.3,
+    "encolhimento_jogos": 4,
+    "rho": -0.1,
+    "incerteza_sigma": 0.15,
+    "tolerancia_frequencia": 0.05,
+    "regra8_pp": 0.1,
+    "gols_acima_xg": 0.5,
+    "melhora_defesa": 0.75,
+    "dias_calendario": 7,
+    "jogos_calendario": 3,
+    "expulsoes_alerta": 2,
+    "chuva": "informativa",
+    "modelo_agentes": null
   }
 }

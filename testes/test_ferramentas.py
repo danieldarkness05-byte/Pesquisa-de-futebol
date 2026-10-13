@@ -9,9 +9,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ferramentas"))
 
 import clima  # noqa: E402
+import defesa as df  # noqa: E402
 import dossie  # noqa: E402
 import historico  # noqa: E402
 import nucleo as n  # noqa: E402
+import previsoes  # noqa: E402
 import registro  # noqa: E402
 import sistema  # noqa: E402
 import varredura as vr  # noqa: E402
@@ -307,3 +309,119 @@ class TestVarredura(unittest.TestCase):
         self.assertEqual(vr.localizar(certa, geo), (22.16, -100.97))
         self.assertEqual(vr.localizar({"coord": {"latitude": 1.0, "longitude": 2.0}}, geo), (1.0, 2.0))
         self.assertIsNone(vr.localizar({}, geo))
+
+
+class TestDefesa(unittest.TestCase):
+    D = dict(df.DEFESA_PADRAO)
+
+    def test_favorito_por_odds_e_tabela(self):
+        self.assertEqual(df.escolher_favorito([1.5, 4.0, 6.0], None, None, 0.4), (True, "odds"))
+        self.assertEqual(df.escolher_favorito([4.0, 3.5, 1.9], None, None, 0.4), (False, "odds"))
+        self.assertTrue(df.escolher_favorito(None, 2.1, 1.0, 0.4)[0])
+        self.assertIsNone(df.escolher_favorito(None, 1.5, 1.3, 0.4)[0])   # diferença pequena
+
+    def test_triagem_e_risco(self):
+        self.assertTrue(df.passa_triagem(1.39, 1.33, self.D))     # tolerância (caso Norrköping)
+        self.assertFalse(df.passa_triagem(1.30, 1.50, self.D))
+        self.assertFalse(df.passa_triagem(1.80, 1.00, self.D))
+        self.assertTrue(df.eh_risco(1.5, None, self.D))
+        self.assertTrue(df.eh_risco(0.9, (2, 20), self.D))        # top 30% de ataques
+        self.assertFalse(df.eh_risco(0.9, (12, 20), self.D))
+
+    def test_nivel_base(self):
+        pal = self.D["palavras_base"]
+        self.assertTrue(df.nivel_base(["England Amateur", "Wessex League", "Bashley FC", "Christchurch FC"], pal))
+        self.assertTrue(df.nivel_base(["Germany", "Regionalliga", "TSV Buchbach", "FC Augsburg II"], pal))
+        self.assertFalse(df.nivel_base(["Sweden", "Superettan", "IFK Norrköping", "GIF Sundsvall"], pal))
+
+    def test_frequencia_e_mediana(self):
+        fav = [{"gf": g, "ga": 0} for g in (2, 2, 1, 3, 0)]
+        az = [{"gf": 0, "ga": g} for g in (5, 1, 1, 0, 5, 1)]        # média 2,17 inflada; mediana 1
+        fr = df.frequencias(fav, az)
+        self.assertAlmostEqual(fr["fav_2"], 0.6)
+        self.assertAlmostEqual(fr["az_2"], 2 / 6)
+        self.assertEqual(fr["mediana_ga_az"], 1)
+        self.assertAlmostEqual(df.freq_mercado(fr, 2), (0.6 + 2 / 6) / 2)
+
+    def test_prob_conservadora_limita_pela_frequencia(self):
+        self.assertEqual(df.prob_conservadora([0.80, 0.72, 0.76], None, 0.05), (0.72, False))
+        p, lim = df.prob_conservadora([0.80, 0.76], 0.55, 0.05)
+        self.assertTrue(lim)
+        self.assertAlmostEqual(p, 0.60)
+        self.assertAlmostEqual(df.odd_minima(0.75, 0.03), 1.37)
+
+    def test_prob_time_marca_bate_com_poisson(self):
+        m = n.matriz_placar(2.0, 0.8, 0.0, 12)
+        self.assertAlmostEqual(df.prob_time_marca(m, True, 1), 1 - math.exp(-2.0), places=4)
+        self.assertAlmostEqual(df.prob_time_marca(m, False, 1), 1 - math.exp(-0.8), places=4)
+        p2 = 1 - math.exp(-2.0) * (1 + 2.0)
+        self.assertAlmostEqual(df.prob_time_marca(m, True, 2), p2, places=4)
+
+    def test_lambdas_mercado_recupera_os_lambdas(self):
+        m = n.matriz_placar(2.1, 0.7, 0.0, 10)
+        r = vr.resultado(m)
+        over = vr.total_gols(m, 2.5, "over")[0]
+        lh, la = df.lambdas_mercado([r["1"], r["X"], r["2"]], over, 2.8)
+        self.assertAlmostEqual(lh, 2.1, delta=0.05)
+        self.assertAlmostEqual(la, 0.7, delta=0.05)
+        lh2, la2 = df.lambdas_mercado([r["1"], r["X"], r["2"]], None, 2.8)   # sem over: total fixo
+        self.assertAlmostEqual(lh2 + la2, 2.8, delta=0.01)
+        self.assertGreater(lh2, la2)
+
+    def test_calendario(self):
+        dia = 86400
+        t0 = 100 * dia
+        passados = [{"startTimestamp": t0 - 3 * dia, "status": {"type": "finished"}},
+                    {"startTimestamp": t0 - 30 * dia, "status": {"type": "finished"}}]
+        futuros = [{"startTimestamp": t0 + 4 * dia}]
+        c = df.calendario(passados, futuros, t0, 7)
+        self.assertEqual(c["jogos_janela"], 3)
+        self.assertEqual(c["dias_desde_ultimo"], 3.0)
+        self.assertEqual(c["dias_ate_proximo"], 4.0)
+
+    def test_alertas_licoes(self):
+        info = {"risco": False, "nivel_base": False, "odds": [1.2, 6, 11], "regra8": None, "fav_casa": True,
+                "liga": {"casa": 1.5, "fora": 1.3},
+                "azarao_amostra": {"n": 10, "ga": 2.1, "xg_contra": 1.3, "ga_ultimos5": 1.2, "expulsoes": 3},
+                "favorito_amostra": {"n": 10, "gf": 2.4, "xg_pro": 1.6},
+                "frequencias": {"mediana_ga_az": 1},
+                "calendario_favorito": {"jogos_janela": 3, "dias_desde_ultimo": 2}}
+        al = " | ".join(df.alertas_estatisticos(info, self.D))
+        for trecho in ("regressão provável", "acima do xG", "melhorando", "goleadas", "rodízio", "expulsão"):
+            self.assertIn(trecho, al)
+
+
+class TestPrevisoes(unittest.TestCase):
+    def test_avaliar_mercados(self):
+        self.assertTrue(previsoes.avaliar("marca_2", "casa", 2, 0))
+        self.assertFalse(previsoes.avaliar("marca_2", "fora", 2, 1))
+        self.assertTrue(previsoes.avaliar("marca_1", "fora", 0, 1))
+        self.assertTrue(previsoes.avaliar("vence", "fora", 0, 1))
+        self.assertTrue(previsoes.avaliar("dupla_chance", "casa", 1, 1))
+        self.assertTrue(previsoes.avaliar("over_2.5", "casa", 2, 1))
+        self.assertFalse(previsoes.avaliar("under_2.5", "casa", 2, 1))
+        self.assertIsNone(previsoes.avaliar("escanteios", "casa", 1, 1))
+
+    def test_fluxo_resolver_e_resumo(self):
+        with tempfile.TemporaryDirectory() as d:
+            arq = Path(d) / "p.csv"
+            linhas = previsoes.ler(arq)
+            base = {"data": "2026-10-12", "jogo": "A x B", "analise": "defesa", "lado": "casa"}
+            previsoes.adicionar(linhas, dict(base, evento="1", mercado="marca_2", prob="0.80"))
+            previsoes.adicionar(linhas, dict(base, evento="2", mercado="marca_1", prob="0.84"))
+            previsoes.adicionar(linhas, dict(base, evento="3", mercado="marca_1", prob="0.70"))
+            previsoes.adicionar(linhas, dict(base, evento="1", mercado="marca_2", prob="0.78"))  # atualiza, não duplica
+            self.assertEqual(len(linhas), 3)
+            self.assertEqual(linhas[0]["prob"], "0.78")
+            eventos = {"1": {"event": {"status": {"type": "finished"}, "homeScore": {"normaltime": 3},
+                                       "awayScore": {"normaltime": 0}}},
+                       "2": {"event": {"status": {"type": "finished"}, "homeScore": {"normaltime": 0},
+                                       "awayScore": {"normaltime": 0}}},
+                       "3": {"event": {"status": {"type": "notstarted"}}}}
+            feitos = previsoes.resolver(linhas, eventos.get)
+            self.assertEqual([x["acerto"] for x in feitos], ["1", "0"])
+            previsoes.salvar(linhas, arq)
+            r = previsoes.resumo(previsoes.ler(arq))
+            self.assertEqual((r["n"], r["acertos"], r["pendentes"]), (2, 1, 1))
+            self.assertAlmostEqual(r["brier"], ((0.78 - 1) ** 2 + 0.84 ** 2) / 2)
+            self.assertTrue(previsoes.avisos_calibracao(r))   # amostra pequena → aviso
