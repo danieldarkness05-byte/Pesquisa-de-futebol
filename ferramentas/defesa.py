@@ -337,6 +337,27 @@ def listar(api: v.Sofascore, data: str, torneios: set[int] | None) -> list[dict]
     return sorted(vistos.values(), key=lambda e: e["startTimestamp"])
 
 
+def _sem_acento(txt: str) -> str:
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFD", txt.lower()) if unicodedata.category(c) != "Mn")
+
+
+def eventos_suspeitos(eventos: list[dict]) -> set[int]:
+    """Lição de 14/10 (Cahul x Congaz): ligas editadas à mão no Sofascore listam como futuro
+    jogo já disputado. Suspeito = evento 'não iniciado' com placar preenchido, ou time com
+    dois eventos no mesmo horário."""
+    sus, vistos = set(), {}
+    for e in eventos:
+        if (e.get("homeScore") or {}).get("current") is not None or (e.get("awayScore") or {}).get("current") is not None:
+            sus.add(e["id"])
+        for lado in ("homeTeam", "awayTeam"):
+            chave = (e[lado]["id"], e["startTimestamp"])
+            if chave in vistos and vistos[chave] != e["id"]:
+                sus.update({e["id"], vistos[chave]})
+            vistos.setdefault(chave, e["id"])
+    return sus
+
+
 def grupos_tabela(api: v.Sofascore, ut: int, s: int, tipo: str) -> list[dict]:
     """[{nome, rows: {time: linha}}] — uma liga pode ter vários grupos ou fases."""
     return [{"nome": g.get("name"), "rows": {r["team"]["id"]: r for r in g.get("rows", [])}}
@@ -349,8 +370,11 @@ def escolher_grupo(grupos: list[dict], times: tuple[int, int], nome_torneio: str
     linha de mais jogos de cada time — nunca a do último grupo listado."""
     comuns = [g for g in grupos if all(g["rows"].get(t, {}).get("matches", 0) > 0 for t in times)]
     if comuns:
-        def chave(g):
-            return (g["nome"] == nome_torneio, sum(r.get("matches", 0) for r in g["rows"].values()))
+        alvo = _sem_acento(nome_torneio or "")
+
+        def chave(g):  # 1º o grupo cujo nome está no nome do torneio ("Finalizacion" em "Liga DIMAYOR, Finalizacion")
+            nome = _sem_acento(g["nome"] or "")
+            return (bool(nome) and (nome == alvo or nome in alvo), sum(r.get("matches", 0) for r in g["rows"].values()))
         return max(comuns, key=chave)["rows"]
     rows: dict[int, dict] = {}
     for g in grupos:
@@ -675,7 +699,11 @@ def main() -> None:
         tc = cfg.get("varredura", {}).get("torneios_sofascore", {})
         torneios = {int(k) for k in tc} if (a.config or not d["todas_as_ligas"]) else None
         jogos = listar(api, data, torneios)
-    total = len(jogos)
+    suspeitos = eventos_suspeitos(jogos)
+    if suspeitos:
+        motivos["evento suspeito (placar já preenchido ou time com 2 jogos no mesmo horário)"] += len(suspeitos)
+        jogos = [e for e in jogos if e["id"] not in suspeitos]
+    total = len(jogos) + len(suspeitos)
 
     # --ids: sem corte da triagem (aprofunda o que foi pedido), mas o resto usa o d original
     d_triagem = dict(d, indice_defesa_min=0, indice_ataque_min=0, amostra_minima_tabela=1) if a.ids else d

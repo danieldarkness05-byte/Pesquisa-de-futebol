@@ -60,6 +60,25 @@ faixa e registre aqui.
     - entram na lista só se não houver caso profissional melhor.
     *(automático: alerta e ordem)*
 
+17. **Teste de chão só com xG antes de um 2+** (Nashville, 14/10).
+    - λ_xG = xG pró do favorito na condição × xG cedido do azarão na condição ÷ xG médio dos mandantes da liga.
+    - Ranking por gols esconde ataque de chances medianas com finalização excepcional: o Nashville é o 1º em
+      gols em casa, mas tem xG de 1,83, na média da liga.
+    - Se o 2+ ainda passar de 60% com esse λ, fica; senão, rebaixe para 1+.
+    - "Defesa melhorando" só vale se o xG cedido dos últimos 5 também cair. Se o xG ficar igual, é só
+      goleada saindo da amostra.
+
+## Dados e fontes (continuação)
+
+18. **Liga editada à mão no Sofascore lista jogo já disputado como futuro** (Cahul x Congaz, Moldávia:
+    o jogo foi em 11/10, 1-6, e aparecia como 14/10). Sinais:
+    - o mesmo time com dois eventos no mesmo horário;
+    - evento "não iniciado" com placar preenchido.
+    *(automático: "evento suspeito", sai da lista)*
+19. **Apertura x Finalización (ou Clausura) na mesma temporada:** a tabela tem que ser a do torneio do
+    jogo. Santa Fe x Jaguares, 14/10: com a do Apertura, o λ dava 2,83; com a do Finalización, ~2,0, e o
+    ataque do Santa Fe era só médio. *(automático: grupo cujo nome está no nome do torneio)*
+
 ## Mercado (regra 8)
 
 15. **Modelo mais de 10 p.p. acima do mercado:** quase sempre o mercado sabia algo.

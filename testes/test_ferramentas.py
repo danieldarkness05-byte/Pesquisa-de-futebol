@@ -423,6 +423,19 @@ class TestDefesa(unittest.TestCase):
         self.assertIs(df.escolher_grupo([apertura, copa], (1, 2)), apertura["rows"])
         junto = df.escolher_grupo([apertura, copa], (1, 9))    # sem grupo comum: linha de mais jogos
         self.assertEqual(junto[1]["matches"], 6)
+        # Santa Fe x Jaguares 14/10: Apertura tem mais jogos, mas o torneio é o Finalización
+        ape = {"nome": "Apertura", "rows": {1: {"matches": 19}, 2: {"matches": 19}}}
+        fin = {"nome": "Finalización", "rows": {1: {"matches": 12}, 2: {"matches": 12}}}
+        self.assertIs(df.escolher_grupo([ape, fin], (1, 2), "Liga DIMAYOR, Finalizacion"), fin["rows"])
+
+    def test_eventos_suspeitos(self):
+        def ev(i, h, a, ts, placar=None):
+            e = {"id": i, "homeTeam": {"id": h}, "awayTeam": {"id": a}, "startTimestamp": ts, "homeScore": {}, "awayScore": {}}
+            if placar:
+                e["homeScore"], e["awayScore"] = {"current": placar[0]}, {"current": placar[1]}
+            return e
+        evs = [ev(1, 10, 11, 100), ev(2, 10, 12, 100), ev(3, 20, 21, 100, (2, 3)), ev(4, 30, 31, 100)]
+        self.assertEqual(df.eventos_suspeitos(evs), {1, 2, 3})   # Cahul com 2 jogos no mesmo horário; placar já preenchido
 
     def test_expulsao_relevante(self):
         jog = {"incidentType": "card", "incidentClass": "red", "isHome": True, "time": 30, "player": {"name": "X"}}
