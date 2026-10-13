@@ -39,7 +39,8 @@ faixa e registre aqui.
    - Shkurin (Katowice): 7 gols com 3,93 de xG. *(automático)*
 8. **Artilheiro fora pesa muito.** O Robson tinha 30% dos gols do Novorizontino: ajuste de −3 p.p.
    Se um jogador tem mais de 40% dos gols (Qalmagambetov, Aral), escalação não confirmada é risco.
-9. **Calendário apertado → rodízio.** Três jogos em 7 dias (Buchbach, Bashley). *(automático)*
+9. **Calendário apertado → rodízio.** *Regra do Daniel (13/10): técnico que vai poupar titulares tira o
+   jogo da lista; a notícia confirma, o calendário só alerta.* Três jogos em 7 dias (Buchbach, Bashley). *(automático)*
 10. **Pausa longa → falta de ritmo.** Norrköping e Aral, com 3 semanas sem jogo oficial.
     - Com goleiro titular fora junto, o desconto é maior: o PAOK perdeu de 1-3 em 12/10, com xG de 1,25 a 2,36.
     *(automático para mais de 18 dias; amistosos contam como jogo)*
@@ -53,7 +54,7 @@ faixa e registre aqui.
     do clube.
 13. **Coordenadas de estádio erradas no Sofascore** (LASK, San Luis Potosí): a cidade confere
     (`localizar`).
-14. **Ligas amadoras, de base e times B:**
+14. **Ligas amadoras, de base e times B** (a "Fursat Liga" do Azerbaijão é amadora: 14/10):
     - não têm xG, a amostra é curta e o elenco muda;
     - dificilmente estão na Betano;
     - entram na lista só se não houver caso profissional melhor.
@@ -79,3 +80,4 @@ faixa e registre aqui.
 | 12/10 | Always Ready x Ind. Petrolero (favoritos) | vence | 78% | 2-0 | ✅ | |
 | 12/10 | Elfsborg x Halmstad (favoritos) | vence | 67% | 4-0 | ✅ | |
 | 12/10 | Atalanta x Venezia (favoritos, no limite) | vence | 60% | 3-1 | ✅ | |
+| 13/10 | Pakhtakor II x Aral | Aral 2+ (fora no Sofascore; mando real em Nukus) | 75% | 1-2 | ✅ | O Aral fez os 2 gols, apesar dos 22 dias sem jogo oficial. |

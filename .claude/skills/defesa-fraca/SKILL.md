@@ -14,6 +14,9 @@ Regras específicas desta análise (pedido dele em 12/10):
 - **Forma do favorito (pedido de 13/10):** favorito com **menos de 8 dos 15 pontos nos últimos 5 jogos
   oficiais** (todas as competições, sem amistosos; menos de 50% se houver menos jogos) **sai da lista**. O `defesa.py` já marca `passa = false`
   com o motivo. Se o pesquisador achar jogo oficial mais recente que o Sofascore não tem, refaça a conta.
+- **Técnico poupando titulares (pedido de 13/10):** se o técnico do favorito for poupar jogadores
+  (`cetico.poupa_titulares_final` = `SIM_CONFIRMADO` ou `PROVAVEL` com fonte confiável), **o jogo sai**.
+  O alerta de calendário do `defesa.py` ("rodízio possível") sozinho não tira: precisa da notícia.
 - **Todas as ligas do Sofascore.** Ligas profissionais vêm primeiro. Amador, base e time B só entram se faltar caso profissional.
 - **Resposta:** até `defesa.max_resposta` jogos (padrão 4). Só os que passam: prob ≥ `criterios.prob_minima`
   depois do ajuste e cético sem refutar. **Nunca force:** se passarem 2, mande 2 e diga que o resto não fechou.
@@ -58,6 +61,7 @@ Para cada resultado:
 
 1. **Mercado e probabilidade.**
    - `mercado = cetico.mercado_final`. Se for `nenhum` ou `refutado = true`, o jogo cai.
+   - Se `cetico.poupa_titulares_final` for `SIM_CONFIRMADO` ou `PROVAVEL`, o jogo cai (técnico poupando).
    - `p = prob do defesa.py para esse mercado + cetico.ajuste_final_pp/100`. O ajuste total vai de −5 a +5 p.p.
    - Escreva o motivo do ajuste.
 2. **Mando invertido (`pesquisa.mando_invertido`):** rode de novo com os dados do mando real.

@@ -130,6 +130,9 @@ Análise diária pedida pelo Daniel em 12/10. Procura jogos em que o **azarão s
      - conta os últimos `forma_jogos` (5) jogos **oficiais**, em todas as competições, sem amistosos, pelo placar dos 90 min;
      - com **menos de 50% dos pontos** (em 5 jogos, menos de 8 de 15), o jogo sai da lista
        (`forma_aproveitamento_min`).
+   - **Técnico poupando titulares** (pedido do Daniel em 13/10): o pesquisador e o cético procuram
+     entrevista, escalação provável e jogo decisivo logo depois. Se for `SIM_CONFIRMADO` ou `PROVAVEL`
+     com fonte confiável, o jogo sai. O alerta de calendário apertado sozinho não tira.
    - **Regra 8 por mercado:**
      - nos gols, compara com o λ implícito do 1X2 e das linhas de gols da bet365;
      - na vitória e na dupla chance, com o 1X2/DC sem margem.

@@ -74,7 +74,7 @@ DEFESA_PADRAO = {
     "palavras_amistoso": ["Friendly", "Friendlies", "Amistoso"],
     "chuva": "informativa",
     "palavras_base": ["Amateur", "NCAA", "U19", "U20", "U21", "U23", "U17", "Reserve", "Women",
-                      "Youth", "Primavera", "Juniors"],
+                      "Youth", "Primavera", "Juniors", "Fursat"],
 }
 
 MERCADOS = [  # (chave, rótulo, gols do favorito exigidos)

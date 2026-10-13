@@ -46,11 +46,15 @@ const PESQ = {
     ataque_favorito_forte: { type: 'boolean' },
     desfalques_ataque_favorito: { type: 'array', items: { type: 'string' } },
     contexto: { type: 'string', description: 'calendário/rodízio, pausa, motivação, técnico, árbitro, altitude, gramado, escalação — no máximo 8 linhas' },
+    poupa_titulares: { type: 'string', enum: ['SIM_CONFIRMADO', 'PROVAVEL', 'NAO', 'N/D'],
+      description: 'o técnico do FAVORITO vai poupar titulares? SIM_CONFIRMADO = declaração/escalação; PROVAVEL = imprensa confiável diz que vai rodar (jogo decisivo logo depois, sequência pesada); NAO = disse que vai com força máxima ou não há motivo; N/D = sem informação' },
+    poupa_evidencia: { type: 'string', description: 'fonte e data da informação sobre poupar (ou N/D)' },
     ajuste_pp: { type: 'number', minimum: -5, maximum: 5, description: 'ajuste em p.p. na prob. do mercado sugerido pelo defesa.py (melhor_mercado), com motivo no contexto' },
     fontes: { type: 'array', items: { type: 'string' } },
   },
   required: ['local_confirmado', 'mando_invertido', 'defesa_azarao', 'defesa_extremamente_fraca', 'desfalques_defesa_azarao',
-    'ataque_azarao', 'ataque_favorito', 'ataque_favorito_forte', 'desfalques_ataque_favorito', 'contexto', 'ajuste_pp', 'fontes'],
+    'ataque_azarao', 'ataque_favorito', 'ataque_favorito_forte', 'desfalques_ataque_favorito', 'contexto', 'poupa_titulares',
+    'poupa_evidencia', 'ajuste_pp', 'fontes'],
 }
 
 const CET = {
@@ -58,6 +62,8 @@ const CET = {
   properties: {
     refutado: { type: 'boolean', description: 'true se a tese (defesa do azarão muito fraca E favorito com ataque forte) não se sustenta' },
     risco_azarao_marca: { type: 'boolean', description: 'azarão marca ≥ 1,3 gol/jogo na condição ou está no top 30% de ataques' },
+    poupa_titulares_final: { type: 'string', enum: ['SIM_CONFIRMADO', 'PROVAVEL', 'NAO', 'N/D'],
+      description: 'conferência própria: o favorito vai poupar titulares? (regra do Daniel: SIM_CONFIRMADO ou PROVAVEL tira o jogo)' },
     mercado_final: { type: 'string', enum: ['fav_marca_1', 'fav_marca_2', 'fav_marca_3', 'fav_vence', 'fav_dc', 'nenhum'],
       description: 'o mercado mais seguro que ainda tem ≥ 60% depois de tudo (pode rebaixar 2+ para 1+)' },
     ajuste_final_pp: { type: 'number', minimum: -5, maximum: 5, description: 'ajuste TOTAL em p.p. sobre a prob. do defesa.py para o mercado_final' },
@@ -66,7 +72,7 @@ const CET = {
     licao: { type: 'string', description: 'lição NOVA e geral que este caso ensina (não repita docs/licoes.md); "" se nenhuma' },
     veredito: { type: 'string', description: '1-2 frases' },
   },
-  required: ['refutado', 'risco_azarao_marca', 'mercado_final', 'ajuste_final_pp', 'pontos_contra', 'pontos_a_favor', 'licao', 'veredito'],
+  required: ['refutado', 'risco_azarao_marca', 'poupa_titulares_final', 'mercado_final', 'ajuste_final_pp', 'pontos_contra', 'pontos_a_favor', 'licao', 'veredito'],
 }
 
 const resumo = c => {
@@ -85,12 +91,14 @@ Pesquise A FUNDO, começando pelo Sofascore e depois imprensa local, site da lig
 2) Ataque do favorito: gols e xG na condição, artilheiros (participação nos gols) e se jogam, rodízio, pausa, motivação.
 3) Ataque do azarão (risco de jogo aberto).
 4) Escalação (event/${c.id}/lineups) e o MANDO REAL do jogo (site da liga/clube).
+5) O técnico do FAVORITO vai POUPAR titulares? Procure entrevista coletiva, escalação provável na imprensa, jogo decisivo nos dias seguintes (copa, continental, clássico), sequência pesada. Regra do Daniel: se for poupar, o jogo sai da lista. Responda poupa_titulares com a fonte.
 Nunca invente número: todo número com fonte e recorte. Sem dado → N/D.
 ${SOFA}`, { label: `pesq:${c.favorito}`, phase: 'Pesquisa', schema: PESQ, model: modelo }),
   (p, c) => !p ? { id: c.id, n: c.n, jogo: c.jogo, hora: c.hora, pesquisa: null, cetico: null, status: 'pesquisa falhou' } : agent(`Você é o CÉTICO. Tente DERRUBAR a tese "${c.azarao} tem defesa extremamente fraca e ${c.favorito} tem ataque forte e deve marcar" no jogo ${c.jogo} (${c.pais} · ${c.competicao}), ${c.hora} de ${dia}, id Sofascore ${c.id}, ids ${JSON.stringify(c.ids)}.
 ${LICOES}
 Dados do defesa.py: ${resumo(c)}
 Relatório do pesquisador: ${JSON.stringify(p)}
+REGRA DO DANIEL: se o técnico do favorito for poupar titulares (confirmado ou provável por fonte confiável), o jogo sai — confira isso por conta própria (poupa_titulares_final), não só pelo calendário.
 Confira por conta própria os pontos frágeis: amostra pequena; média inflada por goleadas (veja a mediana); gols sofridos x xG cedido (regressão); melhora recente (técnico novo); expulsões; o favorito marca acima do xG ou depende de 1 jogador ausente; rodízio e calendário; mando real; o azarão ataca bem (RISCO); regra 8 (modelo > mercado + 10 p.p.).
 Feche o mercado_final: o mais seguro com ≥ ${Math.round(crit.prob_minima * 100)}% depois do ajuste (pode rebaixar "marca 2+" para "marca 1+"), e o ajuste_final_pp (−5 a +5) sobre a prob. do defesa.py para ESSE mercado. Se a defesa do azarão for só mediana para a liga, refutado=true.
 Se o caso ensinar algo NOVO e geral que não esteja em docs/licoes.md, escreva em "licao".
