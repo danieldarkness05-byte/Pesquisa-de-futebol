@@ -411,8 +411,11 @@ class TestDefesa(unittest.TestCase):
         self.assertEqual(f["seq"], "DDEDD")
         self.assertEqual((f["v"], f["e"], f["d"], f["pts"]), (0, 1, 4, 1))
         self.assertTrue(df.forma_negativa(f))
-        self.assertFalse(df.forma_negativa({"n": 5, "v": 2, "e": 1, "d": 2}))   # equilibrado fica
-        self.assertFalse(df.forma_negativa({"n": 0, "v": 0, "e": 0, "d": 0}))   # sem dado não tira
+        self.assertTrue(df.forma_negativa({"n": 5, "pts": 7}))      # 2V 1E 2D = 7 de 15: sai
+        self.assertTrue(df.forma_negativa({"n": 5, "pts": 6}))      # 1V 3E 1D (Buchbach 13/10): sai
+        self.assertFalse(df.forma_negativa({"n": 5, "pts": 8}))     # 8 de 15: fica
+        self.assertTrue(df.forma_negativa({"n": 4, "pts": 5}))      # só 4 oficiais: metade de 12 = 6
+        self.assertFalse(df.forma_negativa({"n": 0, "pts": 0}))     # sem dado não tira
 
     def test_escolher_grupo_da_fase_certa(self):
         apertura = {"nome": "Torneo Final", "rows": {1: {"matches": 6}, 2: {"matches": 6}, 3: {"matches": 6}}}

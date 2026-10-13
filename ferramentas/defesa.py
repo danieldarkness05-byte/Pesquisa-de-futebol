@@ -70,6 +70,7 @@ DEFESA_PADRAO = {
     "jogos_calendario": 3,
     "expulsoes_alerta": 2,
     "forma_jogos": 5,
+    "forma_aproveitamento_min": 0.5,
     "palavras_amistoso": ["Friendly", "Friendlies", "Amistoso"],
     "chuva": "informativa",
     "palavras_base": ["Amateur", "NCAA", "U19", "U20", "U21", "U23", "U17", "Reserve", "Women",
@@ -248,10 +249,10 @@ def forma(eventos: list[dict], tid: int, antes_ts: int, qtd: int, palavras_amist
             "pts": 3 * seq.count("V") + seq.count("E"), "n": len(seq)}
 
 
-def forma_negativa(f: dict) -> bool:
-    """Regra do Daniel (13/10): favorito com mais derrotas que vitórias nos últimos
-    jogos oficiais sai da lista."""
-    return f.get("n", 0) > 0 and f["d"] > f["v"]
+def forma_negativa(f: dict, aproveitamento_min: float = 0.5) -> bool:
+    """Regra do Daniel (13/10): favorito com menos da metade dos pontos nos últimos
+    jogos oficiais sai da lista (em 5 jogos: menos de 8 de 15)."""
+    return f.get("n", 0) > 0 and f["pts"] < aproveitamento_min * 3 * f["n"]
 
 
 def calendario(eventos_passados: list[dict], eventos_futuros: list[dict], inicio_ts: int, dias: int) -> dict:
@@ -611,8 +612,8 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d: dict, data: str, chuv
     if min(len(xf), len(xa)) < 3 or freq_mercado(info["frequencias"], 1) is None:
         info["motivo"] = f"dado faltando: só {len(xf)}/{len(xa)} jogos recentes na condição"
     fm = info["forma_favorito"]
-    if not info["motivo"] and forma_negativa(fm):
-        info["motivo"] = (f"fora pela forma: favorito com mais derrotas que vitórias nos últimos {fm['n']} "
+    if not info["motivo"] and forma_negativa(fm, d["forma_aproveitamento_min"]):
+        info["motivo"] = (f"fora pela forma: favorito fez {fm['pts']} de {3 * fm['n']} pontos nos últimos {fm['n']} "
                           f"oficiais ({fm['v']}V {fm['e']}E {fm['d']}D: {fm['seq']})")
     det = api.get(f"event/{eid}").get("event", {})
     venue = det.get("venue") or {}

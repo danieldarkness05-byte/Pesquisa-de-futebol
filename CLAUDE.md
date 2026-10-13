@@ -60,8 +60,8 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
    (`previsoes.py resolver` + `resumo` + `docs/licoes.md`), depois `defesa.py` → workflow
    `.claude/workflows/defesa.js` (pesquisador + cético, até `config.json → defesa.max_pesquisa`) → veredito →
    salva, registra as previsões e acrescenta as lições novas. Nesta análise a **chuva é só informativa**
-   (pedido do Daniel em 12/10) e entram **todas as ligas** do Sofascore. **Favorito com mais derrotas que
-   vitórias nos últimos 5 jogos oficiais sai da lista** (pedido do Daniel em 13/10).
+   (pedido do Daniel em 12/10) e entram **todas as ligas** do Sofascore. **Favorito com menos de 8 dos 15 pontos
+   nos últimos 5 jogos oficiais sai da lista** (pedido do Daniel em 13/10).
 3. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
 4. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
 

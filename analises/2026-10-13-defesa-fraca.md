@@ -12,13 +12,17 @@
   - λ encolhido da peneira (k = 4), com Dixon-Coles ρ −0,10 e incerteza σ 0,15.
   - Vale o mais conservador, com o ajuste do cético (≤ ±5 p.p.) e conferido contra a frequência real.
 
+> **Atualização 12/10, 23h:** o Daniel pediu uma regra nova: favorito com **menos de 8 dos 15 pontos nos
+> últimos 5 jogos oficiais** sai da lista. O **Buchbach** fez 1V 3E 1D (6 pts, EVEDE) e **saiu**.
+> Ficaram 3: Aral (VEVVV), Norrköping (VEVEV) e Bashley (VVVVE).
+
 ## Passaram (cético não derrubou) — sem ⚠️ RISCO em nenhum
 
 | Azarão · jogo | Hora | Defesa do azarão | Ataque do favorito | Mercado (prob. · odd mínima) |
 |---|---|---|---|---|
 | **Pakhtakor Tashkent II** · Pakhtakor II x Aral (Uzbequistão, Pro Liga) | 10:00 | Fora: 25 sofridos em 11 jogos (2,27/j); sofreu 2+ em 9 dos últimos 10 fora | Aral em casa: 25-3 em 11 jogos, 100% de vitórias, 2+ gols em 7 dos últimos 10 | Aral +1,5 gol: **~75%** · **1.37** |
 | **GIF Sundsvall** · Norrköping x Sundsvall (Suécia, Superettan) | 14:00 | Pior defesa da liga (2,12/j); fora 2,08/j com xG cedido de 2,04 | 2,0/j em casa, xG 2,24 (melhor ataque da liga); Nyman tem 16 gols | Norrköping +0,5: **~83%** · **1.24**. O +1,5 dá 57–63%, no limite |
-| **FC Augsburg II** · Buchbach x Augsburg II (Alemanha, Regionalliga Bayern) | 14:00 | Fora: 17 sofridos em 7 (2,43/j), 2ª pior; xG contra 2,54 | Em casa 2,17/j (13 em 6), mas o xG recente é mediano (~0,9–1,6) | Buchbach +1,5: **~61%** · **1.69**; +0,5: ~85% · 1.22 |
+| ~~**FC Augsburg II** · Buchbach x Augsburg II~~ (saiu pela forma) (Alemanha, Regionalliga Bayern) | 14:00 | Fora: 17 sofridos em 7 (2,43/j), 2ª pior; xG contra 2,54 | Em casa 2,17/j (13 em 6), mas o xG recente é mediano (~0,9–1,6) | Buchbach +1,5: **~61%** · **1.69**; +0,5: ~85% · 1.22 |
 | **Christchurch** · Bashley x Christchurch (Inglaterra, Wessex Premier, 9ª divisão) | 15:45 | Fora: 32 sofridos em 9 (3,56/j); 0 pontos e 16 jogos sem vencer | Em casa 3,33/j, o 1º da liga | Bashley +1,5: **~65%** (o modelo dá 89%, mas a frequência real é 67–70%) · **1.58** |
 
 **Sem odds no Sofascore para os mercados de gol do favorito.** Conferir na Betano: só entra se a odd for ≥ a mínima. Aral, Buchbach e Bashley não têm nem 1X2 no Sofascore.

@@ -3,7 +3,7 @@ id,data,hora,evento,jogo,competicao,nivel,analise,mercado,lado,prob,odd_minima,o
 2,2026-10-12,19:20,16588940,Nacional Asunción x Recoleta FC,Paraguai Primera División,pro,defesa,marca_1,casa,0.84,1.22,,odd do Nacional subiu 1.53->1.67; regra 8 no 2+,resolvida,1-0,1,
 3,2026-10-13,10:00,16362870,Pakhtakor Tashkent II x Pfk Aral,Uzbekistan Pro League,base,defesa,marca_2,fora,0.75,1.37,,mando real em Nukus (PFL); 22 dias sem jogo oficial,pendente,,,
 4,2026-10-13,14:00,15271307,IFK Norrköping x GIF Sundsvall,Superettan,pro,defesa,marca_1,casa,0.83,1.24,,média inflada por goleadas (mediana 1),pendente,,,2+ no limite 57-63%
-5,2026-10-13,14:00,16489417,TSV Buchbach x FC Augsburg II,Regionalliga Bayern,base,defesa,marca_2,casa,0.61,1.69,,3 jogos em 7 dias; xG mediano,pendente,,,
+5,2026-10-13,14:00,16489417,TSV Buchbach x FC Augsburg II,Regionalliga Bayern,base,defesa,marca_2,casa,0.61,1.69,,3 jogos em 7 dias; xG mediano,anulada,,,retirada pela regra de forma: Buchbach 6 de 15 pts nos últimos 5 oficiais (EVEDE)
 6,2026-10-13,15:45,16643818,Bashley FC x Christchurch FC,Wessex League Premier,base,defesa,marca_2,casa,0.65,1.58,,4 jogos em 11 dias; sem xG,pendente,,,
 7,2026-10-12,12:00,16559941,PAOK x PS Kalamata,Super League Grécia,pro,favoritos,vence,casa,0.781,1.32,1.17,,resolvida,1-3,0,lista de chance alta de vitória
 8,2026-10-12,18:15,17255666,Club Always Ready x Club Independiente Petrolero,Bolívia División Profesional,pro,favoritos,vence,casa,0.78,1.32,1.09,,resolvida,2-0,1,lista de chance alta de vitória

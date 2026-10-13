@@ -110,7 +110,7 @@
     "modelo_agentes": "sonnet"
   },
   "defesa": {
-    "_leia": "Análise diária defesa fraca do azarão x ataque forte do favorito (ferramentas/defesa.py + .claude/workflows/defesa.js, skill /defesa-fraca). Triagem: azarão sofre >= indice_defesa_min x a média da liga na condição e favorito marca >= indice_ataque_min x a média (com tolerancia_indice). max_aprofundar = quantos ganham estatística detalhada (Python, grátis); max_pesquisa = quantos vão para os agentes (1 pesquisador + 1 cético cada); max_resposta = quantos jogos no máximo na resposta. Probabilidade = menor entre tabela, λ por gols e λ gols+xG, limitada pela frequência real + tolerancia_frequencia. chuva = informativa (pedido do Daniel em 12/10). forma_jogos: favorito com mais derrotas que vitórias nos últimos N jogos oficiais (sem amistosos) sai da lista (pedido do Daniel em 13/10). modelo_agentes null = mesmo modelo da sessão. Ajuste estes números quando o previsoes.py resumo mostrar faixa descalibrada (docs/licoes.md).",
+    "_leia": "Análise diária defesa fraca do azarão x ataque forte do favorito (ferramentas/defesa.py + .claude/workflows/defesa.js, skill /defesa-fraca). Triagem: azarão sofre >= indice_defesa_min x a média da liga na condição e favorito marca >= indice_ataque_min x a média (com tolerancia_indice). max_aprofundar = quantos ganham estatística detalhada (Python, grátis); max_pesquisa = quantos vão para os agentes (1 pesquisador + 1 cético cada); max_resposta = quantos jogos no máximo na resposta. Probabilidade = menor entre tabela, λ por gols e λ gols+xG, limitada pela frequência real + tolerancia_frequencia. chuva = informativa (pedido do Daniel em 12/10). forma_jogos/forma_aproveitamento_min: favorito com menos de 50% dos pontos nos últimos N jogos oficiais (sem amistosos; em 5 jogos = menos de 8 de 15) sai da lista (pedido do Daniel em 13/10). modelo_agentes null = mesmo modelo da sessão. Ajuste estes números quando o previsoes.py resumo mostrar faixa descalibrada (docs/licoes.md).",
     "todas_as_ligas": true,
     "indice_defesa_min": 1.4,
     "indice_ataque_min": 1.15,
@@ -135,6 +135,7 @@
     "jogos_calendario": 3,
     "expulsoes_alerta": 2,
     "forma_jogos": 5,
+    "forma_aproveitamento_min": 0.5,
     "palavras_amistoso": ["Friendly", "Friendlies", "Amistoso"],
     "chuva": "informativa",
     "modelo_agentes": null
