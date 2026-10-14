@@ -94,3 +94,17 @@ do Daniel; bet365 pelo Sofascore como referência.
   (`copa.py` no scratchpad).
 - **Nashville vitória a 1.23:** não tem valor. Com 62% (modelo), o EV é −24%; com 77% (mercado), −5%.
   O pick da análise continua sendo **Nashville marca 2+ gols, odd mínima 1.52**.
+
+## Regra de forma ajustada para 7+ pontos (14/10, 01:30) — novos casos
+
+Com o mínimo de 7 pontos, dois jogos entraram na triagem. Os dois passaram pela pesquisa
+(workflow `defesa.js`, 4 agentes):
+
+| Jogo | Data real | Mercado | Prob. | Odd mínima | Observação |
+|---|---|---|---|---|---|
+| Real Estelí x Jalapa (Nicarágua) | **15/10, 22:00** (o Sofascore dizia 14/10 18:00) | Real Estelí marca 2+ | ~63% | 1.64 | O Jalapa tem a pior defesa fora (2,4/j; 2+ sofridos em 9 dos últimos 10 fora). Bonilla, o artilheiro, é dúvida. O mercado implica ~1.47 justo, então **provavelmente sem valor** |
+| Stocksbridge x Bridlington (Inglaterra, 8ª divisão) | 14/10, 15:45 | Bridlington marca 1+ | ~83% | 1.24 | Liga amadora. O 2+ caiu no teste das médias gerais (59%). Técnico novo no Stocksbridge |
+
+**Melhorias:**
+- variante "geral" no `defesa.py` (lição 20), com teste;
+- o pesquisador confirma data e hora numa 2ª fonte (lição 21).

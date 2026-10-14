@@ -216,6 +216,19 @@ def lambdas_mercado(p1x2: list[float], p_overs: dict[float, float] | None = None
     return round(melhor[1], 3), round(melhor[2], 3)
 
 
+def lambdas_gerais(casa_tot: dict, fora_tot: dict, liga_casa: float, liga_fora: float) -> tuple[float, float] | None:
+    """λ pelas médias GERAIS da temporada (sem o recorte casa/fora), com o mando da liga.
+    Teste de chão das lições 17/20: com 5–6 jogos por condição, o recorte infla o favorito
+    que marca muito mais em uma das condições (Bridlington 14/10: λ 2,18 → 1,97)."""
+    mc, mf = casa_tot.get("matches") or 0, fora_tot.get("matches") or 0
+    media = (liga_casa + liga_fora) / 2
+    if not mc or not mf or not media:
+        return None
+    lh = (casa_tot["scoresFor"] / mc) * (fora_tot["scoresAgainst"] / mf) / media * (liga_casa / media)
+    la = (fora_tot["scoresFor"] / mf) * (casa_tot["scoresAgainst"] / mc) / media * (liga_fora / media)
+    return lh, la
+
+
 def tendencia(xs: list[dict], chave: str, ultimos: int = 5) -> tuple[float | None, float | None]:
     """(média dos últimos `ultimos`, média da amostra toda)."""
     vals = [x[chave] for x in xs if x.get(chave) is not None]
@@ -517,6 +530,8 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
         "favorito_por": crit, "odds": odds.get("1x2"), "odds_ini": odds.get("1x2_ini"), "mercado_odds": odds,
         "liga": {"casa": round(lh, 3), "fora": round(la, 3),
                  "empates": round(empates, 3) if empates is not None else None},
+        "tabela_geral": {lado: ({k: tt[t][k] for k in ("matches", "scoresFor", "scoresAgainst")} if t in tt else None)
+                         for lado, t in (("casa", h), ("fora", a))},
         "tabela": {"casa": {k: rh[k] for k in ("matches", "scoresFor", "scoresAgainst")},
                    "fora": {k: ra[k] for k in ("matches", "scoresFor", "scoresAgainst")}},
         "az_ga": round(az_ga, 2), "az_gf": round(az_gf, 2), "fav_gf": round(fav_gf, 2),
@@ -568,6 +583,10 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d: dict, data: str, chuv
                               tb["fora"]["scoresFor"] / tb["fora"]["matches"],
                               tb["fora"]["scoresAgainst"] / tb["fora"]["matches"], lg["casa"], lg["fora"])
     variantes["tabela"] = (lt, matriz_e_probs(*lt, fav_casa, rho, sig))
+    tg = info.get("tabela_geral") or {}
+    lg_geral = lambdas_gerais(tg["casa"], tg["fora"], lg["casa"], lg["fora"]) if tg.get("casa") and tg.get("fora") else None
+    if lg_geral:
+        variantes["geral"] = (lg_geral, matriz_e_probs(*lg_geral, fav_casa, rho, sig))
     liga = v.medias_liga(api, ut, info["temporada"]) or (lg["casa"], lg["fora"])
     xh, xaw = (xf, xa) if fav_casa else (xa, xf)
     if min(len(xh), len(xaw)) >= 3:

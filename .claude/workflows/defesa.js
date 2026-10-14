@@ -37,6 +37,8 @@ const PESQ = {
   type: 'object',
   properties: {
     local_confirmado: { type: 'string', description: 'estádio e cidade REAIS (site da liga/clube), e se o mando do Sofascore está certo' },
+    data_confirmada: { type: 'string', description: 'data e hora REAIS (Brasília) conferidas numa 2ª fonte (365Scores, Flashscore, site da liga) — o Sofascore às vezes não atualiza o calendário de ligas pequenas' },
+    data_diferente: { type: 'boolean', description: 'true se a data/hora real difere da do Sofascore' },
     mando_invertido: { type: 'boolean', description: 'true se o jogo é na casa do time que o Sofascore lista como visitante' },
     defesa_azarao: { type: 'string', description: 'números com fonte e recorte: na condição e geral, contra quem sofreu, tendência, técnico novo, expulsões' },
     defesa_extremamente_fraca: { type: 'boolean' },
@@ -52,7 +54,7 @@ const PESQ = {
     ajuste_pp: { type: 'number', minimum: -5, maximum: 5, description: 'ajuste em p.p. na prob. do mercado sugerido pelo defesa.py (melhor_mercado), com motivo no contexto' },
     fontes: { type: 'array', items: { type: 'string' } },
   },
-  required: ['local_confirmado', 'mando_invertido', 'defesa_azarao', 'defesa_extremamente_fraca', 'desfalques_defesa_azarao',
+  required: ['local_confirmado', 'data_confirmada', 'data_diferente', 'mando_invertido', 'defesa_azarao', 'defesa_extremamente_fraca', 'desfalques_defesa_azarao',
     'ataque_azarao', 'ataque_favorito', 'ataque_favorito_forte', 'desfalques_ataque_favorito', 'contexto', 'poupa_titulares',
     'poupa_evidencia', 'ajuste_pp', 'fontes'],
 }
@@ -90,7 +92,7 @@ Pesquise A FUNDO, começando pelo Sofascore e depois imprensa local, site da lig
 1) Defesa do azarão: números na condição e geral, contra quem sofreu, tendência, técnico novo (recorte depois da troca), goleiro e zagueiros fora, expulsões que inflaram os gols.
 2) Ataque do favorito: gols e xG na condição, artilheiros (participação nos gols) e se jogam, rodízio, pausa, motivação.
 3) Ataque do azarão (risco de jogo aberto).
-4) Escalação (event/${c.id}/lineups) e o MANDO REAL do jogo (site da liga/clube).
+4) Escalação (event/${c.id}/lineups), o MANDO REAL do jogo (site da liga/clube) e a DATA/HORA real numa 2ª fonte (365Scores, Flashscore, site da liga): em ligas pequenas o Sofascore às vezes não atualiza o calendário.
 5) O técnico do FAVORITO vai POUPAR titulares? Procure entrevista coletiva, escalação provável na imprensa, jogo decisivo nos dias seguintes (copa, continental, clássico), sequência pesada. Regra do Daniel: se for poupar, o jogo sai da lista. Responda poupa_titulares com a fonte.
 Nunca invente número: todo número com fonte e recorte. Sem dado → N/D.
 ${SOFA}`, { label: `pesq:${c.favorito}`, phase: 'Pesquisa', schema: PESQ, model: modelo }),

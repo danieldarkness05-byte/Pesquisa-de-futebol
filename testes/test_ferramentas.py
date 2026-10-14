@@ -429,6 +429,14 @@ class TestDefesa(unittest.TestCase):
         fin = {"nome": "Finalización", "rows": {1: {"matches": 12}, 2: {"matches": 12}}}
         self.assertIs(df.escolher_grupo([ape, fin], (1, 2), "Liga DIMAYOR, Finalizacion"), fin["rows"])
 
+    def test_lambdas_gerais_tira_o_inflado_da_condicao(self):
+        # Bridlington (fora) 14/10: 18 gols em 11 no geral; Stocksbridge (casa) sofreu 23 em 11 no geral
+        casa = {"matches": 11, "scoresFor": 8, "scoresAgainst": 23}
+        fora = {"matches": 11, "scoresFor": 18, "scoresAgainst": 16}
+        lh, la = df.lambdas_gerais(casa, fora, 1.667, 1.121)
+        self.assertAlmostEqual(la, 1.97, delta=0.02)    # o cético achou ~1,97; o recorte fora dava 2,18
+        self.assertIsNone(df.lambdas_gerais({"matches": 0}, fora, 1.6, 1.1))
+
     def test_eventos_suspeitos(self):
         def ev(i, h, a, ts, placar=None):
             e = {"id": i, "homeTeam": {"id": h}, "awayTeam": {"id": a}, "startTimestamp": ts, "homeScore": {}, "awayScore": {}}

@@ -79,6 +79,14 @@ faixa e registre aqui.
     jogo. Santa Fe x Jaguares, 14/10: com a do Apertura, o λ dava 2,83; com a do Finalización, ~2,0, e o
     ataque do Santa Fe era só médio. *(automático: grupo cujo nome está no nome do torneio)*
 
+20. **Sem xG, o teste de chão do 2+ usa as médias GERAIS da temporada** (Bridlington, 14/10): com 5 ou 6
+    jogos por condição, o recorte casa/fora infla o favorito que marca muito mais em uma delas
+    (2,0 fora contra 1,2 em casa). O λ caiu de 2,18 para 1,97, e o 2+ de 63% para 59%.
+    *(automático: variante "geral" no `defesa.py`)*
+21. **Data do jogo em liga pequena:** confira numa 2ª fonte (365Scores ou Flashscore). Em Real Estelí x
+    Jalapa (Nicarágua), o Sofascore dava 14/10 18:00, e o jogo real era 15/10 22:00. O campo
+    `changeTimestamp` não ajuda, porque vem 0 em todos os jogos. *(o pesquisador confere `data_confirmada`)*
+
 ## Mercado (regra 8)
 
 15. **Modelo mais de 10 p.p. acima do mercado:** quase sempre o mercado sabia algo.

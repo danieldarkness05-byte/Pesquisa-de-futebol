@@ -65,18 +65,20 @@ Para cada resultado:
    - Se `cetico.poupa_titulares_final` for `SIM_CONFIRMADO` ou `PROVAVEL`, o jogo cai (técnico poupando).
    - `p = prob do defesa.py para esse mercado + cetico.ajuste_final_pp/100`. O ajuste total vai de −5 a +5 p.p.
    - Escreva o motivo do ajuste.
-2. **Mando invertido (`pesquisa.mando_invertido`):** rode de novo com os dados do mando real.
+2. **Data diferente (`pesquisa.data_diferente`):** o jogo sai da lista do dia e vai para a data real, registrado
+   com ela (Real Estelí x Jalapa: o Sofascore dava 14/10 18:00, e o jogo real era 15/10 22:00).
+3. **Mando invertido (`pesquisa.mando_invertido`):** rode de novo com os dados do mando real.
    Use `prob.py gols` com as médias da tabela, trocando casa por fora, e fique com o menor valor.
-3. **Passa se** `p ≥ criterios.prob_minima` e não refutado.
-4. **Odd mínima** = (1 + `criterios.ev_minimo`) / p.
+4. **Passa se** `p ≥ criterios.prob_minima` e não refutado.
+5. **Odd mínima** = (1 + `criterios.ev_minimo`) / p.
    - Se houver odd real (bet365 no JSON, ou a que o Daniel colar), rode
      `python3 ferramentas/valor.py --prob <p> --odd <odd>`.
-5. **⚠️ RISCO** (o azarão também ataca bem) não entra como pick. Pode aparecer como aviso.
-6. **Regra 8 do mercado final:** compare o `p` final com `mercados[chave].prob_mercado` do JSON. Para a
+6. **⚠️ RISCO** (o azarão também ataca bem) não entra como pick. Pode aparecer como aviso.
+7. **Regra 8 do mercado final:** compare o `p` final com `mercados[chave].prob_mercado` do JSON. Para a
    vitória e a dupla chance é o 1X2/DC sem margem; para os gols, o λ implícito do 1X2 e das linhas de gols.
    - Se `p` passar do mercado em mais de 10 p.p., só entra se o pesquisador explicou o que o mercado sabe.
    - Senão, desconte até 5 p.p. ou derrube.
-7. **Ordem:** profissional antes de amador, depois maior p, depois menos alertas.
+8. **Ordem:** profissional antes de amador, depois maior p, depois menos alertas.
 
 ## 4. Salvar, registrar e evoluir
 
