@@ -110,3 +110,4 @@ faixa e registre aqui.
 | 13/10 | Pakhtakor II x Aral | Aral 2+ (fora no Sofascore; mando real em Nukus) | 75% | 1-2 | ✅ | O Aral fez os 2 gols, apesar dos 22 dias sem jogo oficial. |
 | 13/10 | IFK Norrköping x GIF Sundsvall | Norrköping 1+ | 83% | 4-0 | ✅ | A pausa longa do Norrköping (lição 10) não pesou desta vez. |
 | 13/10 | Bashley x Christchurch | Bashley 2+ | 65% | 6-0 | ✅ | Liga amadora; a frequência real (67–70%) segurou a prob. abaixo dos 89% do modelo, e o placar passou longe. |
+| 14/10 | Stocksbridge x Bridlington | Bridlington 1+ | 83% | 0-1 | ✅ | Liga amadora: o 1+ passou no limite (1 gol); fez bem não ir no 2+, que caiu no teste das médias gerais. |
