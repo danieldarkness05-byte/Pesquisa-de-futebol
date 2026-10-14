@@ -128,8 +128,8 @@ Análise diária pedida pelo Daniel em 12/10. Procura jogos em que o **azarão s
    - Sem amostra recente (menos de 3 jogos na condição): o jogo não passa (regra 6).
    - **Forma do favorito** (pedido do Daniel em 13/10):
      - conta os últimos `forma_jogos` (5) jogos **oficiais**, em todas as competições, sem amistosos, pelo placar dos 90 min;
-     - com **menos de 50% dos pontos** (em 5 jogos, menos de 8 de 15), o jogo sai da lista
-       (`forma_aproveitamento_min`).
+     - o favorito precisa de **7 pontos ou mais** em 5 jogos (com menos jogos, a proporção 7/15); com
+       menos, o jogo sai da lista (`forma_pontos_min`; era 8 até 14/10).
    - **Técnico poupando titulares** (pedido do Daniel em 13/10): o pesquisador e o cético procuram
      entrevista, escalação provável e jogo decisivo logo depois. Se for `SIM_CONFIRMADO` ou `PROVAVEL`
      com fonte confiável, o jogo sai. O alerta de calendário apertado sozinho não tira.

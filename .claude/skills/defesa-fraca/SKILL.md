@@ -11,8 +11,9 @@ O Daniel quer **esse tipo de análise todo dia, o mais analítica possível e ev
 Regras específicas desta análise (pedido dele em 12/10):
 
 - **Chuva é só informativa.** Ela não exclui jogo aqui; a regra 3 continua valendo no /ouro.
-- **Forma do favorito (pedido de 13/10):** favorito com **menos de 8 dos 15 pontos nos últimos 5 jogos
-  oficiais** (todas as competições, sem amistosos; menos de 50% se houver menos jogos) **sai da lista**. O `defesa.py` já marca `passa = false`
+- **Forma do favorito (pedido de 13/10):** o favorito precisa de **7 pontos ou mais nos últimos 5 jogos
+  oficiais** (todas as competições, sem amistosos; com menos jogos, a proporção 7/15). Com 6 ou menos,
+  **sai da lista** (regra ajustada pelo Daniel em 14/10; antes era 8). O `defesa.py` já marca `passa = false`
   com o motivo. Se o pesquisador achar jogo oficial mais recente que o Sofascore não tem, refaça a conta.
 - **Técnico poupando titulares (pedido de 13/10):** se o técnico do favorito for poupar jogadores
   (`cetico.poupa_titulares_final` = `SIM_CONFIRMADO` ou `PROVAVEL` com fonte confiável), **o jogo sai**.
