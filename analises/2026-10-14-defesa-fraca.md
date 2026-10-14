@@ -72,3 +72,25 @@
 - Federações: fmf.md (Moldávia, Liga 2, etapas 11 e 13).
 - Imprensa: KCTV5, MLSsoccer.com, Squawka (escalação provável) e imprensa colombiana sobre Santa Fe e
   o El Campín.
+
+## Conferência da lista de jogos enviada pelo Daniel (14/10, 01:10)
+
+Pedido: "algum desses times passa nos critérios e, passando, tem mais de 60% de vitória?" Odds dos prints
+do Daniel; bet365 pelo Sofascore como referência.
+
+| Favorito (odd do print) | Vitória pelo mercado | Critérios | Motivo |
+|---|---|---|---|
+| **Nashville** x Sporting KC (1.23) | 77% (modelo conservador 62%) | ✅ passa | já analisado: defesa do SKC é a 2ª pior fora; Nashville com forma DEVVV; sem rodízio no ataque |
+| Kashiwa Reysol x Port FC (1.17) | 75% | ❌ | a defesa do Port está na média da Thai League (×0,96) e o ataque marca 1,9/j (⚠️ RISCO) |
+| Junior x Dep. Pereira (1.24) | 75% | ❌ | forma 7/15 (VVDDE); a defesa do Pereira fora é boa (×0,93) |
+| **Stuttgart** (Slovan x Stuttgart, 1.29) | 73% | ❌ | Slovan tem defesa forte na Eslováquia (×0,77) e ataque forte (RISCO); o ataque do Stuttgart fora está abaixo da média na Bundesliga |
+| **Liverpool** (LASK x Liverpool, 1.30) | 73% | ❌ | o LASK em casa tem a defesa forte na Áustria (×0,61) |
+| Atlético-MG x Montevideo City Torque (1.39) | 68% | ❌ | o MCT é o 2º do Uruguai, com defesa forte (×0,73) e ataque forte (RISCO) |
+| LAFC x Austin (1.45) | 66% | ❌ | forma 5/15 (VDEDE) |
+| Inter Miami x NYCFC (1.51) | 65% | ❌ | a defesa do NYCFC fora é boa (×0,66) |
+
+- **Sub-19 (UEFA Youth League):** sem dado confiável de defesa e ataque na condição; ficam de fora.
+- **Copa entre ligas diferentes:** cada time foi avaliado na liga nacional dele, na mesma condição do jogo
+  (`copa.py` no scratchpad).
+- **Nashville vitória a 1.23:** não tem valor. Com 62% (modelo), o EV é −24%; com 77% (mercado), −5%.
+  O pick da análise continua sendo **Nashville marca 2+ gols, odd mínima 1.52**.
