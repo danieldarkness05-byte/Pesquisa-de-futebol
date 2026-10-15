@@ -320,6 +320,8 @@ def alertas_estatisticos(info: dict, d: dict) -> list[str]:
         al.append(r8)
     if info.get("motivo"):
         al.append(info["motivo"])
+    if info.get("editado"):
+        al.append("temporada editada à mão no Sofascore: confira data e placares numa 2ª fonte")
     if not info.get("odds"):
         al.append("sem odds no Sofascore (favorito pela tabela)")
     return al
@@ -371,6 +373,15 @@ def listar(api: v.Sofascore, data: str, torneios: set[int] | None) -> list[dict]
 def _sem_acento(txt: str) -> str:
     import unicodedata
     return "".join(c for c in unicodedata.normalize("NFD", txt.lower()) if unicodedata.category(c) != "Mn")
+
+
+def liga_nao_verificavel(e: dict) -> bool:
+    """Lição 23 (15/10, United Front x Prime Athletic): temporada editada à mão no Sofascore
+    com os DOIS times criados pelo editor = liga sem 2ª fonte (sem site, Flashscore ou
+    365Scores), dados lançados em lote. Sai da lista. Só a temporada editada (ligas amadoras
+    reais, como a Wessex League) vira alerta."""
+    return bool((e.get("season") or {}).get("editor")
+                and e["homeTeam"].get("createdByEditor") and e["awayTeam"].get("createdByEditor"))
 
 
 def eventos_suspeitos(eventos: list[dict]) -> set[int]:
@@ -500,6 +511,9 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
     if not ut or not s:
         motivos["sem torneio/temporada"] += 1
         return None
+    if liga_nao_verificavel(e):
+        motivos["liga não verificável (times e temporada criados à mão no Sofascore)"] += 1
+        return None
     if (ut, s) not in cache:
         cache[(ut, s)] = tuple(grupos_tabela(api, ut, s, t) for t in ("home", "away", "total"))
     h, a = e["homeTeam"]["id"], e["awayTeam"]["id"]
@@ -559,6 +573,7 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
         "risco": eh_risco(az_gf, rank_az, d),
         "amostra_pequena": min(fv["matches"], az["matches"]) < d["amostra_boa"],
         "nivel_base": nivel_base([cat, e["tournament"].get("name")], d["palavras_base"], [casa, fora]),
+        "editado": bool((e.get("season") or {}).get("editor")),
     }
     info["pontuacao"] = pontuacao(info, d)
     return info

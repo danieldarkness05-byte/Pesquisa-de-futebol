@@ -93,6 +93,14 @@ faixa e registre aqui.
     Com 5 ou mais jogos recentes na média da liga (ou melhor, no caso da defesa), o jogo sai.
     *(automático: `contradiz_tese_recente` no `defesa.py`)*
 
+23. **Liga criada à mão no Sofascore** (United Front x Prime Athletic, "East Championship League" da
+    África do Sul, 15/10):
+    - temporada editada e os 16 times criados pelo editor, com nomes genéricos;
+    - sem estádio, árbitro ou jogadores;
+    - resultados lançados em lote, e nenhuma 2ª fonte (Flashscore, 365Scores, web).
+    Não dá para verificar nada: sai. Só a temporada editada (amadoras reais, como a Wessex) vira alerta.
+    *(automático: `liga_nao_verificavel`)*
+
 ## Mercado (regra 8)
 
 15. **Modelo mais de 10 p.p. acima do mercado:** quase sempre o mercado sabia algo.

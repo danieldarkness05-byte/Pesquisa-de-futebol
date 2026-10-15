@@ -449,6 +449,14 @@ class TestDefesa(unittest.TestCase):
         self.assertAlmostEqual(la, 1.97, delta=0.02)    # o cético achou ~1,97; o recorte fora dava 2,18
         self.assertIsNone(df.lambdas_gerais({"matches": 0}, fora, 1.6, 1.1))
 
+    def test_liga_nao_verificavel(self):
+        fantasma = {"season": {"editor": True}, "homeTeam": {"createdByEditor": True}, "awayTeam": {"createdByEditor": True}}
+        wessex = {"season": {"editor": True}, "homeTeam": {}, "awayTeam": {}}
+        mls = {"season": {"editor": False}, "homeTeam": {}, "awayTeam": {}}
+        self.assertTrue(df.liga_nao_verificavel(fantasma))
+        self.assertFalse(df.liga_nao_verificavel(wessex))   # amadora real: só alerta
+        self.assertFalse(df.liga_nao_verificavel(mls))
+
     def test_eventos_suspeitos(self):
         def ev(i, h, a, ts, placar=None):
             e = {"id": i, "homeTeam": {"id": h}, "awayTeam": {"id": a}, "startTimestamp": ts, "homeScore": {}, "awayScore": {}}
