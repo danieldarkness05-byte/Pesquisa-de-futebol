@@ -300,6 +300,10 @@ def alertas_estatisticos(info: dict, d: dict) -> list[str]:
     if az.get("ga") is not None and liga_az and az["ga"] / liga_az < d["indice_defesa_min"] - d["tolerancia_indice"]:
         al.append(f"nos últimos {az['n']} jogos na condição a defesa do azarão não é tão fraca "
                   f"({az['ga']:.2f}/j = ×{az['ga'] / liga_az:.2f} da média)")
+    liga_fv = info["liga"]["casa"] if info["fav_casa"] else info["liga"]["fora"]
+    if fv.get("gf") is not None and liga_fv and fv["gf"] / liga_fv < d["indice_ataque_min"] - d["tolerancia_indice"]:
+        al.append(f"nos últimos {fv['n']} jogos na condição o ataque do favorito não é forte "
+                  f"({fv['gf']:.2f}/j = ×{fv['gf'] / liga_fv:.2f} da média)")
     rec, tot = az.get("ga_ultimos5"), az.get("ga")
     if rec is not None and tot and rec <= d["melhora_defesa"] * tot:
         al.append(f"defesa do azarão melhorando ({rec:.2f} nos últimos 5 x {tot:.2f}): técnico novo/ajuste?")
@@ -319,6 +323,20 @@ def alertas_estatisticos(info: dict, d: dict) -> list[str]:
     if not info.get("odds"):
         al.append("sem odds no Sofascore (favorito pela tabela)")
     return al
+
+
+def contradiz_tese_recente(info: dict, d: dict) -> str | None:
+    """Lição 22 (15/10, Cumbayá e La Viena): a tabela da temporada passa no corte, mas a
+    amostra recente na condição (≥ amostra_boa jogos) está na média da liga ou pior → sai."""
+    az, fv = info["azarao_amostra"], info["favorito_amostra"]
+    liga = info["liga"]["casa"] if info["fav_casa"] else info["liga"]["fora"]
+    if not liga:
+        return None
+    if az.get("ga") is not None and az["n"] >= d["amostra_boa"] and az["ga"] / liga < 1.0:
+        return f"defesa do azarão na média ou melhor nos últimos {az['n']} na condição (×{az['ga'] / liga:.2f})"
+    if fv.get("gf") is not None and fv["n"] >= d["amostra_boa"] and fv["gf"] / liga < 1.0:
+        return f"ataque do favorito na média ou pior nos últimos {fv['n']} na condição (×{fv['gf'] / liga:.2f})"
+    return None
 
 
 def pontuacao(info: dict, d: dict) -> float:
@@ -654,6 +672,10 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d: dict, data: str, chuv
     info["motivo"] = None
     if min(len(xf), len(xa)) < 3 or freq_mercado(info["frequencias"], 1) is None:
         info["motivo"] = f"dado faltando: só {len(xf)}/{len(xa)} jogos recentes na condição"
+    if not info["motivo"]:
+        motivo_recente = contradiz_tese_recente(info, d)
+        if motivo_recente:
+            info["motivo"] = f"fora: {motivo_recente}"
     fm = info["forma_favorito"]
     if not info["motivo"] and forma_negativa(fm, d["forma_pontos_min"], d["forma_jogos"]):
         info["motivo"] = (f"fora pela forma: favorito fez {fm['pts']} de {3 * fm['n']} pontos nos últimos {fm['n']} "

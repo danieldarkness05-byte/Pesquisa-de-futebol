@@ -429,6 +429,18 @@ class TestDefesa(unittest.TestCase):
         fin = {"nome": "Finalización", "rows": {1: {"matches": 12}, 2: {"matches": 12}}}
         self.assertIs(df.escolher_grupo([ape, fin], (1, 2), "Liga DIMAYOR, Finalizacion"), fin["rows"])
 
+    def test_tese_recente_contradiz_a_tabela(self):
+        base = {"fav_casa": True, "liga": {"casa": 1.15, "fora": 0.70}}
+        cumbaya = dict(base, azarao_amostra={"n": 10, "ga": 2.2}, favorito_amostra={"n": 10, "gf": 0.9})
+        self.assertIn("ataque do favorito", df.contradiz_tese_recente(cumbaya, self.D))
+        la_viena = dict(base, fav_casa=False, liga={"casa": 1.25, "fora": 0.975},
+                        azarao_amostra={"n": 10, "ga": 0.7}, favorito_amostra={"n": 10, "gf": 1.5})
+        self.assertIn("defesa do azarão", df.contradiz_tese_recente(la_viena, self.D))
+        bom = dict(base, azarao_amostra={"n": 10, "ga": 2.0}, favorito_amostra={"n": 10, "gf": 1.6})
+        self.assertIsNone(df.contradiz_tese_recente(bom, self.D))
+        pouco = dict(base, azarao_amostra={"n": 3, "ga": 0.3}, favorito_amostra={"n": 3, "gf": 0.3})
+        self.assertIsNone(df.contradiz_tese_recente(pouco, self.D))     # amostra curta: só alerta
+
     def test_lambdas_gerais_tira_o_inflado_da_condicao(self):
         # Bridlington (fora) 14/10: 18 gols em 11 no geral; Stocksbridge (casa) sofreu 23 em 11 no geral
         casa = {"matches": 11, "scoresFor": 8, "scoresAgainst": 23}

@@ -87,6 +87,12 @@ faixa e registre aqui.
     Jalapa (Nicarágua), o Sofascore dava 14/10 18:00, e o jogo real era 15/10 22:00. O campo
     `changeTimestamp` não ajuda, porque vem 0 em todos os jogos. *(o pesquisador confere `data_confirmada`)*
 
+22. **A tabela da temporada passa no corte, mas a amostra recente na condição desmente** (15/10):
+    - o Cumbayá marcava 1,36 por jogo em casa na tabela, mas 0,9 nos últimos 10 em casa (marcou em só 4);
+    - a defesa do La Viena sofria 1,5 por jogo na tabela, mas 0,7 nos últimos 10.
+    Com 5 ou mais jogos recentes na média da liga (ou melhor, no caso da defesa), o jogo sai.
+    *(automático: `contradiz_tese_recente` no `defesa.py`)*
+
 ## Mercado (regra 8)
 
 15. **Modelo mais de 10 p.p. acima do mercado:** quase sempre o mercado sabia algo.
@@ -111,3 +117,4 @@ faixa e registre aqui.
 | 13/10 | IFK Norrköping x GIF Sundsvall | Norrköping 1+ | 83% | 4-0 | ✅ | A pausa longa do Norrköping (lição 10) não pesou desta vez. |
 | 13/10 | Bashley x Christchurch | Bashley 2+ | 65% | 6-0 | ✅ | Liga amadora; a frequência real (67–70%) segurou a prob. abaixo dos 89% do modelo, e o placar passou longe. |
 | 14/10 | Stocksbridge x Bridlington | Bridlington 1+ | 83% | 0-1 | ✅ | Liga amadora: o 1+ passou no limite (1 gol); fez bem não ir no 2+, que caiu no teste das médias gerais. |
+| 14/10 | Nashville x Sporting KC | Nashville 2+ | 68% | 4-0 | ✅ | A defesa do SKC sem os zagueiros titulares confirmou a tese. O teste só com xG (64%) era conservador demais neste caso. |
