@@ -149,6 +149,20 @@ faixa e registre aqui.
     - Duas das vitórias na liga vieram com xG negativo. Confira a forma só da liga e o xG das vitórias antes
       de chamar o azarão de "em boa fase" (a régua do Daniel continua contando todos os jogos oficiais).
 
+30. **Ajuste o xG cedido pela força do adversário antes de chamar a defesa de muito fraca** (Al-Qadsiah x
+    Abha, 16/10).
+    - Com poucos jogos na condição, divida o xG cedido em cada jogo pelo xG que aquele adversário costuma
+      criar na mesma condição, sem contar o próprio jogo.
+    - Se a mediana dessa razão ficar perto de 1 ou abaixo, a defesa é mediana, mesmo com xG bruto alto.
+    - O Abha cedia 1,91 de xG fora (5º pior), mas só 0,57 a 0,61 do xG habitual do Ahli e do Nassr. O número
+      alto vinha de um jogo atípico, e os gols estavam inflados por 2 gols contra e 3 erros. O cético refutou.
+31. **Placar do evento que contradiz os incidentes e a tabela** (Alashkert x Syunik, 16/10).
+    - Na R8, o Sofascore marcava Ararat 0-1 Syunik, mas o gol era do Ararat (Bakayoko, 77'), e a liga (FFA)
+      registra Syunik 0-1 Ararat em Sisian (mando invertido).
+    - O `defesa.py` leu o placar do evento e contou um jogo fora sem sofrer gol que não existiu: a média caiu
+      de 2,67 para 2,29 e gerou um falso alerta de "defesa não tão fraca".
+    - Antes de confiar na amostra, compare os gols da amostra com a tabela da condição.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
@@ -166,3 +180,4 @@ faixa e registre aqui.
 | 14/10 | Nashville x Sporting KC | Nashville 2+ | 68% | 4-0 | ✅ | A defesa do SKC sem os zagueiros titulares confirmou a tese. O teste só com xG (64%) era conservador demais neste caso. |
 | 15/10 | Real Estelí x ART Jalapa | Real Estelí 1+ | 80% | 1-1 | ✅ | Passou no limite (1 gol): fez bem rebaixar o 2+ (51% no teste das médias gerais, lição 20). |
 | 16/10 | Livorno x Grosseto (azarão) | Grosseto ou empate | 65% | 4-4 | ✅ | O Grosseto forte no xG confirmou; jogo aberto (8 gols), não o "travado" que a tradição sugeria. |
+| 16/10 | FC Alashkert x FC Syunik | Alashkert 2+ | 69% | 5-1 | ✅ | Corrigir o placar da R8 (lição 31) acertou a leitura: a defesa do Syunik era mesmo das piores fora. |
