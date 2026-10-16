@@ -9,6 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ferramentas"))
 
 import clima  # noqa: E402
+import azarao as azr  # noqa: E402
 import defesa as df  # noqa: E402
 import dossie  # noqa: E402
 import historico  # noqa: E402
@@ -522,3 +523,37 @@ class TestPrevisoes(unittest.TestCase):
         self.assertEqual(previsoes.normalizar(dict(base, mercado="over_2.5"))["lado"], "casa")   # total não precisa
         self.assertEqual(previsoes.normalizar(dict(base, lado="casa", alertas=[]))["alertas"], "")
         self.assertEqual(previsoes.normalizar(dict(base, lado="casa", alertas=["a", "b"]))["alertas"], "a; b")
+
+
+class TestAzarao(unittest.TestCase):
+    A = dict(azr.AZARAO_PADRAO)
+
+    def test_ppg(self):
+        self.assertAlmostEqual(azr.ppg({"matches": 10, "wins": 5, "draws": 3}), 1.8)
+        self.assertAlmostEqual(azr.ppg({"matches": 4, "points": 7}), 1.75)
+        self.assertIsNone(azr.ppg({"matches": 0}))
+        xs = [{"gf": 2, "ga": 1}, {"gf": 1, "ga": 1}, {"gf": 0, "ga": 2}]
+        self.assertAlmostEqual(azr.ppg_amostra(xs), 4 / 3)
+
+    def test_triagem_azarao(self):
+        self.assertTrue(azr.passa_triagem_azarao(4.1, 1.46, 1.31, 0.52, 0.92, self.A))     # Tianjin 16/10
+        self.assertFalse(azr.passa_triagem_azarao(1.9, 1.8, 1.0, 0.6, 1.0, self.A))      # não é azarão
+        self.assertFalse(azr.passa_triagem_azarao(3.5, 0.9, 1.8, 0.8, 1.0, self.A))      # rende bem menos
+        self.assertFalse(azr.passa_triagem_azarao(3.5, 1.6, 1.5, 1.3, 1.0, self.A))      # defesa fraca
+        self.assertFalse(azr.passa_triagem_azarao(3.5, 1.6, 1.5, 0.8, 0.6, self.A))      # sem ataque
+
+    def test_frequencias_e_dnb(self):
+        az = [{"gf": 1, "ga": 1}, {"gf": 2, "ga": 0}, {"gf": 0, "ga": 1}, {"gf": 1, "ga": 0}]
+        fav = [{"gf": 0, "ga": 0}, {"gf": 2, "ga": 1}, {"gf": 1, "ga": 2}, {"gf": 3, "ga": 0}]
+        fr = azr.frequencias_azarao(az, fav)
+        self.assertAlmostEqual(fr["az_nao_perde"], 0.75)
+        self.assertAlmostEqual(fr["fav_nao_vence"], 0.5)
+        self.assertAlmostEqual(azr.freq_mercado_az(fr, "az_dc"), 0.625)
+        self.assertAlmostEqual(azr.ev_empate_anula(0.4, 0.3, 2.0), 0.1)   # 0,8 + 0,3 − 1
+
+    def test_probs_lado(self):
+        p = azr.probs_lado(1.2, 1.0, False, 0.0, 0.0)          # lado = visitante
+        m = n.matriz_placar(1.2, 1.0, 0.0, 10)
+        r = vr.resultado(m)
+        self.assertAlmostEqual(p["az_vence"], r["2"], places=6)
+        self.assertAlmostEqual(p["az_dc"], r["2"] + r["X"], places=6)

@@ -139,5 +139,18 @@
     "palavras_amistoso": ["Friendly", "Friendlies", "Amistoso"],
     "chuva": "informativa",
     "modelo_agentes": null
+  },
+  "azarao": {
+    "_leia": "Análise azarão forte (ferramentas/azarao.py + .claude/workflows/azarao.js, skill /azarao-forte): jogos em que o azarão (odd de vitória >= odd_azarao_min) tem boa chance de NÃO perder. Triagem: pontos por jogo do azarão na condição >= os do favorito − ppg_folga, defesa do azarão na condição <= defesa_az_max × média e ataque >= ataque_az_min × média. O azarão precisa de forma_pontos_min nos últimos 5 oficiais. Probabilidade = menor entre tabela, médias gerais, λ gols e λ gols+xG (Poisson e Dixon-Coles), limitada pela frequência real; valor contra a odd bet365; regra 8 contra o 1X2 sem margem. Pedido do Daniel em 16/10.",
+    "odd_azarao_min": 2.2,
+    "ppg_folga": 0.25,
+    "defesa_az_max": 1.1,
+    "ataque_az_min": 0.85,
+    "forma_pontos_min": 7,
+    "forma_jogos": 5,
+    "max_aprofundar": 30,
+    "max_pesquisa": 4,
+    "max_resposta": 4,
+    "regra8_pp": 0.1
   }
 }

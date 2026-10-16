@@ -45,6 +45,7 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/varredura.py [--data D]` | peneira do dia: todos os jogos do Sofascore → só mercados com valor |
 | `python3 ferramentas/dossie.py [--numeros 1,3] [--json]` | dossiê dos candidatos: odds de agora e da abertura, vivo/caiu, desfalques com gols, forma, chuva |
 | `python3 ferramentas/defesa.py [--data D] [--curto] [--json]` | defesa fraca do azarão x ataque forte do favorito em **todas** as ligas do Sofascore: triagem, estatística, alertas, prob. conservadora e odd mínima |
+| `python3 ferramentas/azarao.py [--data D] [--curto]` | azarão forte: jogos em que o azarão tem boa chance de não perder (dupla chance, empate anula, vitória) com valor, em todas as ligas |
 | `python3 ferramentas/previsoes.py add-json/resolver/resumo` | registro de TODA previsão entregue (apostada ou não), resultado automático pelo Sofascore e calibração |
 
 Cada script tem `--help` com exemplos. Use `--json` quando for processar a saída.
@@ -63,8 +64,11 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
    (pedido do Daniel em 12/10) e entram **todas as ligas** do Sofascore. **Favorito precisa de 7+ dos 15 pontos
    nos últimos 5 jogos oficiais (com 6 ou menos, sai; ajuste de 14/10)**, e **favorito cujo técnico vai poupar titulares
    também sai** (pedidos do Daniel em 13/10).
-3. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
-4. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
+3. **`/azarao-forte`** (quando o Daniel pedir; pedido de 16/10): azarão forte que pode empatar ou ganhar.
+   `azarao.py` → workflow `.claude/workflows/azarao.js` → veredito com regra 8 rigorosa → registra com
+   `analise: "azarao"`. As mesmas réguas: azarão com 7+ pontos nos últimos 5; técnico do azarão poupando, sai.
+4. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
+5. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
 
 **Evolução diária:** toda previsão entregue vai para `dados/previsoes.csv` (`previsoes.py`). O resultado é
 resolvido no dia seguinte, e o que cada acerto ou erro ensina vai para `docs/licoes.md`. Esse arquivo é lido

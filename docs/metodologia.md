@@ -155,3 +155,37 @@ Análise diária pedida pelo Daniel em 12/10. Procura jogos em que o **azarão s
    - o que cada caso ensina vai para `docs/licoes.md`, lido antes de cada análise.
 
 **Chuva:** aqui é só informativa (pedido do Daniel). No /ouro, a regra 3 continua valendo.
+
+## Azarão forte (`azarao.py` + `/azarao-forte`)
+
+Pedido do Daniel em 16/10: jogos em que o azarão é forte e tem boa chance de empatar ou ganhar.
+Parâmetros em `config.json → azarao`.
+
+1. **Triagem:** jogos com odds e tabela casa/fora.
+   - O azarão (odd de vitória ≥ `odd_azarao_min`) precisa:
+     - render na condição dele quase como o favorito na dele (pontos por jogo ≥ os do favorito − `ppg_folga`);
+     - ter defesa sólida (≤ `defesa_az_max` × média);
+     - ter algum ataque (≥ `ataque_az_min` × média).
+   - Filtros herdados do `defesa.py`: liga não verificável, eventos suspeitos e tabela do torneio certo.
+2. **Estatística:**
+   - últimos jogos na condição;
+   - frequência real de "azarão não perdeu" e de "favorito não venceu";
+   - forma dos dois (o azarão precisa de `forma_pontos_min` em 5 oficiais) e calendário.
+3. **Probabilidade dos mercados do azarão** (dupla chance, vitória e empate anula):
+   - é o menor valor entre oito variantes: tabela, médias gerais, λ gols e λ gols+xG, cada uma com Poisson
+     simples e com Dixon-Coles ρ −0,10;
+   - a incerteza σ entra em todas;
+   - depois, é limitada pela frequência real + tolerância.
+4. **Valor:** contra a odd bet365.
+   - **Regra 8:** comparação contra o 1X2 sem margem.
+   - Nesta análise a regra 8 é o filtro mais importante: o mercado costuma saber por que o azarão é azarão.
+5. **Alertas:**
+   - ⚠️ RISCO: o favorito ataca muito na condição;
+   - defesa do azarão com sorte (gols sofridos bem abaixo do xG cedido);
+   - favorito marcando abaixo do xG;
+   - favorito em grande fase;
+   - rodízio do azarão.
+6. **Pesquisa** (`.claude/workflows/azarao.js`):
+   - 1 pesquisador: força real do azarão, fraquezas do favorito, desfalques, rodízio, o que o mercado sabe,
+     e data e mando em 2ª fonte;
+   - 1 cético: fecha o mercado e o ajuste (±5 p.p.) e diz se a regra 8 tem explicação.

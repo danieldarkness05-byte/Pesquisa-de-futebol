@@ -522,12 +522,12 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
     if not th or not ta or h not in th or a not in ta:
         motivos["sem tabela casa/fora (copa, amistoso, seleção)"] += 1
         return None
-    jogos = sum(r["matches"] for r in th.values())
+    jogos = sum(r.get("matches") or 0 for r in th.values())
     if not jogos:
         motivos["tabela vazia"] += 1
         return None
-    lh = sum(r["scoresFor"] for r in th.values()) / jogos
-    la = sum(r["scoresAgainst"] for r in th.values()) / jogos
+    lh = sum(r.get("scoresFor") or 0 for r in th.values()) / jogos
+    la = sum(r.get("scoresAgainst") or 0 for r in th.values()) / jogos
     tot_j = sum(r.get("matches", 0) for r in tt.values())
     empates = (sum(r.get("draws", 0) for r in tt.values()) / tot_j) if tot_j else None
     odds = odds_evento(api, e["id"])
@@ -562,7 +562,8 @@ def triar(api: v.Sofascore, e: dict, d: dict, motivos: Counter, cache: dict) -> 
         "favorito_por": crit, "odds": odds.get("1x2"), "odds_ini": odds.get("1x2_ini"), "mercado_odds": odds,
         "liga": {"casa": round(lh, 3), "fora": round(la, 3),
                  "empates": round(empates, 3) if empates is not None else None},
-        "tabela_geral": {lado: ({k: tt[t][k] for k in ("matches", "scoresFor", "scoresAgainst")} if t in tt else None)
+        "tabela_geral": {lado: ({k: tt[t][k] for k in ("matches", "scoresFor", "scoresAgainst")}
+                                if t in tt and all(tt[t].get(k) is not None for k in ("matches", "scoresFor", "scoresAgainst")) else None)
                          for lado, t in (("casa", h), ("fora", a))},
         "tabela": {"casa": {k: rh[k] for k in ("matches", "scoresFor", "scoresAgainst")},
                    "fora": {k: ra[k] for k in ("matches", "scoresFor", "scoresAgainst")}},
