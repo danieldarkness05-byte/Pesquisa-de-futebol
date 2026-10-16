@@ -761,7 +761,7 @@ def imprimir(res: dict) -> None:
         for i, k in enumerate(res["candidatos"], 1):
             freq = "—" if k["frequencia"] is None else f"{k['frequencia']:.0%}"
             linhas.append([str(i), k["hora"], k["jogo"], k["rotulo"], f"{k['odd']:.2f}", n.pct(k["p"]),
-                           f"{k['p_min']:.0%}", n.pct(k["justa_mercado"]), n.fmt_odd(k["odd_minima"]),
+                           f"{k['p_min']:.0%}", n.pct(k["justa_mercado"]), n.fmt_odd_min(k["odd_minima"]),
                            f"{k['ev'] * 100:+.1f}%", freq, k["chuva"]])
         print(n.tabela(["#", "Hora", "Jogo", "Mercado", "Odd bet365", "Prob.", "Pior variante",
                         "Mercado s/ margem", "Odd mín.", "EV", "Freq. amostras", "Chuva"], linhas))
@@ -791,7 +791,7 @@ def imprimir_curto(res: dict) -> None:
     print(f"⚽ Peneira {dia} ({res['consultado']}) — {c['jogos']} jogos, {len(cands)} com valor")
     for i, k in enumerate(cands, 1):
         chuva = "" if k["chuva"] == "seco" else " · ⚠️ chuva não verificada"
-        print(f"{i}) {k['hora']} {k['jogo']} · {k['rotulo']} · {k['p']:.0%} · odd mín {n.fmt_odd(k['odd_minima'])}"
+        print(f"{i}) {k['hora']} {k['jogo']} · {k['rotulo']} · {k['p']:.0%} · odd mín {n.fmt_odd_min(k['odd_minima'])}"
               f" · bet365 {k['odd']:.2f} (EV {k['ev'] * 100:+.0f}%){chuva}")
     fora = [f"{q} {CURTO_MOTIVO.get(m, m)}" for m, q in sorted(res["descartes"].items(), key=lambda x: -x[1])]
     if res["chuva_excluidos"]:
@@ -802,7 +802,7 @@ def imprimir_curto(res: dict) -> None:
         print(f"⚠️ {res['falhas_rede']} consultas falharam — rode de novo.")
     if cands:
         print("Odds bet365, não Betano: entre só com odd ≥ mínima. Triagem — mande /aprofundar (todos ou os números).")
-        itens = [f"{k['hora']} {k['jogo'].split(' x ')[0]} {k['rotulo'].replace('Menos de ', '-').replace('Mais de ', '+')} mín {n.fmt_odd(k['odd_minima'])}"
+        itens = [f"{k['hora']} {k['jogo'].split(' x ')[0]} {k['rotulo'].replace('Menos de ', '-').replace('Mais de ', '+')} mín {n.fmt_odd_min(k['odd_minima'])}"
                  for k in cands[:4]]
         msg = f"⚽ Peneira: {len(cands)} de valor — " + "; ".join(itens)
         print("NOTIFICAR: " + (msg if len(msg) <= 190 else msg[:187] + "…"))

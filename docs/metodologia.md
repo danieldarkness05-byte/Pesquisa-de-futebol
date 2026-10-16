@@ -178,6 +178,9 @@ Parâmetros em `config.json → azarao`.
    - a incerteza σ entra em todas;
    - depois, é limitada pela frequência real + tolerância.
 4. **Valor:** contra a odd bet365.
+   - Sem odd de dupla chance na bet365, usa a DC implícita no 1X2 (`odd_dc_sintetica`, marcada "1X2 implícita").
+     A casa costuma pagar isso ou menos, então é só estimativa: o Daniel confere a odd mínima no app (lição 28).
+   - A odd mínima é sempre arredondada para cima (1.585 → 1.59): com 1.58 o EV não chega aos 3%.
    - **Regra 8:** comparação contra o 1X2 sem margem.
    - Nesta análise a regra 8 é o filtro mais importante: o mercado costuma saber por que o azarão é azarão.
 5. **Alertas:**

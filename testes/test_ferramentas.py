@@ -351,7 +351,9 @@ class TestDefesa(unittest.TestCase):
         p, lim = df.prob_conservadora([0.80, 0.76], 0.55, 0.05)
         self.assertTrue(lim)
         self.assertAlmostEqual(p, 0.60)
-        self.assertAlmostEqual(df.odd_minima(0.75, 0.03), 1.37)
+        self.assertAlmostEqual(df.odd_minima(0.75, 0.03), 1.38)    # 1.3733 → para cima
+        self.assertAlmostEqual(df.odd_minima(0.65, 0.03), 1.59)    # 1.5846 → 1.59 (com 1.58 o EV é 2,7%)
+        self.assertAlmostEqual(n.odd_acima(1.6), 1.6)
         self.assertIsNone(df.odd_minima(0.0, 0.03))      # nada de Infinity no JSON
         self.assertAlmostEqual(df.ajuste_empate_vitoria(0.70, 0.20, 0.28), 0.70 * 0.72 / 0.80)
         self.assertEqual(df.ajuste_empate_vitoria(0.70, 0.30, 0.25), 0.70)
@@ -557,6 +559,11 @@ class TestAzarao(unittest.TestCase):
         r = vr.resultado(m)
         self.assertAlmostEqual(p["az_vence"], r["2"], places=6)
         self.assertAlmostEqual(p["az_dc"], r["2"] + r["X"], places=6)
+
+    def test_odd_dc_sintetica(self):
+        # Livorno x Grosseto 16/10: 2.05/3.20/3.20 → X2 implícita 1.60; Jonava x BFA 3.75/2.50 → 1.50
+        self.assertAlmostEqual(azr.odd_dc_sintetica(3.2, 3.2), 1.6)
+        self.assertAlmostEqual(azr.odd_dc_sintetica(3.75, 2.5), 1.5)
 
     def test_lambdas_amostra_xg(self):
         # visitante "com sorte": sofre 0,8 com 1,55 de xG cedido (Henan x Tianjin, 16/10)

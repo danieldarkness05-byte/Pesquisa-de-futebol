@@ -44,7 +44,7 @@ const PESQ = {
     desfalques_favorito: { type: 'array', items: { type: 'string' } },
     poupa_titulares_azarao: { type: 'string', enum: ['SIM_CONFIRMADO', 'PROVAVEL', 'NAO', 'N/D'], description: 'o técnico do AZARÃO vai poupar titulares? (se sim, o jogo sai)' },
     poupa_titulares_favorito: { type: 'string', enum: ['SIM_CONFIRMADO', 'PROVAVEL', 'NAO', 'N/D'], description: 'o favorito vai poupar? (ajuda o azarão)' },
-    odd_real: { type: 'string', description: 'se o JSON não tem odd_casa para o mercado do azarão (dupla chance, empate anula): odd real em outra casa (Flashscore/Oddsportal/365Scores), com a casa e a fonte; senão "bet365 do JSON"; ou N/D' },
+    odd_real: { type: 'string', description: 'se a odd do mercado do azarão no JSON é estimada (odd_estimada = true: dupla chance implícita no 1X2) ou falta: odd real em outra casa (Flashscore/Oddsportal/365Scores), com a casa e a fonte; senão "bet365 do JSON"; ou N/D' },
     explica_mercado: { type: 'string', description: 'por que o mercado dá menos chance ao azarão que o modelo (regra 8): notícia, desfalque, motivação, movimento de odds; ou N/D' },
     contexto: { type: 'string', description: 'motivação, calendário, clássico/derby, árbitro, gramado — no máximo 8 linhas' },
     ajuste_pp: { type: 'number', minimum: -5, maximum: 5, description: 'ajuste em p.p. na prob. do mercado do azarão (melhor_mercado), com motivo em contexto' },
@@ -85,7 +85,7 @@ Pesquise A FUNDO (Sofascore primeiro, depois imprensa local, site da liga e dos 
 4) Rodízio: o técnico do AZARÃO vai poupar titulares? (regra do Daniel: se sim, o jogo sai). E o do favorito?
 5) Por que o mercado dá menos chance ao azarão que o modelo (regra 8)? Procure notícia, desfalque, movimento das odds (odds/1/all, abertura x agora).
 6) Confirme data, hora e estádio numa 2ª fonte.
-7) Se o JSON não tem odd da bet365 para a dupla chance (odd_casa nulo), procure a odd real desse mercado em outra casa (odd_real).
+7) Se a odd da dupla chance no JSON é estimada (odd_estimada = true, implícita no 1X2), procure a odd real desse mercado em outra casa (odd_real).
 8) Confira o teste de chão só com xG (lição 24): a variante "xg" já está no mínimo do azarao.py quando há xG; sem xG no Sofascore, procure xG em outra fonte (FotMob, FBref) ou diga N/D.
 Nunca invente número: todo número com fonte e recorte. Sem dado → N/D.
 ${SOFA}`, { label: `pesq:${c.azarao}`, phase: 'Pesquisa', schema: PESQ }),

@@ -111,6 +111,11 @@ def ev_empate_anula(p_vence: float, p_empate: float, odd: float) -> float:
     return p_vence * odd + p_empate - 1
 
 
+def odd_dc_sintetica(odd_empate: float, odd_az: float) -> float:
+    """Dupla chance implícita no 1X2 (lição 28): sem odd de DC na bet365, a casa costuma pagar isso ou menos."""
+    return 1 / (1 / odd_empate + 1 / odd_az)
+
+
 def probs_lado(lh: float, la: float, lado_casa: bool, rho: float, sigma: float) -> dict:
     """P(vitória), P(empate), P(não perde) do lado escolhido (mandante se lado_casa)."""
     m = v.matriz(lh, la, rho, sigma)
@@ -287,6 +292,9 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d_def: dict, a: dict, di
     ev_min = cfg["criterios"]["ev_minimo"]
     mercados = []
     for chave, rot, odd in (("az_dc", "{az} ou empate (dupla chance)", odd_dc), ("az_vence", "vitória do {az}", o[0] if az_casa else o[2])):
+        estimada = chave == "az_dc" and not odd
+        if estimada:
+            odd = odd_dc_sintetica(o[1], o[0] if az_casa else o[2])
         vals = [pr[chave] for pr in variantes.values()]
         fr = freq_mercado_az(info["frequencias"], chave)
         p, limitada = df.prob_conservadora(vals, fr, a["tolerancia_frequencia"])
@@ -294,7 +302,7 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d_def: dict, a: dict, di
                 "variantes": {k: round(pr[chave], 3) for k, pr in variantes.items()},
                 "frequencia": round(fr, 3) if fr is not None else None, "limitada_pela_frequencia": limitada,
                 "odd_minima": df.odd_minima(p, ev_min), "odd_casa": round(odd, 3) if odd else None,
-                "ev": round(p * odd - 1, 3) if odd else None, "prob_mercado": round(merc[chave], 3),
+                "ev": round(p * odd - 1, 3) if odd else None, "odd_estimada": estimada, "prob_mercado": round(merc[chave], 3),
                 "regra8": p - merc[chave] > a["regra8_pp"]}
         mercados.append(item)
     # empate anula: p de "não perde" dividida em vitória/empate pela variante mais conservadora
@@ -307,7 +315,7 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d_def: dict, a: dict, di
         mercados.append({"chave": "az_dnb", "mercado": f"{info['azarao']} empate anula", "prob": round(p_sem_empate, 3),
                          "prob_vence": round(pv, 3), "prob_empate": round(pe, 3), "odd_casa": round(odd_dnb, 3),
                          "ev": round(ev_empate_anula(pv, pe, odd_dnb), 3),
-                         "odd_minima": round((1 + ev_min - pe) / pv, 2) if pv > 0 else None,
+                         "odd_minima": n.odd_acima((1 + ev_min - pe) / pv) if pv > 0 else None,
                          "prob_mercado": round(p_az / (p_az + (1 - p_az - p_x)), 3), "regra8": False})
     info["mercados"] = mercados
     crit = cfg["criterios"]
@@ -345,7 +353,8 @@ def linha_curta(i: int, x: dict, crit: dict) -> str:
         return f"{i}) {x['hora']} {x['jogo']} — erro: {x['erro']}"
     ms = [m for m in x.get("mercados", []) if m["prob"] >= crit["prob_minima"] and (m.get("ev") or -1) >= crit["ev_minimo"]]
     merc = " · ".join(f"{m['mercado'].replace(x['azarao'], 'az')} {m['prob']:.0%} (mín {m['odd_minima'] or 0:.2f}, "
-                      f"bet365 {m['odd_casa']:.2f} EV {m['ev']:+.0%}, mercado {m['prob_mercado']:.0%})" for m in ms)
+                      f"{'1X2 implícita' if m.get('odd_estimada') else 'bet365'} {m['odd_casa']:.2f} EV {m['ev']:+.0%}, "
+                      f"mercado {m['prob_mercado']:.0%})" for m in ms)
     if not x.get("passa"):
         merc = x.get("motivo") or "nenhum mercado com prob ≥ 60% e valor"
     az, fv = x["azarao_amostra"], x["favorito_amostra"]

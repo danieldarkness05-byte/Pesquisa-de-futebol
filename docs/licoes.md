@@ -119,6 +119,36 @@ faixa e registre aqui.
       finalização azarada, não time fraco.
     - Mesma ideia das lições 3 e 17 (3º caso) → *(automático: variante "xg" no mínimo do `azarao.py`)*
 
+## Azarão forte
+
+25. **Variante só xG na escala de gols infla os λ** (Livorno x Grosseto, 16/10).
+    - O `azarao.py` normaliza o xG pela média de GOLS da liga. Na Serie C B, o xG médio é 1,67 x 1,46 e os
+      gols são 1,40 x 1,10: o λ do visitante inflava 33% e o do mandante 19%, a favor do azarão visitante.
+    - Normalizado pelo xG da liga, a dupla chance do Grosseto caiu de 70% para 67%.
+    - *Candidato a automático:* guardar o xG médio da liga e reescalar. Até lá, o cético confere.
+26. **Azarão que só pontua contra a metade de baixo** (Locomotive x Merani, 16/10).
+    - Meça o ppg do azarão contra times do nível ATUAL do favorito, não pela posição na tabela.
+    - Favorito que mudou no meio da temporada (rebaixado, reformulado, técnico novo): use o ppg dos últimos
+      10 a 14 jogos para saber em que faixa ele está. O Locomotive era 10º, mas fazia 2,07 pt/j desde a R10;
+      o Merani fazia 0,78 pt/j contra o top 8, e a forma VVVEE veio só contra o 11º ao 16º.
+    - O Grosseto também: 10 pts fora, todos contra o 14º, 16º, 17º e 20º.
+27. **Sem xG, o teste de chão usa três sinais** (Scheiblingkirchen x Krems, 16/10).
+    - Muitos pontos com saldo perto de zero (19 pts com 19-19);
+    - escanteios e posse perdidos em quase todo jogo, inclusive em casa (escanteios 22 x 62);
+    - recém-promovido em início de temporada.
+    - Com os três, refaça a prob. com uma amostra mais longa do favorito (temporada anterior, se o elenco é o
+      mesmo): o Krems com 27 jogos derrubou a dupla chance de 61% para 54%, perto do mercado (57%).
+28. **Margem da casa em liga pequena estreita a janela de valor** (Jonava, Merani e Scheiblingkirchen, 16/10).
+    - Com ~11% de margem no 1X2, a dupla chance do azarão só tem EV ≥ 3% se o modelo ficar uns 8 p.p. acima do
+      mercado sem margem. A partir de +10 p.p. a regra 8 já desconfia: sobra pouco espaço.
+    - Sem odd de DC na bet365, a casa paga mais ou menos a DC implícita no 1X2: 1/(1/odd_empate + 1/odd_azarão).
+    - Os 3 casos tinham DC implícita abaixo da odd mínima (1.47, 1.56 e 1.50).
+    *(automático: `odd_dc_sintetica` no `azarao.py`, marcada como "1X2 implícita")*
+29. **Forma 7+ que só passa por causa de jogo de copa** (AB, 16/10).
+    - O AB tinha 9 pts nos últimos 5 com a vitória sobre o Sønderjyske na copa; só na liga, 6.
+    - Duas das vitórias na liga vieram com xG negativo. Confira a forma só da liga e o xG das vitórias antes
+      de chamar o azarão de "em boa fase" (a régua do Daniel continua contando todos os jogos oficiais).
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

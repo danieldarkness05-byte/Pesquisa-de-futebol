@@ -76,7 +76,7 @@ def linhas_saida(itens: list[dict], cfg: dict) -> tuple[list[list[str]], list[di
         prob_txt = n.pct(p) + (f" (+{n.pct(pd)} dev.)" if pd > 0.0005 else "")
         tabela.append([
             it["nome"], prob_txt, n.fmt_odd(n.odd_justa(p, pd)),
-            n.fmt_odd(n.odd_minima(p, ev_min, pd)),
+            n.fmt_odd_min(n.odd_minima(p, ev_min, pd)),
             f"{odd:.2f}" if odd else "—",
             "—" if valor is None else f"{valor * 100:+.1f}%", marca,
         ])
@@ -110,7 +110,7 @@ def imprimir(titulo: str, contexto: list[str], itens: list[dict], cfg: dict, com
     if faltam:
         print("\nAcima do corte, falta conferir a odd na casa (só entra se for ≥ a odd mínima):")
         for d in faltam:
-            print(f"- {d['nome']}: {n.pct(d['prob'])} → odd mínima {n.fmt_odd(d['odd_minima'])}")
+            print(f"- {d['nome']}: {n.pct(d['prob'])} → odd mínima {n.fmt_odd_min(d['odd_minima'])}")
 
 
 def cmd_gols(a: argparse.Namespace, cfg: dict) -> None:

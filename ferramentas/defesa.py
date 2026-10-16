@@ -182,7 +182,7 @@ def prob_conservadora(variantes: list[float], freq: float | None, tol: float) ->
 
 
 def odd_minima(p: float, ev_min: float) -> float | None:
-    return round((1 + ev_min) / p, 2) if p > 0 else None
+    return n.odd_acima((1 + ev_min) / p) if p > 0 else None
 
 
 def ajuste_empate_vitoria(p_vence: float, p_empate: float, empates_liga: float | None) -> float:
