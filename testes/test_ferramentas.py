@@ -557,3 +557,18 @@ class TestAzarao(unittest.TestCase):
         r = vr.resultado(m)
         self.assertAlmostEqual(p["az_vence"], r["2"], places=6)
         self.assertAlmostEqual(p["az_dc"], r["2"] + r["X"], places=6)
+
+    def test_lambdas_amostra_xg(self):
+        # visitante "com sorte": sofre 0,8 com 1,55 de xG cedido (Henan x Tianjin, 16/10)
+        jogo = lambda gf, ga, xf, xa: {"gf": gf, "ga": ga, "xg_f": xf, "xg_a": xa}  # noqa: E731
+        casa = [jogo(1.3, 1.0, 1.54, 1.04)] * 10
+        fora = [jogo(1.3, 0.8, 1.06, 1.55)] * 10
+        lams = azr.lambdas_amostra(casa, fora, (1.5, 1.2), 4)
+        self.assertEqual(set(lams), {"gols", "mix", "xg"})
+        dc = {m: azr.probs_lado(*lam, False, 0.0, 0.0)["az_dc"] for m, lam in lams.items()}
+        self.assertLess(dc["xg"], dc["mix"])
+        self.assertLess(dc["mix"], dc["gols"])
+        # sem xG: só a variante de gols; amostra curta: nada
+        sem = [dict(j, xg_f=None, xg_a=None) for j in casa]
+        self.assertEqual(set(azr.lambdas_amostra(sem, fora, (1.5, 1.2), 4)), {"gols"})
+        self.assertEqual(azr.lambdas_amostra(casa[:2], fora, (1.5, 1.2), 4), {})

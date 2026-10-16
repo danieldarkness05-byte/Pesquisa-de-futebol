@@ -119,6 +119,20 @@ def probs_lado(lh: float, la: float, lado_casa: bool, rho: float, sigma: float) 
     return {"az_vence": vence, "empate": r["X"], "az_dc": vence + r["X"]}
 
 
+def lambdas_amostra(xh: list[dict], xaw: list[dict], liga: tuple[float, float], k: float) -> dict:
+    """λ pelas amostras na condição (mandante, visitante): gols, mix e só xG.
+    A variante "xg" é o teste de chão da lição 24: tira a sorte defensiva e a finalização
+    (Henan x Tianjin, 16/10: gols 61%, xG 48%, mercado 49%). Mix e xG exigem xG nos dois lados."""
+    if min(len(xh), len(xaw)) < 3:
+        return {}
+    lams = {"gols": v.gols_esperados(xh, xaw, liga, k, "gols")}
+    xg = v.gols_esperados(xh, xaw, liga, k, "xg")
+    if xg:
+        lams["mix"] = v.gols_esperados(xh, xaw, liga, k, "mix")
+        lams["xg"] = xg
+    return {m: lam for m, lam in lams.items() if lam}
+
+
 def alertas_azarao(info: dict, a: dict) -> list[str]:
     al = []
     az, fv = info["azarao_amostra"], info["favorito_amostra"]
@@ -249,11 +263,7 @@ def aprofundar(api: v.Sofascore, info: dict, cfg: dict, d_def: dict, a: dict, di
             lams["geral"] = lgg
     liga = v.medias_liga(api, ut, info["temporada"]) or (lg["casa"], lg["fora"])
     xh, xaw = (xa, xf) if az_casa else (xf, xa)
-    if min(len(xh), len(xaw)) >= 3:
-        for modo in ("gols", "mix"):
-            lam = v.gols_esperados(xh, xaw, liga, a["encolhimento_jogos"], modo)
-            if lam and (modo == "gols" or info["azarao_amostra"].get("xg_pro") is not None):
-                lams[modo] = lam
+    lams.update(lambdas_amostra(xh, xaw, liga, a["encolhimento_jogos"]))
     info["lambdas"] = {k: [round(x, 2) for x in lam] for k, lam in lams.items()}
     variantes = {}
     for nome, lam in lams.items():

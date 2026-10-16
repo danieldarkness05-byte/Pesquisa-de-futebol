@@ -110,6 +110,14 @@ faixa e registre aqui.
     *(automático: λ implícito do 1X2 + over 2,5)*
 16. **Odd que sobe contra o favorito sem notícia** (Nacional, de 1,53 para 1,67) é sinal de alerta.
     Procure escalação e desfalques antes.
+24. **Azarão forte: teste de chão só com xG antes da dupla chance** (Henan x Tianjin, 16/10).
+    - O modelo de gols dava 61% para o Tianjin não perder; só com xG, 51%; o mercado sem margem, 49%.
+    - O Tianjin pontuava fora com sorte: sofreu 12 gols com 21,1 de xG cedido e perdeu o xG em 8 de 13 jogos.
+    - Quando o xG traz a prob. para perto do mercado, os +10 p.p. da regra 8 são sorte defensiva ou de
+      finalização, não informação que o mercado perdeu.
+    - Vale também para o favorito: sequência de empates em casa com xG dominante (Henan, 1,54 x 0,95) é
+      finalização azarada, não time fraco.
+    - Mesma ideia das lições 3 e 17 (3º caso) → *(automático: variante "xg" no mínimo do `azarao.py`)*
 
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
@@ -126,3 +134,4 @@ faixa e registre aqui.
 | 13/10 | Bashley x Christchurch | Bashley 2+ | 65% | 6-0 | ✅ | Liga amadora; a frequência real (67–70%) segurou a prob. abaixo dos 89% do modelo, e o placar passou longe. |
 | 14/10 | Stocksbridge x Bridlington | Bridlington 1+ | 83% | 0-1 | ✅ | Liga amadora: o 1+ passou no limite (1 gol); fez bem não ir no 2+, que caiu no teste das médias gerais. |
 | 14/10 | Nashville x Sporting KC | Nashville 2+ | 68% | 4-0 | ✅ | A defesa do SKC sem os zagueiros titulares confirmou a tese. O teste só com xG (64%) era conservador demais neste caso. |
+| 15/10 | Real Estelí x ART Jalapa | Real Estelí 1+ | 80% | 1-1 | ✅ | Passou no limite (1 gol): fez bem rebaixar o 2+ (51% no teste das médias gerais, lição 20). |

@@ -172,8 +172,9 @@ Parâmetros em `config.json → azarao`.
    - frequência real de "azarão não perdeu" e de "favorito não venceu";
    - forma dos dois (o azarão precisa de `forma_pontos_min` em 5 oficiais) e calendário.
 3. **Probabilidade dos mercados do azarão** (dupla chance, vitória e empate anula):
-   - é o menor valor entre oito variantes: tabela, médias gerais, λ gols e λ gols+xG, cada uma com Poisson
-     simples e com Dixon-Coles ρ −0,10;
+   - é o menor valor entre até dez variantes: tabela, médias gerais, λ gols, λ gols+xG e λ só xG, cada uma
+     com Poisson simples e com Dixon-Coles ρ −0,10;
+   - a variante só xG é o teste de chão (lição 24): tira a sorte defensiva e a de finalização;
    - a incerteza σ entra em todas;
    - depois, é limitada pela frequência real + tolerância.
 4. **Valor:** contra a odd bet365.
