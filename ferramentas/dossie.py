@@ -131,8 +131,8 @@ def contexto_jogo(api: V.Sofascore, e: dict, info: dict) -> dict:
     return out
 
 
-def montar(data: str, numeros: list[int] | None, cfg: dict) -> dict:
-    arq = V.CACHE_PADRAO / f"peneira-{data}.json"
+def montar(data: str, numeros: list[int] | None, cfg: dict, sufixo: str | None = None) -> dict:
+    arq = V.CACHE_PADRAO / f"peneira-{data}{'-' + sufixo if sufixo else ''}.json"
     if not arq.exists():
         sys.exit(f"Sem peneira de {data}. Rode antes: python3 ferramentas/varredura.py --curto")
     pen = json.loads(arq.read_text(encoding="utf-8"))
@@ -208,11 +208,18 @@ def main() -> None:
     p.add_argument("--data", help="AAAA-MM-DD (padrão: hoje, Brasília)")
     p.add_argument("--numeros", help="números da peneira, ex.: 1,3 (padrão: os N primeiros do config)")
     p.add_argument("--json", action="store_true")
+    p.add_argument("--sufixo", help="lê peneira-AAAA-MM-DD-<sufixo>.json (ex.: todas, da varredura --todas)")
+    p.add_argument("--max", type=int, help="quantos candidatos (padrão: aprofundar.max_candidatos)")
+    p.add_argument("--prob-min", type=float, help="corte da reavaliação (o mesmo da varredura), ex.: 0.70")
     a = p.parse_args()
     cfg = config()
+    if a.max is not None:
+        cfg["aprofundar"]["max_candidatos"] = a.max
+    if a.prob_min:
+        cfg["varredura"]["prob_triagem"] = a.prob_min if a.prob_min <= 1 else a.prob_min / 100
     data = a.data or datetime.now(V.FUSO_BR).date().isoformat()
     nums = [int(x) for x in a.numeros.split(",") if x.strip()] if a.numeros else None
-    res = montar(data, nums, cfg)
+    res = montar(data, nums, cfg, a.sufixo)
     if a.json:
         print(json.dumps(res, ensure_ascii=False, default=str))
     else:

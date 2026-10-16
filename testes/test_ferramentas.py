@@ -488,6 +488,11 @@ class TestPrevisoes(unittest.TestCase):
         self.assertTrue(previsoes.avaliar("dupla_chance", "casa", 1, 1))
         self.assertTrue(previsoes.avaliar("over_2.5", "casa", 2, 1))
         self.assertFalse(previsoes.avaliar("under_2.5", "casa", 2, 1))
+        self.assertTrue(previsoes.avaliar("ambas_sim", "casa", 1, 2))
+        self.assertTrue(previsoes.avaliar("ambas_nao", "casa", 3, 0))
+        self.assertTrue(previsoes.avaliar("sem_empate", "casa", 0, 1))
+        self.assertFalse(previsoes.avaliar("handicap_-1.5", "casa", 2, 1))
+        self.assertTrue(previsoes.avaliar("handicap_+1.5", "fora", 2, 1))
         self.assertIsNone(previsoes.avaliar("escanteios", "casa", 1, 1))
 
     def test_fluxo_resolver_e_resumo(self):

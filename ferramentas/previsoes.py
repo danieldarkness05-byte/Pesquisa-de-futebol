@@ -61,6 +61,12 @@ def avaliar(mercado: str, lado: str, gols_casa: int, gols_fora: int) -> bool | N
         return meu > dele
     if mercado == "dupla_chance":
         return meu >= dele
+    if mercado == "sem_empate":  # dupla chance 12
+        return meu != dele
+    if mercado in ("ambas_sim", "ambas_nao"):
+        return (gols_casa > 0 and gols_fora > 0) == (mercado == "ambas_sim")
+    if mercado.startswith("handicap_"):  # linha .5 do ponto de vista do lado: handicap_-1.5, handicap_+1.5
+        return meu - dele + float(mercado[len("handicap_"):]) > 0
     for prefixo in ("over_", "under_"):
         if mercado.startswith(prefixo):
             linha = float(mercado[len(prefixo):])
@@ -81,7 +87,7 @@ def normalizar(novo: dict) -> dict:
     nv["analise"] = str(nv.get("analise") or "defesa").strip()
     lado = str(nv.get("lado") or "").strip().lower()
     mercado = str(nv.get("mercado") or "").strip()
-    precisa_lado = not mercado.startswith(("over_", "under_"))
+    precisa_lado = not mercado.startswith(("over_", "under_", "ambas_", "sem_empate"))
     if precisa_lado and lado not in LADOS:
         raise ValueError(f"lado deve ser casa ou fora (veio {nv.get('lado')!r}) no mercado {mercado}")
     nv["lado"] = LADOS.get(lado, "casa")

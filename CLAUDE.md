@@ -42,7 +42,7 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/clima.py --cidade X --data D --hora H` | previsão de chuva (Open-Meteo) |
 | `python3 ferramentas/sistema.py --sel ... --tamanhos 2` | simula Sistema (Duplas/Triplas) |
 | `python3 ferramentas/registro.py add/resolver/resumo` | registro de apostas e balanço |
-| `python3 ferramentas/varredura.py [--data D]` | peneira do dia: todos os jogos do Sofascore → só mercados com valor |
+| `python3 ferramentas/varredura.py [--data D] [--todas] [--prob-min 0.70]` | peneira do dia: jogos das ligas do config (ou de todas, com `--todas`) → só mercados com valor |
 | `python3 ferramentas/dossie.py [--numeros 1,3] [--json]` | dossiê dos candidatos: odds de agora e da abertura, vivo/caiu, desfalques com gols, forma, chuva |
 | `python3 ferramentas/defesa.py [--data D] [--curto] [--json]` | defesa fraca do azarão x ataque forte do favorito em **todas** as ligas do Sofascore: triagem, estatística, alertas, prob. conservadora e odd mínima |
 | `python3 ferramentas/azarao.py [--data D] [--curto]` | azarão forte: jogos em que o azarão tem boa chance de não perder (dupla chance, empate anula, vitória) com valor, em todas as ligas |
@@ -67,8 +67,11 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
 3. **`/azarao-forte`** (quando o Daniel pedir; pedido de 16/10): azarão forte que pode empatar ou ganhar.
    `azarao.py` → workflow `.claude/workflows/azarao.js` → veredito com regra 8 rigorosa → registra com
    `analise: "azarao"`. As mesmas réguas: azarão com 7+ pontos nos últimos 5; técnico do azarão poupando, sai.
-4. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
-5. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
+4. **`/setenta`** (quando o Daniel pedir; pedido de 16/10): QUALQUER mercado com **70%+** em todas as ligas, hoje e
+   amanhã. `varredura.py --todas --prob-min 0.70` → `dossie.py --sufixo todas` → workflow `aprofundar.js` com corte de
+   70% → veredito → registra com `analise: "setenta"`. Valor (EV ≥ 3%) e regra 8 continuam obrigatórios.
+5. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
+6. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
 
 **Evolução diária:** toda previsão entregue vai para `dados/previsoes.csv` (`previsoes.py`). O resultado é
 resolvido no dia seguinte, e o que cada acerto ou erro ensina vai para `docs/licoes.md`. Esse arquivo é lido

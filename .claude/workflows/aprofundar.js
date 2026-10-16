@@ -84,6 +84,7 @@ const promptPesquisa = c => `Você é o pesquisador de imprensa do /aprofundar (
 Jogo e pick (dados do Sofascore e do modelo JÁ EM MÃOS, não pesquise estatística):
 ${resumo(c)}
 
+ANTES de pesquisar, leia docs/licoes.md (lições de casos anteriores) e confira as que se aplicam a este pick.
 Pesquise na imprensa local/esportiva confiável (use WebSearch e WebFetch; carregue com ToolSearch se não estiverem disponíveis):
 1. Escalação oficial ou provável dos dois times.
 2. Desfalques: confirme os do Sofascore (priorize quem tem gols na liga ou é titular) e ache outros (suspensões, convocações, dúvidas). Status CONFIRMADO / PROVAVEL / RUMOR / VOLTOU.
@@ -101,6 +102,7 @@ ${resumo(c)}
 O pesquisador trouxe:
 ${JSON.stringify(p)}
 
+Leia docs/licoes.md antes (lições de casos anteriores: data e mando em 2ª fonte, regressão pelo xG, amostra recente, liga amadora).
 Faça (WebSearch/WebFetch; carregue com ToolSearch se preciso):
 1. Confira em fonte independente as 2 ou 3 afirmações que mais pesam na tese (sobretudo desfalques e escalação).
 2. Procure ativamente o que faria o pick perder: o que o mercado sabe, rodízio, motivação, estilo de jogo, clima/gramado, árbitro.

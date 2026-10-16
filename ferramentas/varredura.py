@@ -127,15 +127,16 @@ def torneio_id(evento: dict) -> int | None:
     return ((evento.get("tournament") or {}).get("uniqueTournament") or {}).get("id")
 
 
-def listar_jogos(api: Sofascore, data: str, torneios: set[int]) -> list[dict]:
+def listar_jogos(api: Sofascore, data: str, torneios: set[int] | None) -> list[dict]:
+    """Jogos não iniciados da data (Brasília). `torneios` None = todas as ligas do Sofascore."""
     cats = api.get(f"sport/football/{data}/-10800/categories").get("categories", [])
-    alvo = [c["category"]["id"] for c in cats if torneios & set(c.get("uniqueTournamentIds") or [])]
+    alvo = [c["category"]["id"] for c in cats if torneios is None or torneios & set(c.get("uniqueTournamentIds") or [])]
     vistos, jogos = set(), []
     agora = time.time()
     # calendário sempre na hora: o status (não começou / em andamento) muda ao longo do dia
     for res in em_paralelo(lambda cid: api.get(f"category/{cid}/scheduled-events/{data}", cache=None), alvo):
         for e in res.get("events", []):
-            if e["id"] in vistos or torneio_id(e) not in torneios:
+            if e["id"] in vistos or (torneios is not None and torneio_id(e) not in torneios):
                 continue
             vistos.add(e["id"])
             if (hora_br(e["startTimestamp"]).date().isoformat() == data and e["status"]["type"] == "notstarted"
@@ -819,15 +820,21 @@ def main() -> None:
     p.add_argument("--jogos", help="IDs de jogos do Sofascore (reavalia só esses, ignora a lista de torneios)")
     p.add_argument("--curto", action="store_true", help="resumo de celular + linha NOTIFICAR")
     p.add_argument("--json", action="store_true")
+    p.add_argument("--todas", action="store_true", help="todas as ligas do Sofascore (filtra ligas editadas à mão e eventos suspeitos)")
+    p.add_argument("--prob-min", type=float, help="corte de prob. da triagem (padrão: varredura.prob_triagem), ex.: 0.70")
+    p.add_argument("--sufixo", help="salva em peneira-AAAA-MM-DD-<sufixo>.json (padrão com --todas: todas)")
     a = p.parse_args()
 
     cfg = n.carregar_config()
     cfg["varredura"] = {**VARREDURA_PADRAO, **{k: v for k, v in cfg.get("varredura", {}).items() if not k.startswith("_")}}
+    if a.prob_min:
+        cfg["varredura"]["prob_triagem"] = a.prob_min if a.prob_min <= 1 else a.prob_min / 100
+    sufixo = a.sufixo or ("todas" if a.todas else None)
     agora = datetime.now(FUSO_BR)
     data = a.data or agora.date().isoformat()
-    torneios = ({int(x) for x in a.torneios.split(",") if x.strip()} if a.torneios
+    torneios = (None if a.todas else {int(x) for x in a.torneios.split(",") if x.strip()} if a.torneios
                 else {int(x) for x in cfg["varredura"]["torneios_sofascore"]})
-    if not torneios:
+    if torneios is not None and not torneios:
         sys.exit("Nenhum torneio configurado (config.json → varredura.torneios_sofascore).")
     api = Sofascore(None if a.sem_cache else CACHE_PADRAO, data)
 
@@ -836,10 +843,16 @@ def main() -> None:
                                for x in a.jogos.split(",") if x.strip()) if ev and ev["status"]["type"] == "notstarted" and ev["startTimestamp"] > time.time()]
     else:
         jogos = listar_jogos(api, data, torneios)
+    filtrados = {}
+    if a.todas:  # lições 18 e 23: ligas editadas à mão e jogo já disputado listado como futuro
+        import defesa as df
+        sus = df.eventos_suspeitos(jogos)
+        filtrados = {"evento suspeito": len(sus), "liga não verificável": sum(1 for e in jogos if df.liga_nao_verificavel(e))}
+        jogos = [e for e in jogos if e["id"] not in sus and not df.liga_nao_verificavel(e)]
     cache_liga: dict = {}
     infos = em_paralelo(lambda e: analisar_jogo(api, e, cfg, cache_liga), jogos, 4)
 
-    candidatos, excl_chuva, descartes = [], [], {}
+    candidatos, excl_chuva, descartes = [], [], {k: q for k, q in filtrados.items() if q}
     for info in infos:
         if not info["candidatos"]:
             m = "amostra curta" if (info["motivo"] or "").startswith("amostra curta") else (info["motivo"] or MOTIVOS[0])
@@ -853,7 +866,16 @@ def main() -> None:
             candidatos.append({**k, "hora": info["hora"], "jogo": info["jogo"], "competicao": info["competicao"],
                                "id": info["id"], "arbitro": info.get("arbitro"),
                                "chuva": chuva["status"] if chuva["status"] == "seco" else "⚠️ não verificada"})
-    candidatos.sort(key=lambda c: (-c["p"], -c["ev"]))
+    if a.todas:  # lição 14: amador, base, feminino e time B vêm depois (dado fraco, quase nunca na Betano)
+        import defesa as df
+        palavras = {**df.DEFESA_PADRAO, **cfg.get("defesa", {})}["palavras_base"]
+        por_id = {e["id"]: e for e in jogos}
+        for c in candidatos:
+            e = por_id.get(c["id"], {})
+            cat = ((e.get("tournament") or {}).get("category") or {}).get("name", "")
+            c["nivel"] = "base" if df.nivel_base([c["competicao"], cat], palavras,
+                                                 [e.get("homeTeam", {}).get("name"), e.get("awayTeam", {}).get("name")]) else "pro"
+    candidatos.sort(key=lambda c: (c.get("nivel") == "base", -c["p"], -c["ev"]))
     res = {
         "data": data, "consultado": datetime.now(FUSO_BR).strftime("%H:%M"),
         "prob_triagem": cfg["varredura"]["prob_triagem"], "ev_minimo": cfg["criterios"]["ev_minimo"],
@@ -864,7 +886,7 @@ def main() -> None:
     }
     if not a.jogos and not a.sem_cache:
         CACHE_PADRAO.mkdir(parents=True, exist_ok=True)
-        (CACHE_PADRAO / f"peneira-{data}.json").write_text(json.dumps(res, ensure_ascii=False, default=str), encoding="utf-8")
+        (CACHE_PADRAO / f"peneira-{data}{'-' + sufixo if sufixo else ''}.json").write_text(json.dumps(res, ensure_ascii=False, default=str), encoding="utf-8")
     if a.json:
         print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
     elif a.curto:
