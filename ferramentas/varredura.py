@@ -551,9 +551,13 @@ def analisar_jogo(api: Sofascore, e: dict, cfg: dict, cache_liga: dict) -> dict:
     ev_min = cfg["criterios"]["ev_minimo"]
     eid, ut = e["id"], torneio_id(e)
     casa, fora = e["homeTeam"]["name"], e["awayTeam"]["name"]
+    torneio = e.get("tournament") or {}
     info = {"id": eid, "hora": hora_br(e["startTimestamp"]).strftime("%H:%M"),
-            "jogo": f"{casa} x {fora}", "competicao": e["tournament"]["uniqueTournament"]["name"],
+            "jogo": f"{casa} x {fora}", "competicao": (torneio.get("uniqueTournament") or torneio).get("name", "?"),
             "casa": casa, "fora": fora, "candidatos": [], "motivo": None}
+    if ut is None:
+        info["motivo"] = "sem torneio"
+        return info
     odds = api.get(f"event/{eid}/odds/1/all", cache=None)
     if not odds.get("markets"):
         info["motivo"] = "sem odds"
@@ -850,7 +854,13 @@ def main() -> None:
         filtrados = {"evento suspeito": len(sus), "liga não verificável": sum(1 for e in jogos if df.liga_nao_verificavel(e))}
         jogos = [e for e in jogos if e["id"] not in sus and not df.liga_nao_verificavel(e)]
     cache_liga: dict = {}
-    infos = em_paralelo(lambda e: analisar_jogo(api, e, cfg, cache_liga), jogos, 4)
+    def seguro(e):  # um jogo com dado estranho não derruba a varredura inteira
+        try:
+            return analisar_jogo(api, e, cfg, cache_liga)
+        except Exception as exc:  # noqa: BLE001
+            return {"id": e.get("id"), "jogo": "?", "candidatos": [], "motivo": f"erro {type(exc).__name__}"}
+
+    infos = em_paralelo(seguro, jogos, 4)
 
     candidatos, excl_chuva, descartes = [], [], {k: q for k, q in filtrados.items() if q}
     for info in infos:
