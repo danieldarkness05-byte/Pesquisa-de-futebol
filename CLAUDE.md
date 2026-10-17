@@ -13,7 +13,8 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
    válida e honesta. Não rebaixe o critério para ter o que mostrar.
 3. **Exclua jogos com previsão de chuva no dia da partida** (`clima.py`). Se a
    consulta falhar, marque "chuva não verificada" e não aprove o jogo sem conferir.
-   *Exceção:* no `/defesa-fraca` a chuva é só informativa, a pedido do Daniel (12/10).
+   *Exceção:* no `/defesa-fraca`, no `/azarao-forte` e no `/setenta` a chuva é só informativa, a pedido do Daniel
+   (12/10 e 16/10: "pode mandar com chuva ou não, isso não interfere").
 4. **Defesa fraca:** quando apontar o azarão com defesa muito vazada, marque como
    **⚠️ RISCO** se ele também tiver ataque forte (ex.: marca ≥ 1,3 gol/jogo na condição).
 5. **Sofascore é a fonte preferida** — tente primeiro. Se a página não carregar,
@@ -68,7 +69,7 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
    `azarao.py` → workflow `.claude/workflows/azarao.js` → veredito com regra 8 rigorosa → registra com
    `analise: "azarao"`. As mesmas réguas: azarão com 7+ pontos nos últimos 5; técnico do azarão poupando, sai.
 4. **`/setenta`** (quando o Daniel pedir; pedido de 16/10): QUALQUER mercado com **70%+** em todas as ligas, hoje e
-   amanhã. `varredura.py --todas --prob-min 0.70` → `dossie.py --sufixo todas` → workflow `aprofundar.js` com corte de
+   amanhã. `varredura.py --todas --prob-min 0.70 --chuva-informativa` → `dossie.py --sufixo todas` → workflow `aprofundar.js` com corte de
    70% → veredito → registra com `analise: "setenta"`. Valor (EV ≥ 3%) e regra 8 continuam obrigatórios.
 5. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
 6. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.

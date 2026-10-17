@@ -827,6 +827,8 @@ def main() -> None:
     p.add_argument("--todas", action="store_true", help="todas as ligas do Sofascore (filtra ligas editadas à mão e eventos suspeitos)")
     p.add_argument("--prob-min", type=float, help="corte de prob. da triagem (padrão: varredura.prob_triagem), ex.: 0.70")
     p.add_argument("--sufixo", help="salva em peneira-AAAA-MM-DD-<sufixo>.json (padrão com --todas: todas)")
+    p.add_argument("--chuva-informativa", action="store_true",
+                   help="não exclui jogo com chuva, só marca (pedido do Daniel no /setenta, 16/10)")
     a = p.parse_args()
 
     cfg = n.carregar_config()
@@ -869,13 +871,14 @@ def main() -> None:
             descartes[m] = descartes.get(m, 0) + 1
             continue
         chuva = {"status": "não verificada", "detalhe": "--sem-chuva"} if a.sem_chuva else checar_chuva(info, data, cfg)
-        if chuva["status"] == "CHUVA":
+        if chuva["status"] == "CHUVA" and not a.chuva_informativa:
             excl_chuva.append(f"{info['jogo']} ({chuva['detalhe']})")
             continue
         for k in info["candidatos"]:
             candidatos.append({**k, "hora": info["hora"], "jogo": info["jogo"], "competicao": info["competicao"],
                                "id": info["id"], "arbitro": info.get("arbitro"),
-                               "chuva": chuva["status"] if chuva["status"] == "seco" else "⚠️ não verificada"})
+                               "chuva": chuva["status"] if chuva["status"] == "seco" else
+                               f"🌧️ {chuva['detalhe']} (informativa)" if chuva["status"] == "CHUVA" else "⚠️ não verificada"})
     if a.todas:  # lição 14: amador, base, feminino e time B vêm depois (dado fraco, quase nunca na Betano)
         import defesa as df
         palavras = {**df.DEFESA_PADRAO, **cfg.get("defesa", {})}["palavras_base"]

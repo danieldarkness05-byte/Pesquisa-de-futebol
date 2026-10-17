@@ -14,7 +14,8 @@ isso; qualquer mercado que chegue a 70% ou mais de chance; todos os jogos de hoj
   também exige `p_final ≥ 0.70`.
 - **Valor continua obrigatório:** EV ≥ `criterios.ev_minimo` na odd real (bet365) ou, sem odd, a odd
   mínima para o Daniel conferir na Betano. Com 70%, a odd mínima é 1.48; com 80%, 1.29.
-- **Regra 8, chuva e lições** valem como no /ouro: a varredura exclui jogo com chuva prevista.
+- **Regra 8 e lições** valem como no /ouro. **Chuva é só informativa** (Daniel, 16/10: "pode mandar com chuva ou
+  não, isso não interfere"): a varredura roda com `--chuva-informativa`.
 - **Todas as ligas**, mas profissional primeiro. Amador, base, feminino e time B (`nivel = base`) só entram se
   faltar caso profissional (lição 14). A varredura já tira ligas editadas à mão e eventos suspeitos
   (lições 18 e 23).
@@ -27,7 +28,7 @@ resolvida na tabela de `docs/licoes.md`. Leia `docs/licoes.md`.
 
 ## 1. Peneira (script, por data)
 
-`python3 ferramentas/varredura.py --data <D> --todas --prob-min 0.70 --curto` (Bash em segundo plano; um dia
+`python3 ferramentas/varredura.py --data <D> --todas --prob-min 0.70 --chuva-informativa --curto` (Bash em segundo plano; um dia
 cheio leva de 10 a 30 min). O JSON vai para `dados/cache/sofascore/peneira-<D>-todas.json`.
 
 ## 2. Dossiê
