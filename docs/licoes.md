@@ -179,6 +179,24 @@ faixa e registre aqui.
     - "12 jogos seguidos com 2+ gols" não sustenta um over 2.5, que pede 3+. O cético pegou e tirou −2 p.p.
     - Gols sofridos que vêm de duas goleadas (dois 0-5 do HSV) também não sustentam over sozinhos (lição 1).
 
+35. **Confronto extremo infla o λ multiplicativo** (FC Sevastopol x Neftyanik, 17/10).
+    - Com a defesa do azarão a 2x ou mais da média da liga (índice 2,18), o λ foi a 4,0, mas o Sevastopol
+      nunca tinha marcado mais de 3 em casa (3+ em só 2 de 12).
+    - O λ implícito do mercado (2,18) ficou perto da média do favorito em casa (1,83), não do produto.
+    - Com índice de defesa acima de 2, faça o teste de chão com a média geométrica entre os gols do favorito
+      na condição e os sofridos pelo azarão (aqui λ 2,47, 2+ ≈ 71%), e confira o teto de gols do favorito.
+36. **Defesa que desmorona no meio da temporada** (IK Uppsala x Kristianstads, 17/10).
+    - Saída de técnico, titulares vendidos ou clube em crise: o teto de frequência dos últimos 10 mistura o
+      elenco antigo com o atual e fica baixo demais.
+    - Use a frequência de "sofreu 2+" só depois do desmonte. Confira também se o período antigo tinha gols bem
+      abaixo do xG cedido: no Uppsala, o xG cedido em casa ia de 2,3 a 3,3, mas foram só 6 gols em 5 jogos.
+    - É a lição 2 ao contrário: o alerta automático "defesa melhorando" não pega a piora.
+37. **"Defesa melhorando" por blocos, ajustada pelo adversário** (Champs x Fraijanes, 17/10).
+    - Some os gols sofridos e os esperados pelos adversários (média de cada um na condição, sem o próprio
+      jogo) em blocos consecutivos, em vez de olhar só os últimos 5.
+    - O Champs teve uma melhora real de R9 a R13 (0,52x) e recaiu de R14 a R16 (1,56x, já eliminado).
+    - Trecho bom no meio que não se sustenta nos últimos 3 não é melhora estrutural; vale a temporada ajustada.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
