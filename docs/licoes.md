@@ -163,6 +163,22 @@ faixa e registre aqui.
       de 2,67 para 2,29 e gerou um falso alerta de "defesa não tão fraca".
     - Antes de confiar na amostra, compare os gols da amostra com a tabela da condição.
 
+## Mercados de 70%+ (/setenta)
+
+32. **Abertura de temporada: o modelo ainda olha a temporada passada** (Central Coast x Newcastle, A-League, 17/10).
+    - A amostra de 10 jogos na condição era toda de 2025/26. O Mariners teve 13 saídas e técnico novo, e o Jets
+      sofreu 10 gols em 2 jogos da Champions da Ásia. O under 4.5 caiu de 79% para 75%, sem valor.
+    - Nas primeiras rodadas, confira quantos jogos da amostra são da temporada atual e pese as mudanças de elenco.
+    - *Candidato a automático:* alerta "amostra da temporada passada" quando a maioria dos jogos for de outra temporada.
+33. **Under alto contra favorito goleador: olhe a cauda** (Telstar x Feyenoord, 17/10).
+    - O Feyenoord passou de 4,5 gols em 5 dos últimos 7 oficiais (7-0, 5-0, 5-2, 1-5, 3-2). Um under 4.5 de 75%
+      depende quase só do favorito não golear, e o mercado (66%) já precificava isso.
+    - Antes de um under 4.5 ou 5.5, conte em quantos dos últimos 7 jogos (todas as competições) o favorito sozinho
+      faria a linha cair.
+34. **Estatística citada tem que ser da mesma linha do mercado** (Hamburgo x Stuttgart, 17/10).
+    - "12 jogos seguidos com 2+ gols" não sustenta um over 2.5, que pede 3+. O cético pegou e tirou −2 p.p.
+    - Gols sofridos que vêm de duas goleadas (dois 0-5 do HSV) também não sustentam over sozinhos (lição 1).
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

@@ -46,7 +46,9 @@ cheio leva de 10 a 30 min). O JSON vai para `dados/cache/sofascore/peneira-<D>-t
 ## 4. Veredito
 
 Como no /ouro (passo 4): `valor.py`, regra 8, classificação da evidência. **Passa só com `p_final ≥ 0.70`**,
-EV ≥ mínimo, cético sem refutar e evidência FORTE ou MUITO FORTE.
+EV ≥ mínimo e cético sem refutar. Evidência como no /ouro: MUITO FORTE, FORTE ou MODERADA passam (MODERADA com o
+ponto fraco escrito); FRACA (2+ pontos fracos) sai. Se a FRACA for só pelo valor (odd a menos de 2% da mínima), o pick
+pode ir como **condicional** ("só com odd ≥ mínima na Betano"), registrado com essa observação.
 
 ## 5. Salvar, registrar e evoluir
 
