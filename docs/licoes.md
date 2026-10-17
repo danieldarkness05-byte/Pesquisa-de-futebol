@@ -215,3 +215,8 @@ faixa e registre aqui.
 | 15/10 | Real Estelí x ART Jalapa | Real Estelí 1+ | 80% | 1-1 | ✅ | Passou no limite (1 gol): fez bem rebaixar o 2+ (51% no teste das médias gerais, lição 20). |
 | 16/10 | Livorno x Grosseto (azarão) | Grosseto ou empate | 65% | 4-4 | ✅ | O Grosseto forte no xG confirmou; jogo aberto (8 gols), não o "travado" que a tradição sugeria. |
 | 16/10 | FC Alashkert x FC Syunik | Alashkert 2+ | 69% | 5-1 | ✅ | Corrigir o placar da R8 (lição 31) acertou a leitura: a defesa do Syunik era mesmo das piores fora. |
+| 17/10 | Carrarese x Modena (setenta) | menos de 3.5 gols | 78% | 2-1 | ✅ | |
+| 17/10 | Hamburger SV x VfB Stuttgart (setenta) | mais de 2.5 gols | 75% | 1-0 | ❌ | Ver lição 34: a estatística citada tem que ser da mesma linha do mercado. Saiu um gol só. |
+| 17/10 | Stenhousemuir x Raith Rovers (setenta) | menos de 3.5 gols | 85% | 1-1 | ✅ | |
+| 17/10 | FC Sevastopol x Neftyanik | Sevastopol 1+ | 92% | 2-2 | ✅ | Rebaixar do 2+ para o 1+ (lição 35) foi certo: o campeão relaxou e saiu 2-2. |
+| 17/10 | IK Uppsala x Kristianstads | Kristianstads 2+ | 68% | 0-5 | ✅ | A defesa desmontada do Uppsala (lição 36) confirmou: 5-0 fora. |
