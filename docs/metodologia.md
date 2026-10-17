@@ -71,3 +71,125 @@ Combinar seleções sem valor não cria valor.
   mostra se as estimativas estão calibradas: use `registro.py resumo`.
 - **CLV** (sua odd vs. odd de fechamento) positivo de forma consistente é o melhor sinal
   de que a vantagem é real. Anote a odd de fechamento ao resolver as apostas.
+
+## Peneira diária (`varredura.py`)
+
+Triagem automática de todos os jogos das competições em `config.json → varredura`.
+Usa a API pública do Sofascore: calendário, estatísticas por jogo, árbitro e odds da bet365.
+
+- **Amostra:** últimos `jogos_amostra` (10) jogos **da mesma liga na condição** (mandante em casa,
+  visitante fora). Com menos de `amostra_minima` (5), o jogo fica de fora.
+- **Gols:** método de força com 50% gols + 50% xG (quando há xG em ≥ 70% dos jogos). As médias são
+  encolhidas para a média da liga (peso de `encolhimento_jogos`). Médias da liga: temporada atual +
+  anterior.
+- **Escanteios e cartões:** `media_confronto`, com dispersão medida nas amostras. Os cartões entram
+  misturados com a média de carreira do árbitro (≥ 15 jogos).
+- **Todos os mercados com odd:** 1X2, dupla chance, empate anula, ambas marcam, mais/menos de gols,
+  handicap asiático, 1º tempo, primeiro a marcar, escanteios e cartões.
+- **Passa só o que tiver prob ≥ `prob_triagem` e EV ≥ `ev_minimo`:**
+  - na base, com incerteza nas médias (σ = `incerteza_sigma`) e com Dixon-Coles `rho_variante`;
+  - nas demais variantes (sem os 2 últimos jogos, amostra geral, só gols, só xG), com tolerância de
+    `tolerancia_variantes`;
+  - sem divergência > `regra8_pp` com o mercado sem margem (regra 8);
+  - com frequência real nas amostras ≥ triagem − `tolerancia_frequencia`;
+  - com a taxa-base da liga a favor. O 1/2/12/empate anula é refeito com a taxa real de empates,
+    porque a Poisson subestima empates. Gols com prob ≥ 80% precisam acontecer na liga em pelo menos
+    (prob − 10 p.p.).
+  - Linhas com odd < `odd_minima_mercado` (ex.: menos de 5.5 a 1.10) são ignoradas: a cauda do modelo
+    é pouco confiável e a margem é grande.
+- **Chuva:** `clima.py`, só para os jogos que passaram.
+- É **triagem**: não vê escalação nem notícia. O veredito vem do `/aprofundar`.
+
+## Defesa fraca x ataque forte (`defesa.py` + `/defesa-fraca`)
+
+Análise diária pedida pelo Daniel em 12/10. Procura jogos em que o **azarão sofre muito gol** e o
+**favorito marca muito**, em **todas** as ligas do Sofascore. Parâmetros em `config.json → defesa`.
+
+1. **Triagem:** todo jogo não iniciado com tabela casa/fora.
+   - Azarão = pior odd. Sem odds, é o que tem menos pontos por jogo, se a diferença for ≥ `diferenca_ppg_sem_odds`.
+   - Passa se o azarão sofre ≥ `indice_defesa_min` × a média da liga **na condição** e o favorito marca
+     ≥ `indice_ataque_min` × a média.
+   - Ligas profissionais com amostra boa são aprofundadas primeiro.
+2. **Estatística** dos `max_aprofundar` melhores: últimos `jogos_amostra` jogos de liga na condição,
+   com gols, xG, chutes, mediana, frequência de k+ gols, tendência dos últimos 5, expulsões, calendário,
+   odds bet365 e λ implícito do mercado (1X2 + over 2,5).
+3. **Probabilidade** dos mercados "favorito marca 1+/2+/3+", vitória e dupla chance:
+   - É o **menor** valor entre três caminhos:
+     - tabela da temporada (método de força);
+     - λ encolhido por gols;
+     - λ encolhido gols+xG.
+     Todos com Dixon-Coles ρ e incerteza σ.
+   - Depois, é **limitada pela frequência real + `tolerancia_frequencia`**, porque o Poisson exagera
+     quando a média vem de goleadas. Na vitória, a frequência é a de vitórias do favorito e de derrotas do
+     azarão.
+   - Na vitória, a Poisson subestima empates: com a taxa real de empates da liga maior que a do modelo,
+     a vitória é reescalada.
+   - Tabela com vários grupos ou fases: vale o grupo em que os dois times jogaram.
+   - Sem amostra recente (menos de 3 jogos na condição): o jogo não passa (regra 6).
+   - **Forma do favorito** (pedido do Daniel em 13/10):
+     - conta os últimos `forma_jogos` (5) jogos **oficiais**, em todas as competições, sem amistosos, pelo placar dos 90 min;
+     - o favorito precisa de **7 pontos ou mais** em 5 jogos (com menos jogos, a proporção 7/15); com
+       menos, o jogo sai da lista (`forma_pontos_min`; era 8 até 14/10).
+   - **Técnico poupando titulares** (pedido do Daniel em 13/10): o pesquisador e o cético procuram
+     entrevista, escalação provável e jogo decisivo logo depois. Se for `SIM_CONFIRMADO` ou `PROVAVEL`
+     com fonte confiável, o jogo sai. O alerta de calendário apertado sozinho não tira.
+   - **Regra 8 por mercado:**
+     - nos gols, compara com o λ implícito do 1X2 e das linhas de gols da bet365;
+     - na vitória e na dupla chance, com o 1X2/DC sem margem.
+4. **Alertas automáticos** (lições de `docs/licoes.md`):
+   - ⚠️ RISCO (o azarão também marca);
+   - amostra pequena; liga amadora/base;
+   - gols sofridos ≫ xG cedido; favorito acima do xG;
+   - defesa melhorando nos últimos 5; média inflada por goleadas;
+   - calendário apertado ou pausa longa; expulsões;
+   - defesa dos últimos jogos melhor que a da tabela;
+   - regra 8.
+5. **Pesquisa** (`.claude/workflows/defesa.js`), em até `max_pesquisa` candidatos:
+   - 1 pesquisador (Sofascore + imprensa + site da liga, incluindo o mando real);
+   - 1 cético, que fecha o mercado final e o ajuste (±5 p.p.) e escreve uma lição nova, se houver.
+6. **Aprendizado:**
+   - toda previsão entregue vai para `dados/previsoes.csv`;
+   - `previsoes.py resolver` busca o placar e `previsoes.py resumo` mostra a calibração por faixa;
+   - com ≥ 30 resolvidas numa faixa que acerta 5 p.p. ou mais abaixo do previsto, a análise fica mais
+     conservadora ali;
+   - o que cada caso ensina vai para `docs/licoes.md`, lido antes de cada análise.
+
+**Chuva:** aqui é só informativa (pedido do Daniel). No /ouro, a regra 3 continua valendo.
+
+## Azarão forte (`azarao.py` + `/azarao-forte`)
+
+Pedido do Daniel em 16/10: jogos em que o azarão é forte e tem boa chance de empatar ou ganhar.
+Parâmetros em `config.json → azarao`.
+
+1. **Triagem:** jogos com odds e tabela casa/fora.
+   - O azarão (odd de vitória ≥ `odd_azarao_min`) precisa:
+     - render na condição dele quase como o favorito na dele (pontos por jogo ≥ os do favorito − `ppg_folga`);
+     - ter defesa sólida (≤ `defesa_az_max` × média);
+     - ter algum ataque (≥ `ataque_az_min` × média).
+   - Filtros herdados do `defesa.py`: liga não verificável, eventos suspeitos e tabela do torneio certo.
+2. **Estatística:**
+   - últimos jogos na condição;
+   - frequência real de "azarão não perdeu" e de "favorito não venceu";
+   - forma dos dois (o azarão precisa de `forma_pontos_min` em 5 oficiais) e calendário.
+3. **Probabilidade dos mercados do azarão** (dupla chance, vitória e empate anula):
+   - é o menor valor entre até dez variantes: tabela, médias gerais, λ gols, λ gols+xG e λ só xG, cada uma
+     com Poisson simples e com Dixon-Coles ρ −0,10;
+   - a variante só xG é o teste de chão (lição 24): tira a sorte defensiva e a de finalização;
+   - a incerteza σ entra em todas;
+   - depois, é limitada pela frequência real + tolerância.
+4. **Valor:** contra a odd bet365.
+   - Sem odd de dupla chance na bet365, usa a DC implícita no 1X2 (`odd_dc_sintetica`, marcada "1X2 implícita").
+     A casa costuma pagar isso ou menos, então é só estimativa: o Daniel confere a odd mínima no app (lição 28).
+   - A odd mínima é sempre arredondada para cima (1.585 → 1.59): com 1.58 o EV não chega aos 3%.
+   - **Regra 8:** comparação contra o 1X2 sem margem.
+   - Nesta análise a regra 8 é o filtro mais importante: o mercado costuma saber por que o azarão é azarão.
+5. **Alertas:**
+   - ⚠️ RISCO: o favorito ataca muito na condição;
+   - defesa do azarão com sorte (gols sofridos bem abaixo do xG cedido);
+   - favorito marcando abaixo do xG;
+   - favorito em grande fase;
+   - rodízio do azarão.
+6. **Pesquisa** (`.claude/workflows/azarao.js`):
+   - 1 pesquisador: força real do azarão, fraquezas do favorito, desfalques, rodízio, o que o mercado sabe,
+     e data e mando em 2ª fonte;
+   - 1 cético: fecha o mercado e o ajuste (±5 p.p.) e diz se a regra 8 tem explicação.

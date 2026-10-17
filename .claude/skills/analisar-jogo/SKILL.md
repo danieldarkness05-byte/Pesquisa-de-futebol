@@ -27,6 +27,6 @@ nada de número sem fonte).
 5. **Valor:** para cada candidato ≥ 60%, confira com `valor.py` (com `--mercado-odds`
    quando tiver os dois lados do mercado) e aplique a regra de sanidade (+10 p.p.).
 6. **Responda** no formato do CLAUDE.md: OURO primeiro (ou "nenhuma oportunidade"),
-   depois descartados com motivo, depois fontes.
+   depois descartados com motivo (aqui o Daniel perguntou deste jogo), depois fontes.
 7. **Salve** em `analises/<data>-<mandante>-x-<visitante>.md` (slug sem acentos),
    seguindo `templates/analise.md`.

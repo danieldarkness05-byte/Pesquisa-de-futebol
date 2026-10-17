@@ -13,6 +13,8 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
    válida e honesta. Não rebaixe o critério para ter o que mostrar.
 3. **Exclua jogos com previsão de chuva no dia da partida** (`clima.py`). Se a
    consulta falhar, marque "chuva não verificada" e não aprove o jogo sem conferir.
+   *Exceção:* no `/defesa-fraca`, no `/azarao-forte` e no `/setenta` a chuva é só informativa, a pedido do Daniel
+   (12/10 e 16/10: "pode mandar com chuva ou não, isso não interfere").
 4. **Defesa fraca:** quando apontar o azarão com defesa muito vazada, marque como
    **⚠️ RISCO** se ele também tiver ataque forte (ex.: marca ≥ 1,3 gol/jogo na condição).
 5. **Sofascore é a fonte preferida** — tente primeiro. Se a página não carregar,
@@ -41,9 +43,41 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/clima.py --cidade X --data D --hora H` | previsão de chuva (Open-Meteo) |
 | `python3 ferramentas/sistema.py --sel ... --tamanhos 2` | simula Sistema (Duplas/Triplas) |
 | `python3 ferramentas/registro.py add/resolver/resumo` | registro de apostas e balanço |
+| `python3 ferramentas/varredura.py [--data D] [--todas] [--prob-min 0.70]` | peneira do dia: jogos das ligas do config (ou de todas, com `--todas`) → só mercados com valor |
+| `python3 ferramentas/dossie.py [--numeros 1,3] [--json]` | dossiê dos candidatos: odds de agora e da abertura, vivo/caiu, desfalques com gols, forma, chuva |
+| `python3 ferramentas/defesa.py [--data D] [--curto] [--json]` | defesa fraca do azarão x ataque forte do favorito em **todas** as ligas do Sofascore: triagem, estatística, alertas, prob. conservadora e odd mínima |
+| `python3 ferramentas/azarao.py [--data D] [--curto]` | azarão forte: jogos em que o azarão tem boa chance de não perder (dupla chance, empate anula, vitória) com valor, em todas as ligas |
+| `python3 ferramentas/previsoes.py add-json/resolver/resumo` | registro de TODA previsão entregue (apostada ou não), resultado automático pelo Sofascore e calibração |
 
 Cada script tem `--help` com exemplos. Use `--json` quando for processar a saída.
 Detalhes dos modelos e limitações: `docs/metodologia.md`.
+
+## Fluxo diário (economia de esforço)
+
+1. **`/ouro`** (rotina diária às 06:52 e às 17:52, só jogos que ainda não começaram): peneira (script) → dossiê (script) → workflow
+   `.claude/workflows/aprofundar.js` só nos N melhores candidatos **vivos** → veredito pelas
+   ferramentas → notifica só com OURO. Agentes só dentro do workflow: 1 pesquisador + 1 cético por
+   candidato, no modelo de `config.json → aprofundar` (`max_candidatos: 0` desliga).
+2. **`/defesa-fraca`** (rotina das 06:52, para os jogos de HOJE, e quando o Daniel pedir): primeiro aprende
+   (`previsoes.py resolver` + `resumo` + `docs/licoes.md`), depois `defesa.py` → workflow
+   `.claude/workflows/defesa.js` (pesquisador + cético, até `config.json → defesa.max_pesquisa`) → veredito →
+   salva, registra as previsões e acrescenta as lições novas. Nesta análise a **chuva é só informativa**
+   (pedido do Daniel em 12/10) e entram **todas as ligas** do Sofascore. **Favorito precisa de 7+ dos 15 pontos
+   nos últimos 5 jogos oficiais (com 6 ou menos, sai; ajuste de 14/10)**, e **favorito cujo técnico vai poupar titulares
+   também sai** (pedidos do Daniel em 13/10).
+3. **`/azarao-forte`** (quando o Daniel pedir; pedido de 16/10): azarão forte que pode empatar ou ganhar.
+   `azarao.py` → workflow `.claude/workflows/azarao.js` → veredito com regra 8 rigorosa → registra com
+   `analise: "azarao"`. As mesmas réguas: azarão com 7+ pontos nos últimos 5; técnico do azarão poupando, sai.
+4. **`/setenta`** (quando o Daniel pedir; pedido de 16/10): QUALQUER mercado com **70%+** em todas as ligas, hoje e
+   amanhã. `varredura.py --todas --prob-min 0.70 --chuva-informativa` → `dossie.py --sufixo todas` → workflow `aprofundar.js` com corte de
+   70% → veredito → registra com `analise: "setenta"`. Valor (EV ≥ 3%) e regra 8 continuam obrigatórios.
+5. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
+6. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
+
+**Evolução diária:** toda previsão entregue vai para `dados/previsoes.csv` (`previsoes.py`). O resultado é
+resolvido no dia seguinte, e o que cada acerto ou erro ensina vai para `docs/licoes.md`. Esse arquivo é lido
+antes de cada análise. Lição que se repete vira alerta automático em `defesa.py` (com teste) ou parâmetro em
+`config.json → defesa`.
 
 ## Fluxo padrão de análise
 
@@ -59,11 +93,14 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
 
 ## Formato da resposta
 
+- **Só mande ao Daniel jogos que passam no critério** (⭐ OURO: prob ≥ 60% e EV ≥ 3%, pelos `criterios`).
+  Candidatos da peneira, descartados, "quase" e "mais próximos" ficam só no arquivo da análise, a não
+  ser que ele peça. Sem ouro: uma linha, "Nenhuma oportunidade de ouro hoje." (sem notificação).
 - Comece pelo resultado: lista de ⭐ OURO ranqueada, ou "nenhuma oportunidade".
 - Cada pick em 1–2 linhas: jogo · horário · mercado · prob · odd mínima · odd casa
   (se houver) · EV · motivo curto.
-- Depois, descartados em uma linha cada, com o motivo (chuva, < 60%, sem valor,
-  dado faltando, RISCO).
+- Descartados (com o motivo: chuva, < 60%, sem valor, dado faltando, RISCO) vão para o arquivo da
+  análise; na mensagem, só se o Daniel pedir.
 - Fontes no final. Sem textos longos.
 
 ## Banca e registro
