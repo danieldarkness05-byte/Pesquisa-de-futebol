@@ -202,6 +202,28 @@ faixa e registre aqui.
     - Em overs (e unders), odd do pick subindo desde a abertura conta como ponto fraco forte: com mais um ponto
       fraco, sai. Mesma ideia da lição 16, agora para gols.
 
+## Under (/under)
+
+39. **Under: o valor tem que sobreviver ao teste só com o xG DESTA temporada** (Lyngby, Pohang e Odense, 18/10).
+    - Nos três, o modelo de gols ficava 6 a 10 p.p. acima do mercado porque um time (ou os dois) finalizava muito
+      abaixo do xG: o FCN fez 14 gols com 23,3 de xG; o Pohang, 5 com 13,4 em casa ("13 de 13 abaixo de 3.5").
+    - Com o xG da temporada atual na condição, o under caía para o nível do mercado (73–77%), e o valor sumia.
+    - Sequência longa abaixo da linha só vale se o xG somado dos mesmos jogos também for baixo.
+    *(automático: `under_xg_atual` no `under.py` — sai se ficar a menos de 2 p.p. do mercado ou se o EV ficar negativo)*
+40. **Tabelas casa/fora com gols de disputa de pênaltis** (Iwaki x Kofu, J2 2026, 18/10).
+    - Na temporada especial da J.League 2026, as tabelas casa e fora do Sofascore somam os gols das disputas de
+      pênaltis (1.031 gols contra 925 na tabela total). A média da liga ficava ~11% alta e todo λ caía: um viés de
+      under de ~2 p.p. nas ligas japonesas.
+    *(automático: `fator_tabelas` no `varredura.medias_liga` reescala quando casa + fora passa da total em 3%+)*
+41. **Movimento de odd em gols: confira as linhas vizinhas e a abertura** (Odense, Salzburg e Pérez Zeledón, 18/10).
+    - A abertura do Sofascore às vezes é de outra linha, ou vem defeituosa: no OB x Brøndby, o "over 2.5 de 2.15
+      para 1.60" vinha de uma abertura incoerente com o over 3.5. Só vale o movimento na mesma direção em várias linhas.
+    - Dispersão: se os overs da cauda (4.5, 5.5) encurtam desde a abertura, o mercado está tirando chance do under
+      3.5/4.5, mesmo com a média estável.
+42. **Under curto (odd ≤ 1.30): a divisão proporcional subestima o under no mercado** (Salzburg x Altach, 18/10).
+    - A casa põe mais margem no over. A 1.25/3.75, a divisão proporcional dá 75%, e o método da potência, ~78%.
+    - Na regra 8 e na distância modelo x mercado, considere o método da potência. *Candidato a automático.*
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

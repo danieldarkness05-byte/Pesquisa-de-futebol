@@ -642,3 +642,22 @@ class TestUnder(unittest.TestCase):
         self.assertTrue(und.unders_do_jogo(info, cfg, self.U)[0]["com_valor"])   # EV +9,2%
         info["variantes"]["so_xg"][k] = item(0.66)             # outra variante abaixo de 70% − 3 p.p.
         self.assertEqual(und.unders_do_jogo(info, cfg, self.U), [])
+
+    def test_xg_atual_e_tabelas(self):
+        # lição 39: 13 de 13 abaixo da linha, mas 1,3 gol por jogo com 2,9 de xG somado → under ≈ mercado
+        jogo = lambda t: {"t": t, "gf": 1, "ga": 0, "xg_f": 1.5, "xg_a": 1.4}  # noqa: E731
+        xh = [jogo(t) for t in range(10)]
+        xa = [jogo(t) for t in range(100, 110)]
+        r = und.under_xg_atual(xh, xa, set(range(5, 10)) | set(range(105, 110)), 3.5)
+        self.assertEqual(r["n"], [5, 5])
+        self.assertAlmostEqual(r["xg_jogo"], 2.9)
+        self.assertLess(r["p"], 0.72)
+        self.assertIsNone(und.under_xg_atual(xh, xa, {1, 2}, 3.5))        # poucos jogos desta temporada
+        k = {"p": 0.83, "linha": "3.5", "frequencia": 0.9, "justa_mercado": 0.73}
+        ok = {"casa": {"n": 7, "acima": 1, "frac": 1 / 7}, "fora": {"n": 7, "acima": 1, "frac": 1 / 7}}
+        falhas, _ = und.requisitos(k, {"cauda": ok, "xg_atual": dict(r, p=0.74)}, self.U)
+        self.assertEqual(len(falhas), 1)                                   # 74% < 73% + 2 p.p.
+        self.assertEqual(und.requisitos(k, {"cauda": ok, "xg_atual": dict(r, p=0.78)}, self.U)[0], [])
+        # lição 40: tabelas casa/fora com pênaltis (J2 2026)
+        self.assertAlmostEqual(vr.fator_tabelas(540, 491, 925), 925 / 1031)
+        self.assertEqual(vr.fator_tabelas(500, 425, 925), 1.0)

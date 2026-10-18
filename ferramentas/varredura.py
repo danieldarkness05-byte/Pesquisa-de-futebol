@@ -471,21 +471,31 @@ def frequencia(item: dict, xh: list[dict], xa: list[dict]) -> float | None:
 # Varredura de um jogo
 # ---------------------------------------------------------------------------
 
+def fator_tabelas(gols_casa: float, gols_fora: float, gols_total: float) -> float:
+    """Lição 40 (Iwaki x Kofu, 18/10): na J.League 2026 as tabelas casa/fora do Sofascore somam os gols
+    da disputa de pênaltis (1.031 x 925 na tabela total). Se casa + fora passa da total em mais de 3%,
+    reescala para a total; senão, 1."""
+    soma = gols_casa + gols_fora
+    return gols_total / soma if gols_total and soma > gols_total * 1.03 else 1.0
+
+
 def medias_liga(api: Sofascore, ut: int, temporada: int) -> tuple[float, float] | None:
     """Gols por jogo de mandantes e visitantes (temporada atual + anterior)."""
     ids = [s["id"] for s in api.get(f"unique-tournament/{ut}/seasons").get("seasons", [])]
     temporadas = [temporada] + ([ids[ids.index(temporada) + 1]] if temporada in ids and ids.index(temporada) + 1 < len(ids) else [])
     mh = gh = ma = ga = 0
     for s in temporadas:
-        for tipo in ("home", "away"):
+        soma = {}
+        for tipo in ("home", "away", "total"):
+            m = g = 0
             for st in api.get(f"unique-tournament/{ut}/season/{s}/standings/{tipo}").get("standings", []):
                 for row in st.get("rows", []):
-                    if tipo == "home":
-                        mh += row.get("matches", 0)
-                        gh += row.get("scoresFor", 0)
-                    else:
-                        ma += row.get("matches", 0)
-                        ga += row.get("scoresFor", 0)
+                    m += row.get("matches") or 0
+                    g += row.get("scoresFor") or 0
+            soma[tipo] = (m, g)
+        f = fator_tabelas(soma["home"][1], soma["away"][1], soma["total"][1])
+        mh, gh = mh + soma["home"][0], gh + soma["home"][1] * f
+        ma, ga = ma + soma["away"][0], ga + soma["away"][1] * f
     if mh < 30 or ma < 30:
         return None
     return gh / mh, ga / ma

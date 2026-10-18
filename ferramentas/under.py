@@ -43,6 +43,7 @@ UNDER_PADRAO = {
     "temporada_atual_min": 0.30,  # fração mínima da amostra na temporada atual
     "favorito_goleada_odd": 1.30,
     "xg_folga_linha": 0.6,        # alerta se o xG somado ≥ linha − folga
+    "xg_margem_mercado": 0.02,    # lição 39: P(under) só com xG desta temporada ≥ mercado + margem
     "max_pesquisa": 6,
 }
 
@@ -102,6 +103,25 @@ def xg_somado(xh: list[dict], xa: list[dict]) -> float | None:
     return (partes[0] + partes[1]) / 2 + (partes[2] + partes[3]) / 2
 
 
+def under_xg_atual(xh: list[dict], xa: list[dict], ts_atual: set[int], linha: float, minimo: int = 4) -> dict | None:
+    """Lição 39 (Lyngby, Pohang e Odense, 18/10): P(under) só com o xG dos jogos DESTA temporada na
+    condição. Se fica perto do mercado, a vantagem do modelo era finalização ruim (que regride)."""
+    ha = [x for x in xh if x.get("t") in ts_atual]
+    aa = [x for x in xa if x.get("t") in ts_atual]
+    if min(len(ha), len(aa)) < minimo:
+        return None
+    med = lambda xs, k: sum(x[k] for x in xs if x.get(k) is not None) / max(1, sum(1 for x in xs if x.get(k) is not None))  # noqa: E731
+    if any(sum(1 for x in xs if x.get(k) is not None) < minimo for xs in (ha, aa) for k in ("xg_f", "xg_a")):
+        return None
+    lh = (med(ha, "xg_f") + med(aa, "xg_a")) / 2
+    la = (med(aa, "xg_f") + med(ha, "xg_a")) / 2
+    p, _ = v.total_gols(v.matriz(lh, la), linha, "under")
+    gols = sum(x["gf"] + x["ga"] for x in ha + aa) / len(ha + aa)
+    xg = sum((x.get("xg_f") or 0) + (x.get("xg_a") or 0) for x in ha + aa) / len(ha + aa)
+    return {"p": round(p, 4), "lambda": [round(lh, 2), round(la, 2)], "gols_jogo": round(gols, 2),
+            "xg_jogo": round(xg, 2), "n": [len(ha), len(aa)]}
+
+
 def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:
     """(falhas, alertas) do under `k` com os dados extras do jogo."""
     p, linha = k["p"], float(k["linha"])
@@ -116,6 +136,14 @@ def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:
     ft = extra.get("temporada_atual")
     if ft is not None and ft < u["temporada_atual_min"]:
         falhas.append(f"amostra da temporada passada: só {ft:.0%} dos jogos são desta temporada (lição 32)")
+    xa = extra.get("xg_atual")
+    if xa:
+        merc = k.get("justa_mercado")
+        if xa["p"] < u["prob_min"]:
+            falhas.append(f"teste só xG desta temporada: under {xa['p']:.0%} < {u['prob_min']:.0%} (lição 39)")
+        elif merc is not None and xa["p"] < merc + u["xg_margem_mercado"]:
+            falhas.append(f"teste só xG desta temporada: under {xa['p']:.0%} ≈ mercado {merc:.0%} — a vantagem é "
+                          f"finalização ruim ({xa['gols_jogo']} gols x {xa['xg_jogo']} xG por jogo), que regride (lição 39)")
     xg = extra.get("xg_somado")
     if xg is not None and xg >= linha - u["xg_folga_linha"]:
         alertas.append(f"xG somado {xg:.2f} perto da linha {linha}")
@@ -180,6 +208,8 @@ def extras_jogo(api: v.Sofascore, e: dict, info: dict, linha: float, cfg: dict, 
         "taxa_liga": taxa_liga_under((info.get("taxa_base") or {}).get("totais"), linha),
         "temporada_atual": fracao_temporada(ch[-qtd:] + ca[-qtd:], temporada),
         "xg_somado": xg_somado(xh, xa),
+        "xg_atual": under_xg_atual(xh, xa, {x["startTimestamp"] for x in ch + ca
+                                            if (x.get("season") or {}).get("id") == temporada}, linha),
         "odd_favorito": min(um_x_dois) if um_x_dois else None,
         "um_x_dois": [round(x, 2) for x in um_x_dois],
         "lambda": [round(x, 2) for x in info["lambda"]] if info.get("lambda") else None,
@@ -252,6 +282,10 @@ def main() -> None:
                        {**k, "under": {"falhas": ["caiu na reavaliação"], "alertas": []}, "passa": False})
     for k in res:
         k["com_valor"] = k.get("com_valor", k["ev"] >= cfg["criterios"]["ev_minimo"])
+        xa = (k.get("under") or {}).get("xg_atual")
+        if k["com_valor"] and xa and xa["p"] * k["odd"] < 1:  # lição 39: o valor tem que sobreviver ao teste só xG
+            k["com_valor"] = False
+            k["under"]["alertas"].append(f"valor some no teste só xG desta temporada ({xa['p']:.0%} a {k['odd']:.2f})")
     # por jogo, a linha principal é a de maior EV entre as que passam nos requisitos
     for k in res:
         k["principal"] = k["passa"] and k is max((x for x in res if x["id"] == k["id"] and x["passa"]),

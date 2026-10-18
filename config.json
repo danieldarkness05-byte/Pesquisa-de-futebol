@@ -149,6 +149,7 @@
     "temporada_atual_min": 0.3,
     "favorito_goleada_odd": 1.3,
     "xg_folga_linha": 0.6,
+    "xg_margem_mercado": 0.02,
     "max_pesquisa": 6
   },
   "azarao": {
