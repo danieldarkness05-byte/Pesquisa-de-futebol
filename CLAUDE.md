@@ -47,6 +47,7 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/dossie.py [--numeros 1,3] [--json]` | dossiê dos candidatos: odds de agora e da abertura, vivo/caiu, desfalques com gols, forma, chuva |
 | `python3 ferramentas/defesa.py [--data D] [--curto] [--json]` | defesa fraca do azarão x ataque forte do favorito em **todas** as ligas do Sofascore: triagem, estatística, alertas, prob. conservadora e odd mínima |
 | `python3 ferramentas/azarao.py [--data D] [--curto]` | azarão forte: jogos em que o azarão tem boa chance de não perder (dupla chance, empate anula, vitória) com valor, em todas as ligas |
+| `python3 ferramentas/under.py [--data D]` | especialista em under: filtra os "menos de X.5 gols" da peneira `--todas` pelos requisitos de under (cauda, taxa da liga, temporada atual, xG somado, favorito goleador) |
 | `python3 ferramentas/previsoes.py add-json/resolver/resumo` | registro de TODA previsão entregue (apostada ou não), resultado automático pelo Sofascore e calibração |
 
 Cada script tem `--help` com exemplos. Use `--json` quando for processar a saída.
@@ -71,8 +72,12 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
 4. **`/setenta`** (quando o Daniel pedir; pedido de 16/10): QUALQUER mercado com **70%+** em todas as ligas, hoje e
    amanhã. `varredura.py --todas --prob-min 0.70 --chuva-informativa` → `dossie.py --sufixo todas` → workflow `aprofundar.js` com corte de
    70% → veredito → registra com `analise: "setenta"`. Valor (EV ≥ 3%) e regra 8 continuam obrigatórios.
-5. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
-6. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
+5. **`/under`** (quando o Daniel pedir; pedido de 17/10): especialista em under de gols, 70%+. `varredura.py --todas`
+   → `under.py` (requisitos de under) → `dossie.py --sufixo under` → workflow `.claude/workflows/under.js` (checklist de
+   under: desfalques no ataque e na defesa, estilo, motivação, H2H na linha certa, árbitro, mercado) → registra com
+   `analise: "under"`.
+6. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
+7. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
 
 **Evolução diária:** toda previsão entregue vai para `dados/previsoes.csv` (`previsoes.py`). O resultado é
 resolvido no dia seguinte, e o que cada acerto ou erro ensina vai para `docs/licoes.md`. Esse arquivo é lido

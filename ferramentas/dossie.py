@@ -182,7 +182,7 @@ def montar(data: str, numeros: list[int] | None, cfg: dict, sufixo: str | None =
             "gols_esperados": [round(x, 3) for x in info["lambda"]] if info.get("lambda") else None,
             "amostra_jogos": info.get("amostra"),
             "odds_movimento": {"escolha_abertura_agora": odds_escolha(j["odds"], k), "1x2_abertura_agora": odds_1x2(j["odds"])},
-            "chuva": j["chuva"], **j["ctx"]})
+            "chuva": j["chuva"], **({"under": c["under"]} if c.get("under") else {}), **j["ctx"]})
     return res
 
 

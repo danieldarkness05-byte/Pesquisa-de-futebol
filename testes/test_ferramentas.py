@@ -17,6 +17,7 @@ import nucleo as n  # noqa: E402
 import previsoes  # noqa: E402
 import registro  # noqa: E402
 import sistema  # noqa: E402
+import under as und  # noqa: E402
 import varredura as vr  # noqa: E402
 
 CFG = n.carregar_config()
@@ -584,3 +585,44 @@ class TestAzarao(unittest.TestCase):
         sem = [dict(j, xg_f=None, xg_a=None) for j in casa]
         self.assertEqual(set(azr.lambdas_amostra(sem, fora, (1.5, 1.2), 4)), {"gols"})
         self.assertEqual(azr.lambdas_amostra(casa[:2], fora, (1.5, 1.2), 4), {})
+
+
+class TestUnder(unittest.TestCase):
+    U = dict(und.UNDER_PADRAO)
+
+    @staticmethod
+    def ev(ts, hs, as_, torneio="Eredivisie", status="finished", season=1):
+        return {"startTimestamp": ts, "status": {"type": status}, "homeScore": {"normaltime": hs},
+                "awayScore": {"normaltime": as_}, "tournament": {"name": torneio, "uniqueTournament": {"name": torneio}},
+                "season": {"id": season}}
+
+    def test_cauda_feyenoord(self):
+        # lição 33: 5 dos últimos 7 com 5+ gols derrubam o under 4.5 de 75%
+        placares = [(1, 0), (2, 1), (5, 2), (7, 0), (5, 0), (1, 5), (3, 2), (2, 2)]
+        evs = [self.ev(100 + i, a, b) for i, (a, b) in enumerate(placares)]
+        evs.append(self.ev(50, 9, 0, torneio="Club Friendly Games"))   # amistoso não conta
+        evs.append(self.ev(500, 9, 0))                                    # depois do jogo: não conta
+        c = und.cauda(evs, 400, 4.5, 7, ["Friendly"])
+        self.assertEqual((c["n"], c["acima"]), (7, 5))
+        self.assertTrue(und.estoura_cauda([c["frac"], 0.0], 0.75, 0.15))
+        self.assertFalse(und.estoura_cauda([2 / 7, None], 0.75, 0.15))   # 29% ≤ 25% + 15%
+
+    def test_liga_temporada_xg(self):
+        self.assertAlmostEqual(und.taxa_liga_under([1, 2, 3, 4, 5], 3.5), 0.6)
+        self.assertIsNone(und.taxa_liga_under([], 3.5))
+        self.assertAlmostEqual(und.fracao_temporada([{"season": {"id": 2}}, {"season": {"id": 1}}], 2), 0.5)
+        xh = [{"xg_f": 1.5, "xg_a": 1.0}] * 4
+        xa = [{"xg_f": 1.0, "xg_a": 1.5}] * 4
+        self.assertAlmostEqual(und.xg_somado(xh, xa), 2.5)
+        self.assertIsNone(und.xg_somado([{"xg_f": None, "xg_a": None}] * 4, xa))
+
+    def test_requisitos(self):
+        k = {"p": 0.75, "linha": "4.5", "frequencia": 0.8}
+        ok = {"casa": {"n": 7, "acima": 1, "frac": 1 / 7}, "fora": {"n": 7, "acima": 1, "frac": 1 / 7}}
+        ex = {"cauda": ok, "taxa_liga": 0.85, "temporada_atual": 0.9, "xg_somado": 2.6, "odd_favorito": 1.33}
+        self.assertEqual(und.requisitos(k, ex, self.U), ([], []))
+        ruim = dict(ex, cauda={**ok, "fora": {"n": 7, "acima": 5, "frac": 5 / 7}}, taxa_liga=0.5,
+                    temporada_atual=0.0, xg_somado=4.0, odd_favorito=1.2)
+        falhas, alertas = und.requisitos(k, ruim, self.U)
+        self.assertEqual(len(falhas), 3)       # cauda, liga e temporada passada (Central Coast, lição 32)
+        self.assertEqual(len(alertas), 2)      # xG perto da linha e favorito muito forte

@@ -140,6 +140,17 @@
     "chuva": "informativa",
     "modelo_agentes": null
   },
+  "under": {
+    "_leia": "Especialista em under de gols (ferramentas/under.py + .claude/workflows/under.js, skill /under; pedido do Daniel em 17/10). Lê a peneira --todas com prob ≥ prob_min e confere: cauda (nos últimos cauda_jogos oficiais de cada time, estouro da linha acima de (1 − p) + cauda_folga derruba), taxa de under da liga (≥ p − liga_folga), amostra da temporada atual (≥ temporada_atual_min), xG somado perto da linha (alerta) e favorito com odd ≤ favorito_goleada_odd (alerta). max_pesquisa = quantos vão para os agentes.",
+    "prob_min": 0.7,
+    "cauda_jogos": 7,
+    "cauda_folga": 0.15,
+    "liga_folga": 0.15,
+    "temporada_atual_min": 0.3,
+    "favorito_goleada_odd": 1.3,
+    "xg_folga_linha": 0.6,
+    "max_pesquisa": 6
+  },
   "azarao": {
     "_leia": "Análise azarão forte (ferramentas/azarao.py + .claude/workflows/azarao.js, skill /azarao-forte): jogos em que o azarão (odd de vitória >= odd_azarao_min) tem boa chance de NÃO perder. Triagem: pontos por jogo do azarão na condição >= os do favorito − ppg_folga, defesa do azarão na condição <= defesa_az_max × média e ataque >= ataque_az_min × média. O azarão precisa de forma_pontos_min nos últimos 5 oficiais. Probabilidade = menor entre tabela, médias gerais, λ gols, λ gols+xG e λ só xG (Poisson e Dixon-Coles; lição 24), limitada pela frequência real; valor contra a odd bet365; regra 8 contra o 1X2 sem margem. Pedido do Daniel em 16/10.",
     "odd_azarao_min": 2.2,

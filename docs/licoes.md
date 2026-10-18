@@ -179,6 +179,12 @@ faixa e registre aqui.
     - "12 jogos seguidos com 2+ gols" não sustenta um over 2.5, que pede 3+. O cético pegou e tirou −2 p.p.
     - Gols sofridos que vêm de duas goleadas (dois 0-5 do HSV) também não sustentam over sozinhos (lição 1).
 
+35. **Over com a odd subindo desde a abertura e sem notícia: o mercado sabia** (Hamburgo x Stuttgart, 17/10: 1-0).
+    - O over 2.5 foi de 1.364 para 1.40 enquanto o 1X2 se mexia. Com o ataque do mandante desfalcado (Daka) e
+      sem marcar em 3 de 5, a evidência era MODERADA justamente por esse ponto fraco, e o pick perdeu.
+    - Em overs (e unders), odd do pick subindo desde a abertura conta como ponto fraco forte: com mais um ponto
+      fraco, sai. Mesma ideia da lição 16, agora para gols.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
@@ -197,3 +203,6 @@ faixa e registre aqui.
 | 15/10 | Real Estelí x ART Jalapa | Real Estelí 1+ | 80% | 1-1 | ✅ | Passou no limite (1 gol): fez bem rebaixar o 2+ (51% no teste das médias gerais, lição 20). |
 | 16/10 | Livorno x Grosseto (azarão) | Grosseto ou empate | 65% | 4-4 | ✅ | O Grosseto forte no xG confirmou; jogo aberto (8 gols), não o "travado" que a tradição sugeria. |
 | 16/10 | FC Alashkert x FC Syunik | Alashkert 2+ | 69% | 5-1 | ✅ | Corrigir o placar da R8 (lição 31) acertou a leitura: a defesa do Syunik era mesmo das piores fora. |
+| 17/10 | Carrarese x Modena (/setenta) | menos de 3.5 | 78% | 2-1 | ✅ | Os 11 de 12 jogos dos dois abaixo de 3.5 na temporada e os técnicos esperando jogo travado bateram. |
+| 17/10 | Hamburgo x Stuttgart (/setenta) | mais de 2.5 | 75% | 1-0 | ❌ | Os riscos do cético se confirmaram: HSV sem Daka (não marcou em 3 de 5) e odd do over subindo desde a abertura. Lição 35. |
+| 17/10 | Stenhousemuir x Raith (/setenta) | menos de 3.5 | 85% | 1-1 | ✅ | Duas defesas menos vazadas da liga: o under mais seguro do dia, mesmo com valor no limite. |

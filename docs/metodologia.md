@@ -193,3 +193,22 @@ Parâmetros em `config.json → azarao`.
    - 1 pesquisador: força real do azarão, fraquezas do favorito, desfalques, rodízio, o que o mercado sabe,
      e data e mando em 2ª fonte;
    - 1 cético: fecha o mercado e o ajuste (±5 p.p.) e diz se a regra 8 tem explicação.
+
+## Especialista em under (`under.py` + `/under`)
+
+Pedido do Daniel em 17/10: "fica especialista em um mercado... todos os requisitos para ir no under", com 70%+.
+Parâmetros em `config.json → under`.
+
+1. **Peneira de todas as ligas** (`varredura.py --todas --prob-min 0.70 --chuva-informativa`): o under só sobra se
+   passar em todas as variantes do modelo de gols (Poisson/Dixon-Coles com incerteza, sem os 2 últimos jogos, só
+   gols, só xG, amostra geral), na frequência real das amostras, na taxa-base da liga e na regra 8.
+2. **Requisitos de under** (`under.py`), com o Sofascore:
+   - **cauda** (lição 33): nos últimos 7 oficiais de cada time, estouro da linha acima de (1 − p) + 15 p.p. → sai;
+   - **taxa da liga**: jogos da liga abaixo da linha < p − 15 p.p. → sai;
+   - **temporada atual** (lição 32): menos de 30% da amostra nesta temporada → sai;
+   - **alertas**: xG somado dos dois a menos de 0,6 da linha; favorito com odd ≤ 1.30 (goleada).
+3. **Pesquisa** (`.claude/workflows/under.js`): checklist de under para o pesquisador. Inclui desfalques no ataque
+   (a favor) e na defesa (contra), estilo e técnico, motivação (empate serve?), H2H na linha exata (lição 34),
+   árbitro (pênaltis e expulsões), calendário, clima e movimento da odd do under. O cético tenta derrubar, e o
+   ajuste total fica em ±5 p.p.
+4. **Veredito:** p final ≥ 70%, EV ≥ 3%, regra 8 e evidência como no /ouro.
