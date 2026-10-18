@@ -224,6 +224,21 @@ faixa e registre aqui.
     - A casa põe mais margem no over. A 1.25/3.75, a divisão proporcional dá 75%, e o método da potência, ~78%.
     - Na regra 8 e na distância modelo x mercado, considere o método da potência. *Candidato a automático.*
 
+43. **Mando só no papel em liga de estádio compartilhado** (Rancho Santana x Diriangén, Nicarágua, 18/10).
+    - Quando o jogo é no estádio que o favorito usa como casa, o recorte "favorito fora x azarão em casa" não
+      mede o mando. Nessa liga, o visitante marca mais que o mandante (1,64 contra 1,27).
+    - Use as médias gerais e confira o que o favorito fez naquele estádio: o Diriangén fez 2,43 por jogo fora,
+      mas só 1,5 no Estadio Nacional, onde é o jogo.
+44. **Grupo da tabela com o ano no nome** (Academia Puerto Cabello x Monagas, 18/10).
+    - O grupo "Primera Division 2026, Clausura" não estava contido em "Primera Division, Clausura", e o
+      `defesa.py` pegou o Apertura (mais jogos). A defesa mediana do Monagas (1,67 fora) virou a 2ª pior (2,17).
+    - *(automático: `escolher_grupo` compara a fase sem o ano — Apertura/Clausura/Finalización; com teste)*
+45. **A estreia do técnico novo conta como período antigo** (Santa Cruz x Antofagasta, 18/10).
+    - Na estreia, o Giovagnoli perdeu de 2-3 com 3,11 de xG cedido (2,9x o habitual do rival).
+    - Quando o alerta "defesa melhorando" dispara e os últimos 5 na condição estão na média da liga em gols e
+      no xG ajustado pelo adversário, aplique a lição 22: a tese de defesa fraca cai, mesmo que os últimos 10
+      (com o técnico anterior) passem no corte.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

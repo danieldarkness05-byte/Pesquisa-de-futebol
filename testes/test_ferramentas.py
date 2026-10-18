@@ -432,6 +432,10 @@ class TestDefesa(unittest.TestCase):
         ape = {"nome": "Apertura", "rows": {1: {"matches": 19}, 2: {"matches": 19}}}
         fin = {"nome": "Finalización", "rows": {1: {"matches": 12}, 2: {"matches": 12}}}
         self.assertIs(df.escolher_grupo([ape, fin], (1, 2), "Liga DIMAYOR, Finalizacion"), fin["rows"])
+        # Academia x Monagas 18/10: o grupo leva o ano no nome ("Primera Division 2026, Clausura")
+        ape26 = {"nome": "Primera Division 2026, Apertura", "rows": {1: {"matches": 13}, 2: {"matches": 13}}}
+        cla26 = {"nome": "Primera Division 2026, Clausura", "rows": {1: {"matches": 6}, 2: {"matches": 6}}}
+        self.assertIs(df.escolher_grupo([ape26, cla26], (1, 2), "Primera Division, Clausura"), cla26["rows"])
 
     def test_tese_recente_contradiz_a_tabela(self):
         base = {"fav_casa": True, "liga": {"casa": 1.15, "fora": 0.70}}

@@ -414,9 +414,13 @@ def escolher_grupo(grupos: list[dict], times: tuple[int, int], nome_torneio: str
     if comuns:
         alvo = _sem_acento(nome_torneio or "")
 
+        def fase(txt: str) -> str:  # "primera division 2026, clausura" → "clausura" (sem ano e só a última parte)
+            return " ".join(re.sub(r"\d+", "", txt).split(",")[-1].split())
+
         def chave(g):  # 1º o grupo cujo nome está no nome do torneio ("Finalizacion" em "Liga DIMAYOR, Finalizacion")
             nome = _sem_acento(g["nome"] or "")
-            return (bool(nome) and (nome == alvo or nome in alvo), sum(r.get("matches", 0) for r in g["rows"].values()))
+            mesma = bool(nome) and (nome == alvo or nome in alvo or (bool(fase(nome)) and fase(nome) == fase(alvo)))
+            return (mesma, sum(r.get("matches", 0) for r in g["rows"].values()))
         return max(comuns, key=chave)["rows"]
     rows: dict[int, dict] = {}
     for g in grupos:
