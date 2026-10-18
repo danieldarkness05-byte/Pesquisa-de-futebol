@@ -127,6 +127,42 @@ def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:
     return falhas, alertas
 
 
+OBRIG = ("base", "incerteza", "dixon_coles")
+
+
+def unders_do_jogo(info: dict, cfg: dict, u: dict) -> list[dict]:
+    """Todas as linhas de under do jogo que batem a PROBABILIDADE (com ou sem valor): ≥ prob_min nas
+    variantes obrigatórias, ≥ prob_min − tolerância nas outras, frequência real, regra 8 e taxa-base."""
+    vs = info.get("variantes") or {}
+    if not vs.get("base"):
+        return []
+    vc, pm = cfg["varredura"], u["prob_min"]
+    xh, xa = info.get("amostras") or ([], [])
+    base = info.get("taxa_base")
+    out = []
+    for chave, b in vs["base"].items():
+        if b["mercado"] != "Match goals" or b["escolha"] != "Under" or b["odd"] < vc["odd_minima_mercado"]:
+            continue
+        if any(chave not in vs.get(o, {}) or vs[o][chave]["p"] < pm for o in OBRIG):
+            continue
+        outras = {k: var[chave]["p"] for k, var in vs.items() if k not in OBRIG and chave in var}
+        if any(x < pm - vc["tolerancia_variantes"] for x in outras.values()):
+            continue
+        if b["p"] - b["justa_mercado"] > vc["regra8_pp"]:
+            continue
+        freq = v.frequencia(b, xh, xa)
+        if freq is not None and freq < pm - vc["tolerancia_frequencia"]:
+            continue
+        if base and b["p"] >= 0.80:
+            linha = float(b["linha"])
+            if sum(1 for t in base["totais"] if t < linha) / len(base["totais"]) < b["p"] - 0.10:
+                continue
+        out.append({**b, "frequencia": freq, "variantes": {k: round(x, 3) for k, x in outras.items()},
+                    "p_min": min([b["p"], *outras.values(), *(vs[o][chave]["p"] for o in OBRIG)]),
+                    "com_valor": b["ev"] >= cfg["criterios"]["ev_minimo"]})
+    return out
+
+
 def extras_jogo(api: v.Sofascore, e: dict, info: dict, linha: float, cfg: dict, u: dict, palavras: list[str]) -> dict:
     th, ta = e["homeTeam"]["id"], e["awayTeam"]["id"]
     evh, eva = v.ultimos_eventos(api, th), v.ultimos_eventos(api, ta)
@@ -150,68 +186,97 @@ def extras_jogo(api: v.Sofascore, e: dict, info: dict, linha: float, cfg: dict, 
     }
 
 
+def linha_txt(i: int, k: dict) -> str:
+    ex = k["under"]
+    cauda_txt = f"cauda {ex['cauda']['casa']['acima']}/{ex['cauda']['casa']['n']} e {ex['cauda']['fora']['acima']}/{ex['cauda']['fora']['n']}"
+    liga = f"liga {ex['taxa_liga']:.0%}" if ex.get("taxa_liga") is not None else "liga N/D"
+    xg = f"xG {ex['xg_somado']:.2f}" if ex.get("xg_somado") is not None else "xG N/D"
+    txt = (f"{i}) {k['hora']} {k['jogo']} [{k['competicao']}] · {k['rotulo']} · {k['p']:.0%} (pior {k['p_min']:.0%})"
+           f" · mín {n.fmt_odd_min(k['odd_minima'])} · bet365 {k['odd']:.2f} (EV {k['ev']:+.0%}) · mercado {k['justa_mercado']:.0%}"
+           f" · {cauda_txt} · {liga} · {xg}{'' if k.get('principal') else ' · (linha alternativa)'}")
+    return txt + ("\n   alertas: " + "; ".join(ex["alertas"]) if ex["alertas"] else "")
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--data", help="AAAA-MM-DD (padrão: hoje, Brasília)")
     p.add_argument("--entrada", default="todas", help="sufixo da peneira de entrada (padrão: todas)")
+    p.add_argument("--varrer", action="store_true",
+                   help="varre todos os jogos de novo e mapeia TODO under com prob ≥ prob_min, com ou sem valor (lista sem_valor com a odd mínima)")
     p.add_argument("--json", action="store_true")
     a = p.parse_args()
     cfg, u = config()
     data = a.data or datetime.now(v.FUSO_BR).date().isoformat()
-    arq = v.CACHE_PADRAO / f"peneira-{data}-{a.entrada}.json"
-    if not arq.exists():
-        sys.exit(f"Sem {arq.name}. Rode antes: python3 ferramentas/varredura.py --data {data} --todas "
-                 f"--prob-min {u['prob_min']} --chuva-informativa")
-    pen = json.loads(arq.read_text(encoding="utf-8"))
-    unders = [k for k in pen["candidatos"] if k["mercado"] == "Match goals" and k["escolha"] == "Under"]
     palavras = {**df.DEFESA_PADRAO, **cfg.get("defesa", {})}["palavras_amistoso"]
     api = v.Sofascore(v.CACHE_PADRAO, data)
     cache_liga: dict = {}
-    jogos: dict[int, tuple] = {}
+    pen: dict = {}
 
-    def avaliar(k: dict) -> dict:
-        if k["id"] not in jogos:
-            e = api.get(f"event/{k['id']}", cache=None).get("event") or {}
-            jogos[k["id"]] = (e, v.analisar_jogo(api, e, cfg, cache_liga) if e.get("status", {}).get("type") == "notstarted" else None)
-        e, info = jogos[k["id"]]
-        if not info:
-            return {**k, "under": {"falhas": ["jogo já começou ou não encontrado"], "alertas": []}, "passa": False}
-        vivo = next((x for x in info["candidatos"] if (x["mercado"], x["linha"], x["escolha"]) == (k["mercado"], k["linha"], k["escolha"])), None)
-        if not vivo:
-            return {**k, "under": {"falhas": [f"caiu na reavaliação: {info.get('motivo') or 'sem valor agora'}"], "alertas": []}, "passa": False}
+    def completar(e: dict, info: dict, k: dict) -> dict:
         ex = extras_jogo(api, e, info, float(k["linha"]), cfg, u, palavras)
-        falhas, alertas = requisitos(vivo, ex, u)
-        return {**k, **{c: vivo[c] for c in ("p", "odd", "ev", "odd_minima", "justa_mercado", "frequencia", "p_min")},
-                "under": {**ex, "falhas": falhas, "alertas": alertas}, "passa": not falhas}
+        falhas, alertas = requisitos(k, ex, u)
+        return {**k, "under": {**ex, "falhas": falhas, "alertas": alertas}, "passa": not falhas}
 
-    res = [avaliar(k) for k in unders]  # poucos jogos: sequencial, para reaproveitar o cache do jogo
-    # por jogo, a linha principal é a de maior EV entre as que passam
+    if a.varrer:
+        jogos = v.listar_jogos(api, data, None)
+        sus = df.eventos_suspeitos(jogos)
+        jogos = [e for e in jogos if e["id"] not in sus and not df.liga_nao_verificavel(e)]
+
+        def um(e):
+            try:
+                info = v.analisar_jogo(api, e, cfg, cache_liga)
+                base = {"hora": info["hora"], "jogo": info["jogo"], "competicao": info["competicao"], "id": e["id"]}
+                return [completar(e, info, {**k, **base}) for k in unders_do_jogo(info, cfg, u)]
+            except Exception:  # noqa: BLE001 — um jogo estranho não derruba a varredura
+                return []
+        res = [k for lista in v.em_paralelo(um, jogos, 6) for k in lista]
+        contagem = {"jogos": len(jogos)}
+    else:
+        arq = v.CACHE_PADRAO / f"peneira-{data}-{a.entrada}.json"
+        if not arq.exists():
+            sys.exit(f"Sem {arq.name}. Rode antes: python3 ferramentas/varredura.py --data {data} --todas "
+                     f"--prob-min {u['prob_min']} --chuva-informativa (ou use --varrer)")
+        pen = json.loads(arq.read_text(encoding="utf-8"))
+        contagem = pen.get("contagem")
+        jogos_info: dict[int, tuple] = {}
+        res = []
+        for k in pen["candidatos"]:
+            if k["mercado"] != "Match goals" or k["escolha"] != "Under":
+                continue
+            if k["id"] not in jogos_info:
+                e = api.get(f"event/{k['id']}", cache=None).get("event") or {}
+                jogos_info[k["id"]] = (e, v.analisar_jogo(api, e, cfg, cache_liga) if e.get("status", {}).get("type") == "notstarted" else None)
+            e, info = jogos_info[k["id"]]
+            vivo = next((x for x in unders_do_jogo(info, cfg, u) if (x["linha"], x["escolha"]) == (k["linha"], k["escolha"])), None) if info else None
+            res.append(completar(e, info, {**k, **vivo}) if vivo else
+                       {**k, "under": {"falhas": ["caiu na reavaliação"], "alertas": []}, "passa": False})
+    for k in res:
+        k["com_valor"] = k.get("com_valor", k["ev"] >= cfg["criterios"]["ev_minimo"])
+    # por jogo, a linha principal é a de maior EV entre as que passam nos requisitos
     for k in res:
         k["principal"] = k["passa"] and k is max((x for x in res if x["id"] == k["id"] and x["passa"]),
                                                   key=lambda x: (x["ev"], x["p"]))
-    res.sort(key=lambda k: (not k["passa"], k.get("nivel") == "base", not k.get("principal"), -k["p"], -k["ev"]))
-    saida = {**{c: pen.get(c) for c in ("data", "prob_triagem", "ev_minimo", "contagem")},
-             "consultado": datetime.now(v.FUSO_BR).strftime("%H:%M"), "peneira_das": pen.get("consultado"),
-             "under": u, "candidatos": [k for k in res if k["passa"]], "caidos": [k for k in res if not k["passa"]],
-             "descartes": pen.get("descartes"), "falhas_rede": api.falhas}
+    res.sort(key=lambda k: (not k["passa"], not k["com_valor"], not k.get("principal"), -k["p_min"], -k["ev"]))
+    saida = {"data": data, "contagem": contagem, "consultado": datetime.now(v.FUSO_BR).strftime("%H:%M"),
+             "prob_triagem": u["prob_min"], "ev_minimo": cfg["criterios"]["ev_minimo"], "under": u,
+             "candidatos": [k for k in res if k["passa"] and k["com_valor"]],
+             "sem_valor": [k for k in res if k["passa"] and not k["com_valor"]],
+             "caidos": [k for k in res if not k["passa"]], "falhas_rede": api.falhas}
     out = v.CACHE_PADRAO / f"peneira-{data}-under.json"
     out.write_text(json.dumps(saida, ensure_ascii=False, default=str), encoding="utf-8")
     if a.json:
         print(json.dumps(saida, ensure_ascii=False, indent=1, default=str))
         return
-    print(f"🧊 Under {data} — {len(unders)} unders com {u['prob_min']:.0%}+ e valor na peneira "
-          f"({(pen.get('contagem') or {}).get('jogos')} jogos) → {len(saida['candidatos'])} passam nos requisitos")
+    print(f"🧊 Under {data} — {(contagem or {}).get('jogos')} jogos · {len(res)} unders com {u['prob_min']:.0%}+ "
+          f"→ {len(saida['candidatos'])} com valor e requisitos · {len(saida['sem_valor'])} batem a prob. mas sem valor na bet365")
     for i, k in enumerate(saida["candidatos"], 1):
-        ex = k["under"]
-        cauda_txt = f"cauda {ex['cauda']['casa']['acima']}/{ex['cauda']['casa']['n']} e {ex['cauda']['fora']['acima']}/{ex['cauda']['fora']['n']}"
-        liga = f"liga {ex['taxa_liga']:.0%}" if ex.get("taxa_liga") is not None else "liga N/D"
-        xg = f"xG {ex['xg_somado']:.2f}" if ex.get("xg_somado") is not None else "xG N/D"
-        print(f"{i}) {k['hora']} {k['jogo']} [{k['competicao']}] · {k['rotulo']} · {k['p']:.0%} · mín {n.fmt_odd_min(k['odd_minima'])}"
-              f" · bet365 {k['odd']:.2f} (EV {k['ev']:+.0%}) · {cauda_txt} · {liga} · {xg}{'' if k.get('principal') else ' · (linha alternativa)'}")
-        if ex["alertas"]:
-            print("   alertas: " + "; ".join(ex["alertas"]))
+        print(linha_txt(i, k))
+    if saida["sem_valor"]:
+        print("Batem a prob. e os requisitos, mas a bet365 paga abaixo da odd mínima (conferir a Betano):")
+        for i, k in enumerate(saida["sem_valor"], 1):
+            print(linha_txt(i, k))
     if saida["caidos"]:
-        print("Caíram nos requisitos: " + " | ".join(f"{k['jogo']} {k['rotulo']}: {k['under']['falhas'][0]}" for k in saida["caidos"]))
+        print("Caíram nos requisitos de under: " + " | ".join(f"{k['jogo']} {k['rotulo']}: {k['under']['falhas'][0]}" for k in saida["caidos"]))
     print(f"JSON: {out.relative_to(n.RAIZ)}")
 
 

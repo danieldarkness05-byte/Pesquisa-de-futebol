@@ -626,3 +626,19 @@ class TestUnder(unittest.TestCase):
         falhas, alertas = und.requisitos(k, ruim, self.U)
         self.assertEqual(len(falhas), 3)       # cauda, liga e temporada passada (Central Coast, lição 32)
         self.assertEqual(len(alertas), 2)      # xG perto da linha e favorito muito forte
+
+    def test_unders_do_jogo(self):
+        cfg = {"varredura": dict(vr.VARREDURA_PADRAO), "criterios": {"ev_minimo": 0.03}}
+        item = lambda p, odd=1.30, justa=0.70: {"mercado": "Match goals", "linha": "3.5", "escolha": "Under",  # noqa: E731
+                                                "p": p, "odd": odd, "ev": p * odd - 1, "justa_mercado": justa, "dev": 0.0}
+        k = ("Match goals", "3.5", "Under")
+        jogo = [{"gf": 1, "ga": 0}] * 6
+        info = {"variantes": {"base": {k: item(0.78)}, "incerteza": {k: item(0.76)}, "dixon_coles": {k: item(0.77)},
+                              "so_xg": {k: item(0.69)}}, "amostras": (jogo, jogo), "taxa_base": None}
+        r = und.unders_do_jogo(info, cfg, self.U)
+        self.assertEqual(len(r), 1)
+        self.assertFalse(r[0]["com_valor"])                    # 0.78 × 1.30 → EV +1,4% < 3%: bate a prob., sem valor
+        info["variantes"]["base"][k] = item(0.78, odd=1.40)
+        self.assertTrue(und.unders_do_jogo(info, cfg, self.U)[0]["com_valor"])   # EV +9,2%
+        info["variantes"]["so_xg"][k] = item(0.66)             # outra variante abaixo de 70% − 3 p.p.
+        self.assertEqual(und.unders_do_jogo(info, cfg, self.U), [])
