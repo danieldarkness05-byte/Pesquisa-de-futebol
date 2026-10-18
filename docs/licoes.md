@@ -239,6 +239,14 @@ faixa e registre aqui.
       no xG ajustado pelo adversário, aplique a lição 22: a tese de defesa fraca cai, mesmo que os últimos 10
       (com o técnico anterior) passem no corte.
 
+46. **Teste de chão com xG pela metade quando falta o xG do favorito** (Belgrano x River, 18/10).
+    - O `azarao.py` pula a variante xG se um dos lados não tem xG; o River não tinha, e o mínimo ficou só com gols.
+    - Trocar só os números do azarão pelo xG dele (1,00 cedido em casa, contra 0,70 de gols sofridos) derrubou o 1X
+      de 68% para 56%, igual ao mercado: os 8 p.p. de vantagem eram sorte defensiva do Belgrano.
+    - Na rotina da tarde, confira antes no `analises/<data>-ouro.md` da manhã: o mesmo jogo já tinha sido descartado
+      (mando no Kempes com torcida do River). Sem mudança a favor (odd, escalação), não gaste agentes de novo.
+    - *Candidato a automático:* variante xG parcial no `azarao.py` (xG do lado que tem, gols do outro).
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

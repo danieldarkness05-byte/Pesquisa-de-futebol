@@ -25,6 +25,7 @@ Fora do workflow: sem WebSearch, sem subagentes avulsos e sem ler arquivos além
    - Depois rode `python3 ferramentas/dossie.py --json > <scratchpad>/dossie.json`.
    - Se o Daniel pediu números, use `--numeros`. Sem números, entram os N primeiros do config; jogos a menos de 20 min do início ficam fora.
    - Nenhum candidato `vivo`: não há ouro e nenhum agente roda aqui. Pule para o passo 7 (de manhã) ou para a resposta.
+   - Na rodada da tarde, confira o `analises/<data>-ouro.md` da manhã: candidato que já foi descartado lá só vai ao workflow se algo mudou a favor (odd, escalação, desfalque). Senão, repita o veredito sem gastar agentes (lição 46).
 3. **Workflow:** leia o JSON e chame
    `Workflow({scriptPath: ".claude/workflows/aprofundar.js", args: <objeto do dossiê>})`.
    - `args` vai como objeto JSON, não como string.
