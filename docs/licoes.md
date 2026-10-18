@@ -179,7 +179,24 @@ faixa e registre aqui.
     - "12 jogos seguidos com 2+ gols" não sustenta um over 2.5, que pede 3+. O cético pegou e tirou −2 p.p.
     - Gols sofridos que vêm de duas goleadas (dois 0-5 do HSV) também não sustentam over sozinhos (lição 1).
 
-35. **Over com a odd subindo desde a abertura e sem notícia: o mercado sabia** (Hamburgo x Stuttgart, 17/10: 1-0).
+35. **Confronto extremo infla o λ multiplicativo** (FC Sevastopol x Neftyanik, 17/10).
+    - Com a defesa do azarão a 2x ou mais da média da liga (índice 2,18), o λ foi a 4,0, mas o Sevastopol
+      nunca tinha marcado mais de 3 em casa (3+ em só 2 de 12).
+    - O λ implícito do mercado (2,18) ficou perto da média do favorito em casa (1,83), não do produto.
+    - Com índice de defesa acima de 2, faça o teste de chão com a média geométrica entre os gols do favorito
+      na condição e os sofridos pelo azarão (aqui λ 2,47, 2+ ≈ 71%), e confira o teto de gols do favorito.
+36. **Defesa que desmorona no meio da temporada** (IK Uppsala x Kristianstads, 17/10).
+    - Saída de técnico, titulares vendidos ou clube em crise: o teto de frequência dos últimos 10 mistura o
+      elenco antigo com o atual e fica baixo demais.
+    - Use a frequência de "sofreu 2+" só depois do desmonte. Confira também se o período antigo tinha gols bem
+      abaixo do xG cedido: no Uppsala, o xG cedido em casa ia de 2,3 a 3,3, mas foram só 6 gols em 5 jogos.
+    - É a lição 2 ao contrário: o alerta automático "defesa melhorando" não pega a piora.
+37. **"Defesa melhorando" por blocos, ajustada pelo adversário** (Champs x Fraijanes, 17/10).
+    - Some os gols sofridos e os esperados pelos adversários (média de cada um na condição, sem o próprio
+      jogo) em blocos consecutivos, em vez de olhar só os últimos 5.
+    - O Champs teve uma melhora real de R9 a R13 (0,52x) e recaiu de R14 a R16 (1,56x, já eliminado).
+    - Trecho bom no meio que não se sustenta nos últimos 3 não é melhora estrutural; vale a temporada ajustada.
+38. **Over com a odd subindo desde a abertura e sem notícia: o mercado sabia** (Hamburgo x Stuttgart, 17/10: 1-0).
     - O over 2.5 foi de 1.364 para 1.40 enquanto o 1X2 se mexia. Com o ataque do mandante desfalcado (Daka) e
       sem marcar em 3 de 5, a evidência era MODERADA justamente por esse ponto fraco, e o pick perdeu.
     - Em overs (e unders), odd do pick subindo desde a abertura conta como ponto fraco forte: com mais um ponto
@@ -204,5 +221,7 @@ faixa e registre aqui.
 | 16/10 | Livorno x Grosseto (azarão) | Grosseto ou empate | 65% | 4-4 | ✅ | O Grosseto forte no xG confirmou; jogo aberto (8 gols), não o "travado" que a tradição sugeria. |
 | 16/10 | FC Alashkert x FC Syunik | Alashkert 2+ | 69% | 5-1 | ✅ | Corrigir o placar da R8 (lição 31) acertou a leitura: a defesa do Syunik era mesmo das piores fora. |
 | 17/10 | Carrarese x Modena (/setenta) | menos de 3.5 | 78% | 2-1 | ✅ | Os 11 de 12 jogos dos dois abaixo de 3.5 na temporada e os técnicos esperando jogo travado bateram. |
-| 17/10 | Hamburgo x Stuttgart (/setenta) | mais de 2.5 | 75% | 1-0 | ❌ | Os riscos do cético se confirmaram: HSV sem Daka (não marcou em 3 de 5) e odd do over subindo desde a abertura. Lição 35. |
+| 17/10 | Hamburgo x Stuttgart (/setenta) | mais de 2.5 | 75% | 1-0 | ❌ | Os riscos do cético se confirmaram: HSV sem Daka (não marcou em 3 de 5) e odd do over subindo desde a abertura. Lição 38. |
 | 17/10 | Stenhousemuir x Raith (/setenta) | menos de 3.5 | 85% | 1-1 | ✅ | Duas defesas menos vazadas da liga: o under mais seguro do dia, mesmo com valor no limite. |
+| 17/10 | FC Sevastopol x Neftyanik | Sevastopol 1+ | 92% | 2-2 | ✅ | Rebaixar do 2+ para o 1+ (lição 35) foi certo: o campeão relaxou e saiu 2-2. |
+| 17/10 | IK Uppsala x Kristianstads | Kristianstads 2+ | 68% | 0-5 | ✅ | A defesa desmontada do Uppsala (lição 36) confirmou: 5-0 fora. |
