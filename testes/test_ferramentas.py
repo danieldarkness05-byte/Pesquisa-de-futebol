@@ -657,6 +657,11 @@ class TestUnder(unittest.TestCase):
         self.assertAlmostEqual(r["xg_jogo"], 2.9)
         self.assertLess(r["p"], 0.72)
         self.assertIsNone(und.under_xg_atual(xh, xa, {1, 2}, 3.5))        # poucos jogos desta temporada
+        sem = [dict(x, xg_f=None, xg_a=None) for x in xa]                  # lição 46: só um lado com xG
+        parcial = und.under_xg_atual(xh, sem, set(range(5, 10)) | set(range(105, 110)), 3.5)
+        self.assertTrue(parcial["parcial"])
+        self.assertIsNone(und.under_xg_atual([dict(x, xg_f=None, xg_a=None) for x in xh], sem,
+                                             set(range(5, 10)) | set(range(105, 110)), 3.5))
         k = {"p": 0.83, "linha": "3.5", "frequencia": 0.9, "justa_mercado": 0.73}
         ok = {"casa": {"n": 7, "acima": 1, "frac": 1 / 7}, "fora": {"n": 7, "acima": 1, "frac": 1 / 7}}
         falhas, _ = und.requisitos(k, {"cauda": ok, "xg_atual": dict(r, p=0.74)}, self.U)

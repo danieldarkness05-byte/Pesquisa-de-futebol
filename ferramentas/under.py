@@ -105,21 +105,27 @@ def xg_somado(xh: list[dict], xa: list[dict]) -> float | None:
 
 def under_xg_atual(xh: list[dict], xa: list[dict], ts_atual: set[int], linha: float, minimo: int = 4) -> dict | None:
     """Lição 39 (Lyngby, Pohang e Odense, 18/10): P(under) só com o xG dos jogos DESTA temporada na
-    condição. Se fica perto do mercado, a vantagem do modelo era finalização ruim (que regride)."""
+    condição. Se fica perto do mercado, a vantagem do modelo era finalização ruim (que regride).
+    Lição 46: se só um lado tem xG, o outro entra com gols (teste parcial); sem xG nos dois, None."""
     ha = [x for x in xh if x.get("t") in ts_atual]
     aa = [x for x in xa if x.get("t") in ts_atual]
     if min(len(ha), len(aa)) < minimo:
         return None
-    med = lambda xs, k: sum(x[k] for x in xs if x.get(k) is not None) / max(1, sum(1 for x in xs if x.get(k) is not None))  # noqa: E731
-    if any(sum(1 for x in xs if x.get(k) is not None) < minimo for xs in (ha, aa) for k in ("xg_f", "xg_a")):
+
+    def medias(xs):  # (pró, contra, usou_xg)
+        com = [x for x in xs if x.get("xg_f") is not None and x.get("xg_a") is not None]
+        if len(com) >= minimo:
+            return sum(x["xg_f"] for x in com) / len(com), sum(x["xg_a"] for x in com) / len(com), True
+        return sum(x["gf"] for x in xs) / len(xs), sum(x["ga"] for x in xs) / len(xs), False
+
+    (hf, hc, hx), (af, ac, ax) = medias(ha), medias(aa)
+    if not (hx or ax):
         return None
-    lh = (med(ha, "xg_f") + med(aa, "xg_a")) / 2
-    la = (med(aa, "xg_f") + med(ha, "xg_a")) / 2
+    lh, la = (hf + ac) / 2, (af + hc) / 2
     p, _ = v.total_gols(v.matriz(lh, la), linha, "under")
     gols = sum(x["gf"] + x["ga"] for x in ha + aa) / len(ha + aa)
-    xg = sum((x.get("xg_f") or 0) + (x.get("xg_a") or 0) for x in ha + aa) / len(ha + aa)
     return {"p": round(p, 4), "lambda": [round(lh, 2), round(la, 2)], "gols_jogo": round(gols, 2),
-            "xg_jogo": round(xg, 2), "n": [len(ha), len(aa)]}
+            "xg_jogo": round(lh + la, 2), "n": [len(ha), len(aa)], "parcial": not (hx and ax)}
 
 
 def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:

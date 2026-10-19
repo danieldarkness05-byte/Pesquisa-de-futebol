@@ -272,3 +272,5 @@ faixa e registre aqui.
 | 17/10 | IK Uppsala x Kristianstads | Kristianstads 2+ | 68% | 0-5 | ✅ | A defesa desmontada do Uppsala (lição 36) confirmou: 5-0 fora. |
 | 18/10 | Odense x Brøndby (/under) | menos de 4.5 | 82% | 2-1 | ✅ | Linha alta com folga: 3 gols, longe do limite. |
 | 18/10 | Red Bull Salzburg x Altach (ouro) | menos de 4.5 | 81% | 3-0 | ✅ | O Salzburg goleador fez 3, mas o Altach não marcou: a cauda de 5+ não veio. |
+| 17/10 | Champs Academy x Fraijanes | Fraijanes 1+ | 82% | 1-3 | ✅ | |
+| 18/10 | Pérez Zeledón x Herediano (/under) | menos de 3.5 | 76% | 0-3 | ✅ | No limite (3 gols): o Herediano marcou os 3; os dois ataques mais fracos da liga seguraram o total. |
