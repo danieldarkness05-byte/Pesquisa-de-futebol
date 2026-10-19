@@ -319,3 +319,6 @@ faixa e registre aqui.
 | 17/10 | Champs Academy x Fraijanes | Fraijanes 1+ | 82% | 1-3 | ✅ | |
 | 18/10 | Pérez Zeledón x Herediano (/under) | menos de 3.5 | 76% | 0-3 | ✅ | No limite (3 gols): o Herediano marcou os 3; os dois ataques mais fracos da liga seguraram o total. |
 | 18/10 | Rancho Santana x Diriangén | Diriangén 2+ | 68% | 0-1 | ❌ | Os dois alertas do cético bateram: no Estadio Nacional ele faz 1,5/j (lição 43) e os gols fora estavam acima do xG. Com o recorte do estádio e o xG, o 2+ não chegava a 60%. |
+| 19/10 | Parma x Torino (/under) | menos de 3.5 | 80% | 0-3 | ✅ | No limite (3 gols), todos do Torino. |
+| 19/10 | Jong Ajax x De Graafschap (/under) | menos de 5.5 | 82% | 2-1 | ✅ | Linha alta com folga. |
+| 19/10 | Waterford x Galway (/under) | menos de 4.5 | 77% | 3-2 | ❌ | A cauda na condição avisou (lição 50): o Waterford em casa tinha 5 de 10 com 4+ gols e precisava vencer. Modelo igual ao mercado, sem valor: não era pick de ouro. |
