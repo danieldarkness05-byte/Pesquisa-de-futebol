@@ -270,6 +270,27 @@ faixa e registre aqui.
     - Confira a cauda e os jogos no limite também na condição do jogo (mandante em casa, visitante fora).
     *(automático: `cauda_amostra` no `under.py` — falha pela cauda na condição e alerta de jogos no limite)*
 
+## Defesa fraca (19/10)
+
+51. **Defesa fraca só nos gols, mediana no xG** (Tukums, Pendikspor e Encarnación, 19/10; antes, Monagas, 18/10).
+    - Os três azarões sofriam muito mais que o xG cedido: Tukums 2,8 com 1,75; Pendik 1,9 com 1,31;
+      Encarnación 1,7 com 1,13. O cético refutou os três, e os gols vinham de gols contra, expulsões e finalização.
+    - Confira o outro recorte. O Tukums cedia MAIS xG em casa (1,80) e sofria MENOS gols (1,53). O Encarnación
+      sofreu 27 gols em casa (pior) com 18,4 de xG e 13 fora (4ª melhor) com 23,6; no total, 40 gols com 42,0 de xG.
+      Quando o xG não acompanha a divisão dos gols, o recorte casa/fora é ruído: use os números gerais.
+    - *(automático: com 5+ jogos na condição, xG cedido abaixo da média de gols da liga tira o jogo, como a lição 22
+      faz com os gols; teste com Pendik e com Nashville, que acertou com ×1,00 e continua.)*
+    - Entre ×1,0 e ×1,2 (Tukums, ×1,07) o jogo ainda vai ao workflow: o cético decide com o xG ajustado pelo
+      adversário (lição 30).
+52. **Suspensão por amarelos em liga pequena** (Kfar Shalem x Acre, 19/10).
+    - Lista de desfalques vazia no Sofascore não exclui suspensão. Antes de dar o artilheiro como titular, conte os
+      amarelos nos incidentes e confira o acumulado no site da liga ou na imprensa (o Sport5 lista o acumulado).
+    - Jogador que ficou fora logo depois de um amarelo provavelmente já cumpriu a suspensão.
+53. **xG individual parcial em liga menor** (Bursaspor x Pendikspor, 19/10).
+    - Na 1. Lig turca, o xG por jogador vinha zerado em 5 dos 10 jogos: a soma dava 12,2, contra 19,3 do time.
+    - Antes de aplicar a lição 7 a um jogador, compare a soma do xG dos jogadores com o xG do time. Se ficar bem
+      abaixo, conte os gols só dos jogos que têm xG individual.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

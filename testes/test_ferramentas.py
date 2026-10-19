@@ -448,6 +448,14 @@ class TestDefesa(unittest.TestCase):
         self.assertIsNone(df.contradiz_tese_recente(bom, self.D))
         pouco = dict(base, azarao_amostra={"n": 3, "ga": 0.3}, favorito_amostra={"n": 3, "gf": 0.3})
         self.assertIsNone(df.contradiz_tese_recente(pouco, self.D))     # amostra curta: só alerta
+        # Bursaspor x Pendikspor 19/10: sofre 1,9 fora, mas cede 1,31 de xG (×0,96 da liga) → sai
+        pendik = dict(base, liga={"casa": 1.371, "fora": 1.229},
+                      azarao_amostra={"n": 10, "ga": 1.9, "xg_contra": 1.31}, favorito_amostra={"n": 4, "gf": 2.0})
+        self.assertIn("xG cedido", df.contradiz_tese_recente(pendik, self.D))
+        # Nashville x Sporting KC 14/10 (acertou 4-0): xG cedido ×1,00 da liga continua
+        skc = dict(base, liga={"casa": 1.852, "fora": 1.3},
+                   azarao_amostra={"n": 10, "ga": 2.9, "xg_contra": 1.86}, favorito_amostra={"n": 10, "gf": 2.5})
+        self.assertIsNone(df.contradiz_tese_recente(skc, self.D))
 
     def test_lambdas_gerais_tira_o_inflado_da_condicao(self):
         # Bridlington (fora) 14/10: 18 gols em 11 no geral; Stocksbridge (casa) sofreu 23 em 11 no geral

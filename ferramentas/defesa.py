@@ -329,13 +329,17 @@ def alertas_estatisticos(info: dict, d: dict) -> list[str]:
 
 def contradiz_tese_recente(info: dict, d: dict) -> str | None:
     """Lição 22 (15/10, Cumbayá e La Viena): a tabela da temporada passa no corte, mas a
-    amostra recente na condição (≥ amostra_boa jogos) está na média da liga ou pior → sai."""
+    amostra recente na condição (≥ amostra_boa jogos) está na média da liga ou pior → sai.
+    Lição 51 (19/10, Monagas, Pendikspor e Encarnación): o mesmo vale para o xG cedido."""
     az, fv = info["azarao_amostra"], info["favorito_amostra"]
     liga = info["liga"]["casa"] if info["fav_casa"] else info["liga"]["fora"]
     if not liga:
         return None
     if az.get("ga") is not None and az["n"] >= d["amostra_boa"] and az["ga"] / liga < 1.0:
         return f"defesa do azarão na média ou melhor nos últimos {az['n']} na condição (×{az['ga'] / liga:.2f})"
+    if az.get("xg_contra") is not None and az["n"] >= d["amostra_boa"] and az["xg_contra"] / liga < 1.0:
+        return (f"defesa do azarão na média ou melhor pelo xG cedido nos últimos {az['n']} na condição "
+                f"(×{az['xg_contra'] / liga:.2f}): os gols sofridos são azar, não defesa fraca")
     if fv.get("gf") is not None and fv["n"] >= d["amostra_boa"] and fv["gf"] / liga < 1.0:
         return f"ataque do favorito na média ou pior nos últimos {fv['n']} na condição (×{fv['gf'] / liga:.2f})"
     return None
