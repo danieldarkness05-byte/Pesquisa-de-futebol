@@ -689,3 +689,17 @@ class TestUnder(unittest.TestCase):
         falhas, alertas = und.requisitos(k, {"cauda": {"casa": c, "fora": c}}, self.U)
         self.assertEqual(falhas, [])
         self.assertTrue(any("exatamente 3 gols" in a for a in alertas))
+
+    def test_cauda_na_condicao(self):
+        # lição 50: cauda mista limpa, mas o mandante em casa tem 4+ em metade dos jogos
+        casa = [{"gf": a, "ga": b} for a, b in [(2, 2), (3, 1), (1, 3), (2, 2), (3, 3), (1, 0), (2, 1), (0, 1), (1, 1), (2, 0)]]
+        c = und.cauda_amostra(casa, 4.5)
+        self.assertEqual((c["n"], c["acima"], c["no_limite"]), (10, 1, 4))
+        ok = {"n": 7, "acima": 1, "frac": 1 / 7, "no_limite": 0}
+        k = {"p": 0.77, "linha": "4.5", "frequencia": 0.9, "justa_mercado": 0.77}
+        falhas, alertas = und.requisitos(k, {"cauda": {"casa": ok, "fora": ok},
+                                              "cauda_cond": {"casa": c, "fora": und.cauda_amostra(casa[:5], 4.5)}}, self.U)
+        self.assertEqual(falhas, [])
+        self.assertTrue(any("na condição" in a for a in alertas))
+        ruim = und.cauda_amostra([{"gf": 3, "ga": 3}] * 4 + [{"gf": 1, "ga": 0}] * 6, 4.5)   # 40% acima
+        self.assertTrue(und.requisitos(k, {"cauda": {"casa": ok, "fora": ok}, "cauda_cond": {"casa": ruim, "fora": c}}, self.U)[0])

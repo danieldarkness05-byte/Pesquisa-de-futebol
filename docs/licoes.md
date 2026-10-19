@@ -263,6 +263,13 @@ faixa e registre aqui.
     *(automático: `under_dispersao` — com variância > 1,3 × a média nos últimos 14 totais, refaz pela binomial
     negativa e sai se ficar perto do mercado)*
 
+50. **Cauda na condição, não só a mista** (Waterford x Galway, 19/10).
+    - A cauda dos últimos 7 oficiais (casa e fora, todas as competições) deu 1 de 7 e só 2 de 14 com exatamente
+      4 gols. Mas nos últimos 10 do Waterford em casa pela liga foram 4 jogos de exatamente 4 gols e 1 de 6, com
+      média 3,2 (a média da temporada em casa, 2,63, vinha de um início travado).
+    - Confira a cauda e os jogos no limite também na condição do jogo (mandante em casa, visitante fora).
+    *(automático: `cauda_amostra` no `under.py` — falha pela cauda na condição e alerta de jogos no limite)*
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

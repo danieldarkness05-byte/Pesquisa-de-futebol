@@ -81,6 +81,14 @@ def cauda(eventos: list[dict], antes_ts: int, linha: float, qtd: int, palavras_a
     return {"n": len(tots), "acima": acima, "frac": acima / len(tots) if tots else None, "no_limite": no_limite, "totais": tots}
 
 
+def cauda_amostra(xs: list[dict], linha: float) -> dict:
+    """Lição 50 (Waterford x Galway, 19/10): a cauda NA CONDIÇÃO (mandante em casa, visitante fora, na liga)."""
+    tots = [x["gf"] + x["ga"] for x in xs if x.get("gf") is not None and x.get("ga") is not None]
+    acima = sum(1 for t in tots if t > linha)
+    return {"n": len(tots), "acima": acima, "frac": acima / len(tots) if tots else None,
+            "no_limite": sum(1 for t in tots if t == math.floor(linha)), "totais": tots}
+
+
 def under_dispersao(totais: list[int], linha: float, fator: float = 1.3) -> dict | None:
     """Lição 49 (Jong Ajax, 19/10): o Poisson ignora a dispersão. Se a variância dos totais reais passa de
     `fator` × a média, refaz P(under) com uma binomial negativa de mesma média e variância."""
@@ -154,6 +162,10 @@ def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:
     if estoura_cauda([fc["frac"], ff["frac"]], p, u["cauda_folga"]):
         pior = max((fc, "mandante"), (ff, "visitante"), key=lambda x: x[0]["frac"] or 0)
         falhas.append(f"cauda: o {pior[1]} passou de {linha} gols em {pior[0]['acima']} dos últimos {pior[0]['n']} oficiais")
+    cc = extra.get("cauda_cond") or {}
+    if cc and estoura_cauda([(cc.get("casa") or {}).get("frac"), (cc.get("fora") or {}).get("frac")], p, u["cauda_folga"]):
+        pior = max(((cc["casa"], "mandante em casa"), (cc["fora"], "visitante fora")), key=lambda x: x[0]["frac"] or 0)
+        falhas.append(f"cauda na condição: o {pior[1]} passou de {linha} em {pior[0]['acima']} dos últimos {pior[0]['n']} da liga (lição 50)")
     tl = extra.get("taxa_liga")
     if tl is not None and tl < p - u["liga_folga"]:
         falhas.append(f"liga: só {tl:.0%} dos jogos abaixo de {linha} (modelo {p:.0%})")
@@ -172,10 +184,12 @@ def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:
     if disp and k.get("justa_mercado") is not None and disp["p"] < k["justa_mercado"] + u["xg_margem_mercado"]:
         falhas.append(f"dispersão: placares com média {disp['media']} e variância {disp['variancia']} → under {disp['p']:.0%} "
                       f"≈ mercado {k['justa_mercado']:.0%} (lição 49)")
-    lim = [extra["cauda"][l].get("no_limite") for l in ("casa", "fora")]
-    ns = [extra["cauda"][l]["n"] for l in ("casa", "fora")]
-    if None not in lim and sum(ns) and sum(lim) / sum(ns) >= u["limite_frac_alerta"]:
-        alertas.append(f"{sum(lim)} de {sum(ns)} jogos com exatamente {math.floor(linha)} gols: folga curta (lição 48)")
+    for fonte, rot in ((extra["cauda"], "últimos 7 oficiais"), (cc, "na condição")):
+        lim = [(fonte.get(l) or {}).get("no_limite") for l in ("casa", "fora")]
+        ns = [(fonte.get(l) or {}).get("n") or 0 for l in ("casa", "fora")]
+        if None not in lim and sum(ns) and sum(lim) / sum(ns) >= u["limite_frac_alerta"]:
+            alertas.append(f"{sum(lim)} de {sum(ns)} jogos ({rot}) com exatamente {math.floor(linha)} gols: folga curta (lições 48 e 50)")
+            break
     xg = extra.get("xg_somado")
     if xg is not None and xg >= linha - u["xg_folga_linha"]:
         alertas.append(f"xG somado {xg:.2f} perto da linha {linha}")
@@ -244,6 +258,7 @@ def extras_jogo(api: v.Sofascore, e: dict, info: dict, linha: float, cfg: dict, 
     c_fora = cauda(eva, e["startTimestamp"], linha, u["cauda_jogos"], palavras)
     return {
         "cauda": {"casa": c_casa, "fora": c_fora},
+        "cauda_cond": {"casa": cauda_amostra(xh, linha), "fora": cauda_amostra(xa, linha)},
         "taxa_liga": taxa_liga_under((info.get("taxa_base") or {}).get("totais"), linha),
         "temporada_atual": fracao_temporada(ch[-qtd:] + ca[-qtd:], temporada),
         "xg_somado": xg_somado(xh, xa),
