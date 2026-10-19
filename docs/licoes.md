@@ -297,3 +297,4 @@ faixa e registre aqui.
 | 18/10 | Red Bull Salzburg x Altach (ouro) | menos de 4.5 | 81% | 3-0 | ✅ | O Salzburg goleador fez 3, mas o Altach não marcou: a cauda de 5+ não veio. |
 | 17/10 | Champs Academy x Fraijanes | Fraijanes 1+ | 82% | 1-3 | ✅ | |
 | 18/10 | Pérez Zeledón x Herediano (/under) | menos de 3.5 | 76% | 0-3 | ✅ | No limite (3 gols): o Herediano marcou os 3; os dois ataques mais fracos da liga seguraram o total. |
+| 18/10 | Rancho Santana x Diriangén | Diriangén 2+ | 68% | 0-1 | ❌ | Os dois alertas do cético bateram: no Estadio Nacional ele faz 1,5/j (lição 43) e os gols fora estavam acima do xG. Com o recorte do estádio e o xG, o 2+ não chegava a 60%. |
