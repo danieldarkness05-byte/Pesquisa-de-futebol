@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from datetime import datetime
 
@@ -44,6 +45,7 @@ UNDER_PADRAO = {
     "favorito_goleada_odd": 1.30,
     "xg_folga_linha": 0.6,        # alerta se o xG somado ≥ linha − folga
     "xg_margem_mercado": 0.02,    # lição 39: P(under) só com xG desta temporada ≥ mercado + margem
+    "limite_frac_alerta": 0.35,   # lição 48: alerta se tantos jogos terminam exatamente na linha − 0,5
     "max_pesquisa": 6,
 }
 
@@ -75,7 +77,23 @@ def cauda(eventos: list[dict], antes_ts: int, linha: float, qtd: int, palavras_a
             tots.append(t)
     tots = tots[-qtd:]
     acima = sum(1 for t in tots if t > linha)
-    return {"n": len(tots), "acima": acima, "frac": acima / len(tots) if tots else None, "totais": tots}
+    no_limite = sum(1 for t in tots if t == math.floor(linha))  # lição 48: "cauda limpa" encostada na linha
+    return {"n": len(tots), "acima": acima, "frac": acima / len(tots) if tots else None, "no_limite": no_limite, "totais": tots}
+
+
+def under_dispersao(totais: list[int], linha: float, fator: float = 1.3) -> dict | None:
+    """Lição 49 (Jong Ajax, 19/10): o Poisson ignora a dispersão. Se a variância dos totais reais passa de
+    `fator` × a média, refaz P(under) com uma binomial negativa de mesma média e variância."""
+    if len(totais) < 8:
+        return None
+    m = sum(totais) / len(totais)
+    s2 = sum((t - m) ** 2 for t in totais) / (len(totais) - 1)
+    if m <= 0 or s2 <= fator * m:
+        return None
+    r, q = m * m / (s2 - m), m / s2   # q = prob. de "sucesso" da NB (média r(1−q)/q = m)
+    p = sum(math.exp(math.lgamma(k + r) - math.lgamma(r) - math.lgamma(k + 1) + r * math.log(q) + k * math.log(1 - q))
+            for k in range(math.floor(linha) + 1))
+    return {"p": round(p, 4), "media": round(m, 2), "variancia": round(s2, 2), "n": len(totais)}
 
 
 def estoura_cauda(fracs: list[float | None], p: float, folga: float) -> bool:
@@ -150,6 +168,14 @@ def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:
         elif merc is not None and xa["p"] < merc + u["xg_margem_mercado"]:
             falhas.append(f"teste só xG desta temporada: under {xa['p']:.0%} ≈ mercado {merc:.0%} — a vantagem é "
                           f"finalização ruim ({xa['gols_jogo']} gols x {xa['xg_jogo']} xG por jogo), que regride (lição 39)")
+    disp = extra.get("dispersao")
+    if disp and k.get("justa_mercado") is not None and disp["p"] < k["justa_mercado"] + u["xg_margem_mercado"]:
+        falhas.append(f"dispersão: placares com média {disp['media']} e variância {disp['variancia']} → under {disp['p']:.0%} "
+                      f"≈ mercado {k['justa_mercado']:.0%} (lição 49)")
+    lim = [extra["cauda"][l].get("no_limite") for l in ("casa", "fora")]
+    ns = [extra["cauda"][l]["n"] for l in ("casa", "fora")]
+    if None not in lim and sum(ns) and sum(lim) / sum(ns) >= u["limite_frac_alerta"]:
+        alertas.append(f"{sum(lim)} de {sum(ns)} jogos com exatamente {math.floor(linha)} gols: folga curta (lição 48)")
     xg = extra.get("xg_somado")
     if xg is not None and xg >= linha - u["xg_folga_linha"]:
         alertas.append(f"xG somado {xg:.2f} perto da linha {linha}")
@@ -208,14 +234,21 @@ def extras_jogo(api: v.Sofascore, e: dict, info: dict, linha: float, cfg: dict, 
     odds = api.get(f"event/{e['id']}/odds/1/all", cache=None)
     ft = next((m for m in odds.get("markets", []) if m.get("marketName") == "Full time"), None)
     um_x_dois = [v.odd_decimal(c["fractionalValue"]) for c in ft["choices"]] if ft else []
+    ts_atual = {x["startTimestamp"] for x in ch + ca if (x.get("season") or {}).get("id") == temporada}
+    xg_atual = under_xg_atual(xh, xa, ts_atual, linha)
+    if xg_atual is None:  # lição 47: jogo adiado ou início de temporada — tenta com 3 jogos por lado
+        xg_atual = under_xg_atual(xh, xa, ts_atual, linha, minimo=3)
+        if xg_atual:
+            xg_atual["n_reduzido"] = True
+    c_casa = cauda(evh, e["startTimestamp"], linha, u["cauda_jogos"], palavras)
+    c_fora = cauda(eva, e["startTimestamp"], linha, u["cauda_jogos"], palavras)
     return {
-        "cauda": {"casa": cauda(evh, e["startTimestamp"], linha, u["cauda_jogos"], palavras),
-                  "fora": cauda(eva, e["startTimestamp"], linha, u["cauda_jogos"], palavras)},
+        "cauda": {"casa": c_casa, "fora": c_fora},
         "taxa_liga": taxa_liga_under((info.get("taxa_base") or {}).get("totais"), linha),
         "temporada_atual": fracao_temporada(ch[-qtd:] + ca[-qtd:], temporada),
         "xg_somado": xg_somado(xh, xa),
-        "xg_atual": under_xg_atual(xh, xa, {x["startTimestamp"] for x in ch + ca
-                                            if (x.get("season") or {}).get("id") == temporada}, linha),
+        "xg_atual": xg_atual,
+        "dispersao": under_dispersao(c_casa["totais"] + c_fora["totais"], linha),
         "odd_favorito": min(um_x_dois) if um_x_dois else None,
         "um_x_dois": [round(x, 2) for x in um_x_dois],
         "lambda": [round(x, 2) for x in info["lambda"]] if info.get("lambda") else None,

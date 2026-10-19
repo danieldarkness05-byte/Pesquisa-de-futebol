@@ -247,6 +247,22 @@ faixa e registre aqui.
       (mando no Kempes com torcida do River). Sem mudança a favor (odd, escalação), não gaste agentes de novo.
     - *Candidato a automático:* variante xG parcial no `azarao.py` (xG do lado que tem, gols do outro).
 
+47. **Teste só xG com poucos jogos desta temporada: rode com 3 e com a média geral** (Wisła Płock x Radomiak, 19/10).
+    - O teste da lição 39 não rodou porque a Wisła tinha só 3 jogos em casa (um adiado). Feito à mão: 77% na
+      condição e 73% no geral, contra 78–81% do mercado; o modelo dava 86% com 65% da amostra de 2025/26 e
+      técnicos diferentes nos dois times. Confira também se o xG cedido vem de um jogo extremo (use a mediana).
+    *(automático: `under_xg_atual` tenta com 3 jogos por lado quando não há 4)*
+48. **"Cauda limpa" encostada na linha** (Parma x Torino, 19/10).
+    - 0 de 7 acima de 3.5 nos dois times, mas 7 de 14 jogos com exatamente 3 gols, e a Serie A 2026/27 mais aberta
+      (70,6% de under 3.5, contra 75% da taxa histórica do requisito).
+    - Cauda limpa com muitos jogos no limite não é folga: puxe o under para a média real de gols da temporada.
+    *(automático: alerta "jogos com exatamente X gols" no `under.py`)*
+49. **Linha alta (5.5): o Poisson ignora a dispersão** (Jong Ajax x De Graafschap, 19/10).
+    - Time B que alterna 0-0 com 6-1: totais com média 3,8 e variância 9,1. A binomial negativa com média e
+      variância da temporada atual deu ~80% para o under 5.5, contra 84,6% do modelo e ~78–81% do mercado.
+    *(automático: `under_dispersao` — com variância > 1,3 × a média nos últimos 14 totais, refaz pela binomial
+    negativa e sai se ficar perto do mercado)*
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

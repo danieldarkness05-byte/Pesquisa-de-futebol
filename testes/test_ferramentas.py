@@ -670,3 +670,22 @@ class TestUnder(unittest.TestCase):
         # lição 40: tabelas casa/fora com pênaltis (J2 2026)
         self.assertAlmostEqual(vr.fator_tabelas(540, 491, 925), 925 / 1031)
         self.assertEqual(vr.fator_tabelas(500, 425, 925), 1.0)
+
+    def test_dispersao_e_limite(self):
+        # lição 49: totais dispersos (0-0 e goleadas) derrubam a P(under 5.5) do Poisson
+        tots = [3, 10, 5, 5, 2, 1, 2, 7, 0, 3, 5, 5, 3, 3]
+        d = und.under_dispersao(tots, 5.5)
+        self.assertGreater(d["variancia"], 1.3 * d["media"])
+        m = sum(tots) / len(tots)
+        poisson = sum(math.exp(-m) * m ** k / math.factorial(k) for k in range(6))
+        self.assertLess(d["p"], poisson)
+        self.assertIsNone(und.under_dispersao([2, 3, 2, 3, 2, 3, 2, 3], 3.5))   # sem sobredispersão
+        self.assertIsNone(und.under_dispersao([1, 9], 3.5))                     # poucos jogos
+        # lição 48: jogos exatamente no limite
+        evs = [self.ev(100 + i, a, b) for i, (a, b) in enumerate([(2, 1), (1, 2), (3, 0), (1, 1), (0, 0), (2, 1), (1, 0)])]
+        c = und.cauda(evs, 400, 3.5, 7, ["Friendly"])
+        self.assertEqual((c["acima"], c["no_limite"]), (0, 4))
+        k = {"p": 0.82, "linha": "3.5", "frequencia": 0.9, "justa_mercado": 0.78}
+        falhas, alertas = und.requisitos(k, {"cauda": {"casa": c, "fora": c}}, self.U)
+        self.assertEqual(falhas, [])
+        self.assertTrue(any("exatamente 3 gols" in a for a in alertas))
