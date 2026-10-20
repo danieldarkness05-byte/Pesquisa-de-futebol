@@ -163,7 +163,9 @@ def montar(data: str, numeros: list[int] | None, cfg: dict, sufixo: str | None =
             res["fora"].append({"n": num, "jogo": c["jogo"], "hora": c["hora"], "rotulo": c["rotulo"], "motivo": j["fora"]})
             continue
         k, info = chave(c), j["info"]
-        if c.get("under") is not None:  # under: vivo pela régua do under.py (prob. robusta, com ou sem valor)
+        if c.get("robusto"):  # mapa: vivo pela prob. robusta, com ou sem valor
+            vivo = next((x for x in V.mercados_robustos(info, cfg, cfg["varredura"]["prob_triagem"]) if chave(x) == k), None)
+        elif c.get("under") is not None:  # under: vivo pela régua do under.py (prob. robusta, com ou sem valor)
             import under as U
             vivo = next((x for x in U.unders_do_jogo(info, cfg, U.config()[1]) if chave(x) == k), None)
         else:

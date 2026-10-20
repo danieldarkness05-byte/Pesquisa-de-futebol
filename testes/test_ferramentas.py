@@ -717,3 +717,15 @@ class TestUnder(unittest.TestCase):
         self.assertTrue(any("na condição" in a for a in alertas))
         ruim = und.cauda_amostra([{"gf": 3, "ga": 3}] * 4 + [{"gf": 1, "ga": 0}] * 6, 4.5)   # 40% acima
         self.assertTrue(und.requisitos(k, {"cauda": {"casa": ok, "fora": ok}, "cauda_cond": {"casa": ruim, "fora": c}}, self.U)[0])
+
+    def test_mercados_robustos_qualquer_mercado(self):
+        cfg = {"varredura": dict(vr.VARREDURA_PADRAO), "criterios": {"ev_minimo": 0.03}}
+        it = lambda m, l, e, p, odd, justa: {"mercado": m, "linha": l, "escolha": e, "p": p, "odd": odd,  # noqa: E731
+                                             "ev": p * odd - 1, "justa_mercado": justa, "dev": 0.0}
+        k1, k2 = ("Double chance", None, "1X"), ("Match goals", "2.5", "Over")
+        var = lambda p1, p2: {k1: it("Double chance", None, "1X", p1, 1.30, 0.74), k2: it("Match goals", "2.5", "Over", p2, 1.50, 0.62)}  # noqa: E731
+        info = {"variantes": {"base": var(0.78, 0.72), "incerteza": var(0.77, 0.71), "dixon_coles": var(0.78, 0.69)},
+                "amostras": ([], []), "taxa_base": None}
+        r = vr.mercados_robustos(info, cfg, 0.70)
+        self.assertEqual([x["mercado"] for x in r], ["Double chance"])      # o over cai: 69% numa obrigatória
+        self.assertFalse(r[0]["com_valor"])                                 # 0,78 × 1,30 → EV +1,4% < 3%: bate a prob., sem valor

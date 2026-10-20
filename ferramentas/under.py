@@ -201,40 +201,9 @@ def requisitos(k: dict, extra: dict, u: dict) -> tuple[list[str], list[str]]:
     return falhas, alertas
 
 
-OBRIG = ("base", "incerteza", "dixon_coles")
-
-
 def unders_do_jogo(info: dict, cfg: dict, u: dict) -> list[dict]:
-    """Todas as linhas de under do jogo que batem a PROBABILIDADE (com ou sem valor): ≥ prob_min nas
-    variantes obrigatórias, ≥ prob_min − tolerância nas outras, frequência real, regra 8 e taxa-base."""
-    vs = info.get("variantes") or {}
-    if not vs.get("base"):
-        return []
-    vc, pm = cfg["varredura"], u["prob_min"]
-    xh, xa = info.get("amostras") or ([], [])
-    base = info.get("taxa_base")
-    out = []
-    for chave, b in vs["base"].items():
-        if b["mercado"] != "Match goals" or b["escolha"] != "Under" or b["odd"] < vc["odd_minima_mercado"]:
-            continue
-        if any(chave not in vs.get(o, {}) or vs[o][chave]["p"] < pm for o in OBRIG):
-            continue
-        outras = {k: var[chave]["p"] for k, var in vs.items() if k not in OBRIG and chave in var}
-        if any(x < pm - vc["tolerancia_variantes"] for x in outras.values()):
-            continue
-        if b["p"] - b["justa_mercado"] > vc["regra8_pp"]:
-            continue
-        freq = v.frequencia(b, xh, xa)
-        if freq is not None and freq < pm - vc["tolerancia_frequencia"]:
-            continue
-        if base and b["p"] >= 0.80:
-            linha = float(b["linha"])
-            if sum(1 for t in base["totais"] if t < linha) / len(base["totais"]) < b["p"] - 0.10:
-                continue
-        out.append({**b, "frequencia": freq, "variantes": {k: round(x, 3) for k, x in outras.items()},
-                    "p_min": min([b["p"], *outras.values(), *(vs[o][chave]["p"] for o in OBRIG)]),
-                    "com_valor": b["ev"] >= cfg["criterios"]["ev_minimo"]})
-    return out
+    """Todas as linhas de under do jogo que batem a PROBABILIDADE (com ou sem valor)."""
+    return v.mercados_robustos(info, cfg, u["prob_min"], lambda b: b["mercado"] == "Match goals" and b["escolha"] == "Under")
 
 
 def extras_jogo(api: v.Sofascore, e: dict, info: dict, linha: float, cfg: dict, u: dict, palavras: list[str]) -> dict:

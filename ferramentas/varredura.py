@@ -708,6 +708,42 @@ def filtrar(variantes: dict[str, dict], xh: list[dict], xa: list[dict], v: dict,
     return candidatos, (max(motivos)[1] if motivos else None)
 
 
+OBRIG = ("base", "incerteza", "dixon_coles")
+
+
+def mercados_robustos(info: dict, cfg: dict, prob_min: float, filtro=None) -> list[dict]:
+    """Mercados do jogo que batem a PROBABILIDADE de forma robusta, com ou sem valor (mapa do /setenta e do
+    /under): ≥ prob_min nas variantes obrigatórias, ≥ prob_min − tolerância nas outras, frequência real,
+    regra 8 e taxa-base da liga. `filtro(item)` restringe o mercado (ex.: só under). `com_valor` = EV ≥ mínimo."""
+    vs = info.get("variantes") or {}
+    if not vs.get("base"):
+        return []
+    vc = cfg["varredura"]
+    xh, xa = info.get("amostras") or ([], [])
+    base = info.get("taxa_base")
+    out = []
+    for chave, b in vs["base"].items():
+        if (filtro and not filtro(b)) or b["odd"] < vc["odd_minima_mercado"]:
+            continue
+        if any(chave not in vs.get(o, {}) or vs[o][chave]["p"] < prob_min for o in OBRIG):
+            continue
+        outras = {k: var[chave]["p"] for k, var in vs.items() if k not in OBRIG and chave in var}
+        if any(x < prob_min - vc["tolerancia_variantes"] for x in outras.values()):
+            continue
+        p_cond = b["p"] / (1 - b["dev"]) if b["dev"] else b["p"]
+        if p_cond - b["justa_mercado"] > vc["regra8_pp"]:
+            continue
+        freq = frequencia(b, xh, xa)
+        if freq is not None and freq < prob_min - vc["tolerancia_frequencia"]:
+            continue
+        if base and not confere_taxa_base(b, vs["dixon_coles"], base, prob_min, float("-inf")):
+            continue
+        out.append({**b, "frequencia": freq, "variantes": {k: round(x, 3) for k, x in outras.items()},
+                    "p_min": min([b["p"], *outras.values(), *(vs[o][chave]["p"] for o in OBRIG)]),
+                    "com_valor": b["ev"] >= cfg["criterios"]["ev_minimo"]})
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Chuva (só para quem passou na peneira)
 # ---------------------------------------------------------------------------
@@ -837,6 +873,8 @@ def main() -> None:
     p.add_argument("--todas", action="store_true", help="todas as ligas do Sofascore (filtra ligas editadas à mão e eventos suspeitos)")
     p.add_argument("--prob-min", type=float, help="corte de prob. da triagem (padrão: varredura.prob_triagem), ex.: 0.70")
     p.add_argument("--sufixo", help="salva em peneira-AAAA-MM-DD-<sufixo>.json (padrão com --todas: todas)")
+    p.add_argument("--mapa", action="store_true",
+                   help="grava também peneira-<D>-mapa.json: TODO mercado com prob ≥ triagem robusta, com ou sem valor (odd mínima)")
     p.add_argument("--chuva-informativa", action="store_true",
                    help="não exclui jogo com chuva, só marca (pedido do Daniel no /setenta, 16/10)")
     a = p.parse_args()
@@ -889,6 +927,33 @@ def main() -> None:
                                "id": info["id"], "arbitro": info.get("arbitro"),
                                "chuva": chuva["status"] if chuva["status"] == "seco" else
                                f"🌧️ {chuva['detalhe']} (informativa)" if chuva["status"] == "CHUVA" else "⚠️ não verificada"})
+    if a.mapa:
+        import defesa as df
+        palavras = {**df.DEFESA_PADRAO, **cfg.get("defesa", {})}["palavras_base"]
+        por_ev = {e["id"]: e for e in jogos}
+        mapa = []
+        for info in infos:
+            if not info.get("variantes"):
+                continue
+            e = por_ev.get(info["id"], {})
+            cat = ((e.get("tournament") or {}).get("category") or {}).get("name", "")
+            nivel = "base" if df.nivel_base([info["competicao"], cat], palavras,
+                                             [e.get("homeTeam", {}).get("name"), e.get("awayTeam", {}).get("name")]) else "pro"
+            for k in mercados_robustos(info, cfg, cfg["varredura"]["prob_triagem"]):
+                mapa.append({**k, "hora": info["hora"], "jogo": info["jogo"], "competicao": info["competicao"],
+                             "id": info["id"], "nivel": nivel, "robusto": True})
+        mapa.sort(key=lambda k: (k["nivel"] == "base", not k["com_valor"], -k["p_min"], -k["ev"]))
+        CACHE_PADRAO.mkdir(parents=True, exist_ok=True)
+        (CACHE_PADRAO / f"peneira-{data}-mapa.json").write_text(json.dumps(
+            {"data": data, "consultado": datetime.now(FUSO_BR).strftime("%H:%M"), "prob_triagem": cfg["varredura"]["prob_triagem"],
+             "ev_minimo": cfg["criterios"]["ev_minimo"], "contagem": {"jogos": len(jogos)}, "candidatos": mapa},
+            ensure_ascii=False, default=str), encoding="utf-8")
+        print(f"🗺️ Mapa {data}: {len(mapa)} mercados com prob. robusta ≥ {cfg['varredura']['prob_triagem']:.0%} "
+              f"({sum(1 for k in mapa if k['com_valor'])} com valor) em {len({k['id'] for k in mapa})} jogos")
+        for k in mapa[:40]:
+            print(f"  {k['hora']} {k['jogo']} [{k['competicao']}{' · base' if k['nivel'] == 'base' else ''}] · {k['rotulo']} · "
+                  f"{k['p']:.0%} (pior {k['p_min']:.0%}) · mín {n.fmt_odd_min(k['odd_minima'])} · bet365 {k['odd']:.2f} "
+                  f"(EV {k['ev'] * 100:+.0f}%) · mercado {k['justa_mercado']:.0%}")
     if a.todas:  # lição 14: amador, base, feminino e time B vêm depois (dado fraco, quase nunca na Betano)
         import defesa as df
         palavras = {**df.DEFESA_PADRAO, **cfg.get("defesa", {})}["palavras_base"]
