@@ -359,3 +359,4 @@ faixa e registre aqui.
 | 19/10 | Parma x Torino (/under) | menos de 3.5 | 80% | 0-3 | ✅ | No limite (3 gols), todos do Torino. |
 | 19/10 | Jong Ajax x De Graafschap (/under) | menos de 5.5 | 82% | 2-1 | ✅ | Linha alta com folga. |
 | 19/10 | Waterford x Galway (/under) | menos de 4.5 | 77% | 3-2 | ❌ | A cauda na condição avisou (lição 50): o Waterford em casa tinha 5 de 10 com 4+ gols e precisava vencer. Modelo igual ao mercado, sem valor: não era pick de ouro. |
+| 20/10 | Uxbridge x Malvern Town | Uxbridge 1+ | 89% | 3-0 | ✅ | A pior defesa fora confirmou, mesmo com o ataque desfalcado; rebaixar o 2+ pela regra 8 (lição 54) foi conservador, mas o 1+ era a leitura certa. |
