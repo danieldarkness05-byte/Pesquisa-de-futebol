@@ -93,6 +93,7 @@ Pesquise A FUNDO (Sofascore primeiro, depois imprensa local; WebSearch/WebFetch,
 7) Clima e gramado (informativo; o Daniel não exclui por chuva), árbitro (pênaltis/expulsões), calendário e rodízio.
 8) Mercado: movimento da odd do under (abertura → agora) e o que o mercado pode saber.
 9) Ajuste em p.p. na prob. do UNDER (−5 a +5), só com fato que o modelo não mede. Na dúvida, 0.
+   O ajuste é somado à prob. DO MODELO: se a sua leitura honesta é menor que a do modelo, o ajuste é NEGATIVO até chegar nela (lição 56).
 Nunca invente: cada fato com fonte e data; sem fonte = N/D.
 ${SOFA}`
 

@@ -91,6 +91,7 @@ Pesquise na imprensa local/esportiva confiável (use WebSearch e WebFetch; carre
 3. Técnicos (troca recente? pressão?), tabela e motivação, calendário/rodízio (copa no meio da semana, data FIFA), árbitro.
 4. O que o mercado pode saber: explique o movimento das odds (abertura → agora) ou a diferença modelo x mercado.
 5. Ajuste em p.p. na probabilidade DO PICK (−5 a +5; + = mais chance de o pick bater), só com motivo concreto e sem contar de novo o que o modelo já mede (forma e médias). Na dúvida, 0.
+   O ajuste é somado à prob. DO MODELO: se a sua leitura honesta é menor que a do modelo, o ajuste é NEGATIVO até chegar nela (lição 56).
 
 Economia: no máximo ~8 buscas/páginas; pare quando os itens estiverem respondidos. Prefira matérias de ontem e de hoje.
 Regras: nunca invente; cada fato com fonte e data; sem fonte = N/D. derruba_pick = true só com fato forte e confirmado (ex.: time reserva confirmado, jogo adiado).`

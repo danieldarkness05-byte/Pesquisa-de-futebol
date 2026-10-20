@@ -307,6 +307,27 @@ faixa e registre aqui.
       *(automático: `ga_aparada` no `defesa.py` — sem a pior goleada, defesa na média ou melhor tira o jogo; com teste.
       Nos candidatos de 14 a 20/10 só o Bracknell sairia; nenhum acerto cortado.)*
 
+## Mapa de 70%+ (/setenta e /under, 21/10)
+
+56. **O ajuste vai do modelo até a leitura honesta** (Reading x Leyton Orient, 21/10).
+    - O pesquisador escreveu que o under honesto era de 81–82%, mas deu +1 p.p. em cima dos 85% do modelo (o p final
+      iria a 86%). Se a leitura honesta (xG da temporada, gols reais na condição e mercado pelo método da potência)
+      fica abaixo do modelo, o ajuste é negativo até chegar nela.
+    *(nos prompts do `under.js` e do `aprofundar.js`)*
+    - Confira também a deriva das linhas pelo handicap asiático do favorito e pelo "marca primeiro": se tudo vai na
+      mesma direção (mais gols), é o mercado sabendo algo (lições 38 e 41).
+57. **Razão gols/xG da liga: compare com as temporadas anteriores antes de escalar** (Omiya x Toyama, J2, 21/10).
+    - Na J2 2026/27 a razão é 0,857 em 110 jogos, mas foi 0,92 em 2025 e 0,99 na especial 2026. Reduzir o xG pela razão
+      atual favorece o under; encolhida para o histórico (~0,91), o under 4.5 caiu de 77,7% para ~73,5%, abaixo do
+      mercado.
+    - "Melhores defesas em gols sofridos" com xG cedido na média, contra os 2 melhores ataques em xG, não é "topo
+      contra topo trava" (a lição 11 não vale para times de posse e volume).
+58. **Dupla chance 12 com o λ do mandante inflado** (Levante x Athletic, 21/10).
+    - O modelo dava 2,32 gols ao Levante (17º, 12 gols na liga) e o fazia favorito com 62%. O mercado, pelo método da
+      potência, punha o Athletic como favorito; com qualquer λ realista, a 12 ficava em 72–75%, sem valor a 1.286.
+    - Antes de uma 12 ou de uma vitória, compare o λ de cada time com os gols reais dele na temporada (lição 39 para
+      o resultado).
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
