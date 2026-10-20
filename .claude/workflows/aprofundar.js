@@ -144,8 +144,10 @@ const resultados = await pipeline(
   (p, c) => {
     const previo = veredito(c, p, null)
     // cético só quando ainda pode virar ouro (com 1 p.p. de folga) — economiza agente
+    // cético só quando ainda pode virar ouro (com 1 p.p. de folga) — economiza agente; args.cetico_sempre (análise
+    // profunda de todos, pedido do Daniel em 20/10) roda o cético mesmo sem valor
     const vale = conf.cetico !== false && c.status === 'vivo' && p && !p.derruba_pick &&
-      previo.p_final >= crit.prob_minima - 0.01 && (previo.ev_final ?? -1) >= crit.ev_minimo - 0.01
+      (D.cetico_sempre || (previo.p_final >= crit.prob_minima - 0.01 && (previo.ev_final ?? -1) >= crit.ev_minimo - 0.01))
     if (!vale) return { c, p, k: null, cetico: 'pulado' }
     agentes++
     return agent(promptCetico(c, p), { label: `cético: ${c.jogo}`, phase: 'Cético', schema: CETICO, model: modelo, effort: 'medium' })
