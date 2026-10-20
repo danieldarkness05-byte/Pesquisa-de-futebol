@@ -330,7 +330,8 @@ def alertas_estatisticos(info: dict, d: dict) -> list[str]:
 def contradiz_tese_recente(info: dict, d: dict) -> str | None:
     """Lição 22 (15/10, Cumbayá e La Viena): a tabela da temporada passa no corte, mas a
     amostra recente na condição (≥ amostra_boa jogos) está na média da liga ou pior → sai.
-    Lição 51 (19/10, Monagas, Pendikspor e Encarnación): o mesmo vale para o xG cedido."""
+    Lição 51 (19/10, Monagas, Pendikspor e Encarnación): o mesmo vale para o xG cedido.
+    Lição 55 (20/10, Bracknell): e para a média sem a pior goleada."""
     az, fv = info["azarao_amostra"], info["favorito_amostra"]
     liga = info["liga"]["casa"] if info["fav_casa"] else info["liga"]["fora"]
     if not liga:
@@ -340,6 +341,9 @@ def contradiz_tese_recente(info: dict, d: dict) -> str | None:
     if az.get("xg_contra") is not None and az["n"] >= d["amostra_boa"] and az["xg_contra"] / liga < 1.0:
         return (f"defesa do azarão na média ou melhor pelo xG cedido nos últimos {az['n']} na condição "
                 f"(×{az['xg_contra'] / liga:.2f}): os gols sofridos são azar, não defesa fraca")
+    if az.get("ga_aparada") is not None and az["n"] >= d["amostra_boa"] and az["ga_aparada"] / liga < 1.0:
+        return (f"defesa do azarão na média ou melhor sem a pior goleada nos últimos {az['n']} na condição "
+                f"(×{az['ga_aparada'] / liga:.2f})")
     if fv.get("gf") is not None and fv["n"] >= d["amostra_boa"] and fv["gf"] / liga < 1.0:
         return f"ataque do favorito na média ou pior nos últimos {fv['n']} na condição (×{fv['gf'] / liga:.2f})"
     return None
@@ -505,6 +509,9 @@ def resumo_amostra(xs: list[dict]) -> dict:
          "chutes_pro": m("chutes_f"), "chutes_contra": m("chutes_a"), "sot_contra": m("sot_a"),
          "sem_sofrer": sum(1 for x in xs if x["ga"] == 0), "sem_marcar": sum(1 for x in xs if x["gf"] == 0),
          "placares": [f"{x['gf']}-{x['ga']} {x['adv']}" for x in xs]}
+    gas = [x["ga"] for x in xs if x.get("ga") is not None]
+    # lição 55: sem a pior goleada, a defesa continua fraca?
+    r["ga_aparada"] = (sum(gas) - max(gas)) / (len(gas) - 1) if len(gas) >= 3 else None
     r["ga_ultimos5"], _ = tendencia(xs, "ga")
     r["gf_ultimos5"], _ = tendencia(xs, "gf")
     return {k: (round(val, 2) if isinstance(val, float) else val) for k, val in r.items()}

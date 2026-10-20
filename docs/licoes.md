@@ -291,6 +291,22 @@ faixa e registre aqui.
     - Antes de aplicar a lição 7 a um jogador, compare a soma do xG dos jogadores com o xG do time. Se ficar bem
       abaixo, conte os gols só dos jogos que têm xG individual.
 
+## Defesa fraca (20/10)
+
+54. **Mercado só com 1X2: refaça o λ pelo método da potência** (Uxbridge x Malvern, 20/10).
+    - Em liga amadora (margem ~11%), a divisão proporcional joga a margem no empate e no azarão e subestima o
+      favorito e o total de gols. No Uxbridge, o λ implícito foi de 1,99 para 2,19: o 2+ do mercado subiu de 59%
+      para 64% e o 1+ de 86% para 89%.
+    - Antes de medir a regra 8 num mercado de gols sem linha de over/under, refaça o λ: a distância no 2+ cai
+      uns 5 p.p., e a vantagem que parecia existir no 1+ pode sumir.
+55. **Uma goleada isolada numa amostra curta passa pelo alerta da mediana** (Taunton x Bracknell, 20/10).
+    - Fora, o Bracknell sofreu 7, 2, 2, 2, 1 e 1: média 2,5 (4ª pior), mediana 2. O alerta "média inflada" não
+      dispara, mas o 0-7 da estreia, com o elenco ainda em montagem, decidia a triagem (índice 1,41 contra corte de 1,38).
+    - Sem esse jogo: 1,6 por jogo (×0,90), na média da liga. O elenco ainda foi reformulado em 13/10.
+    - Mesma família das lições 1 e 22 e do Acre (19/10, 2 goleadas com o elenco antigo).
+      *(automático: `ga_aparada` no `defesa.py` — sem a pior goleada, defesa na média ou melhor tira o jogo; com teste.
+      Nos candidatos de 14 a 20/10 só o Bracknell sairia; nenhum acerto cortado.)*
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

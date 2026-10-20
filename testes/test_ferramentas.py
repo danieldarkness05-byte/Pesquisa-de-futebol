@@ -456,6 +456,12 @@ class TestDefesa(unittest.TestCase):
         skc = dict(base, liga={"casa": 1.852, "fora": 1.3},
                    azarao_amostra={"n": 10, "ga": 2.9, "xg_contra": 1.86}, favorito_amostra={"n": 10, "gf": 2.5})
         self.assertIsNone(df.contradiz_tese_recente(skc, self.D))
+        # Taunton x Bracknell 20/10: 2,1/j fora, mas 1,56 sem o 0-7 da estreia (×0,88) → sai
+        bracknell = dict(base, liga={"casa": 1.776, "fora": 1.4},
+                         azarao_amostra={"n": 10, "ga": 2.1, "ga_aparada": 1.56}, favorito_amostra={"n": 10, "gf": 2.1})
+        self.assertIn("pior goleada", df.contradiz_tese_recente(bracknell, self.D))
+        xs = [{"gf": 0, "ga": g, "adv": "x"} for g in (7, 2, 2, 2, 1, 1)]
+        self.assertAlmostEqual(df.resumo_amostra(xs)["ga_aparada"], 1.6)
 
     def test_lambdas_gerais_tira_o_inflado_da_condicao(self):
         # Bridlington (fora) 14/10: 18 gols em 11 no geral; Stocksbridge (casa) sofreu 23 em 11 no geral
