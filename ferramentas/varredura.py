@@ -32,6 +32,7 @@ import json
 import math
 import re
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -66,17 +67,34 @@ VARREDURA_PADRAO = {
 # Acesso ao Sofascore (com cache em disco)
 # ---------------------------------------------------------------------------
 
+_RITMO = threading.Lock()
+_ULTIMA = [0.0]
+INTERVALO_MIN = 0.07   # ~14 consultas/s no total: o Sofascore bloqueou (403) as varreduras grandes em 21/10
+
+
+def _esperar_vez() -> None:
+    with _RITMO:
+        espera = _ULTIMA[0] + INTERVALO_MIN - time.monotonic()
+        if espera > 0:
+            time.sleep(espera)
+        _ULTIMA[0] = time.monotonic()
+
+
 def _baixar(caminho: str, tentativas: int = 3) -> dict | None:
-    """JSON do endpoint; {} se não existe (404); None se a rede falhou."""
+    """JSON do endpoint; {} se não existe (404); None se a rede falhou ou o Sofascore bloqueou (403/429)."""
     req = urllib.request.Request(API + caminho, headers={
         "User-Agent": UA, "Accept": "application/json", "Referer": "https://www.sofascore.com/"})
     for i in range(tentativas):
+        _esperar_vez()
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
                 return json.loads(r.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 return {}
+            if e.code in (403, 429):  # bloqueio: espera mais antes de tentar de novo
+                time.sleep(10 * (i + 1))
+                continue
         except (urllib.error.URLError, TimeoutError, ValueError, OSError):
             pass
         time.sleep(1 + 2 * i)
