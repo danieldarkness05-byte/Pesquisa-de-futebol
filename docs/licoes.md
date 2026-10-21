@@ -336,6 +336,15 @@ faixa e registre aqui.
     - *Candidato a automático:* lista de ligas de estádio compartilhado no `plataformas.py` e no `under.py`, com a
       variante "geral".
 
+60. **Under com mandante que precisa vencer contra visitante confortável** (Llaneros x Cali, 21/10).
+    - O Llaneros (12º, 6 pontos fora dos 8) precisava vencer em casa; o Cali (3º) estava confortável, jogava de novo
+      em 3 dias e tinha a lateral direita improvisada. O cético puxou a leitura honesta de 78,7% para 76%, igual ao
+      mercado.
+    - Antes de um under, confira a tabela: esse cenário vale −2 a −3 p.p. e tira o selo elite.
+    - Limite de sessão: no modo web cada jogo leva ~30 min de agentes. Rode cedo e, se os agentes caírem, retome assim
+      que o limite zerar, começando pelo jogo mais próximo. O Liverpool x Cerro Largo (87,7% na conta, terminou 1-0)
+      ficou sem cético e começou antes da retomada.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
