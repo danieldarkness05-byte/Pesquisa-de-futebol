@@ -67,6 +67,7 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/defesa.py [--data D] [--curto] [--json]` | defesa fraca do azarão x ataque forte do favorito em **todas** as ligas do Sofascore: triagem, estatística, alertas, prob. conservadora e odd mínima |
 | `python3 ferramentas/azarao.py [--data D] [--curto]` | azarão forte: jogos em que o azarão tem boa chance de não perder (dupla chance, empate anula, vitória) com valor, em todas as ligas |
 | `python3 ferramentas/under.py [--data D]` | especialista em under: filtra os "menos de X.5 gols" da peneira `--todas` pelos requisitos de under (cauda, taxa da liga, temporada atual, xG somado, favorito goleador) |
+| `python3 ferramentas/plataformas.py confere/mapa/anexa [--data D]` | 2ª plataforma com os mesmos dados do Sofascore (365Scores): confirma os unders (CONFIRMADO/DIVERGENTE) e monta o mapa de under sem o Sofascore |
 | `python3 ferramentas/previsoes.py add-json/resolver/resumo` | registro de TODA previsão entregue (apostada ou não), resultado automático pelo Sofascore e calibração |
 
 Cada script tem `--help` com exemplos. Use `--json` quando for processar a saída.

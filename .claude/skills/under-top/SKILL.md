@@ -31,9 +31,14 @@ Igual ao `/under`, passo 1. Se o mapa do dia já existe, reaproveite e não rode
 1. `python3 ferramentas/varredura.py --data <D> --todas --prob-min 0.70 --chuva-informativa --curto` (segundo plano,
    10 a 30 min), só se `dados/cache/sofascore/peneira-<D>-todas.json` não existir.
 2. `python3 ferramentas/under.py --data <D> --varrer --json > <scratchpad>/under-<D>.json`.
-3. **Sofascore fora do ar** (403, ou peneira com 0 jogos e falhas, mesmo depois de 1 nova tentativa): pule os passos 2 e 3.1
-   e chame o workflow no **modo web**: `args = {data, modo: "web", criterios: {prob_minima: 0.80, ev_minimo: 0.03},
-   under: {max_pesquisa: 5}}`. O descobridor acha os unders em 365Scores, SoccerStats, FootyStats e outras fontes.
+3. **Confirme em outra plataforma (de graça):** `python3 ferramentas/plataformas.py confere --data <D>`. Cada under é
+   refeito no **365Scores** (mesmas informações do Sofascore) e sai CONFIRMADO, DIVERGENTE ou NAO_ACHADO.
+   **DIVERGENTE não entra na elite.**
+4. **Sofascore fora do ar** (403, ou peneira com 0 jogos e falhas, mesmo depois de 1 nova tentativa):
+   `python3 ferramentas/plataformas.py mapa --data <D> --json > <scratchpad>/dossie-365-<D>.json`. Use esse mapa no
+   pré-filtro: `p_modelo` no lugar de `p_min`, a soma de `gols_esperados` no lugar do xG, e os campos que faltam não
+   cortam. Pule o passo 3.1. Se o 365Scores também falhar, chame o workflow no **modo web**:
+   `args = {data, modo: "web", criterios: {prob_minima: 0.80, ev_minimo: 0.03}, under: {max_pesquisa: 5}}`.
 
 ## 2. Pré-filtro elite (de graça, antes de gastar agente)
 
@@ -58,6 +63,7 @@ Leia o JSON do `under.py`. Fica só o candidato que cumpre **tudo**:
 ## 3. Dossiê e pesquisa a fundo (os créditos vão aqui)
 
 1. `python3 ferramentas/dossie.py --data <D> --sufixo under --prob-min 0.70 --numeros <os do passo 2> --json > <scratchpad>/dossie-top-<D>.json`.
+   Em seguida: `python3 ferramentas/plataformas.py anexa --dossie <scratchpad>/dossie-top-<D>.json`.
 2. **Mercado a favor (corte):** sai quem tem a odd do under **subindo mais de 3%** desde a abertura sem notícia
    (lições 38 e 41), ou o modelo mais de **8 p.p.** acima do mercado sem margem.
 3. `Workflow({scriptPath: ".claude/workflows/under.js", args: <dossiê>})`, com `args.criterios.prob_minima = 0.80`,

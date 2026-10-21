@@ -206,11 +206,14 @@ const resumo = c => JSON.stringify({
   gols_esperados_modelo: c.gols_esperados, variantes: c.variantes, frequencia_under_nas_amostras: c.frequencia_amostras,
   requisitos_under: c.under, desfalques_sofascore: c.desfalques, artilheiros_liga: c.artilheiros, forma: c.forma,
   escalacao_confirmada: c.escalacao_confirmada, chuva: c.chuva, descoberta_web: c.web,
+  conferencia_365: c.confere,
 })
 
 const promptEst = c => `Você é o ESTATÍSTICO INDEPENDENTE do Método Under do Daniel (português do Brasil). Pick: ${c.mercado} em ${c.jogo} (${c.competicao}), ${c.hora} de ${D.data} (Brasília).
 O que já se sabe: ${resumo(c)}
-Sua tarefa é refazer a conta SEM depender do Sofascore, para conferir ou desmentir o modelo:
+Sua tarefa é refazer a conta SEM depender do Sofascore, para conferir ou desmentir o modelo.
+Se "conferencia_365" já trouxer os números do 365Scores (médias, totais, cauda, H2H), não repita a 365Scores: confirme numa TERCEIRA plataforma (SoccerStats, FBref, FootyStats, FlashScore, FotMob).
+
 1) Médias na condição do jogo (mandante em casa, visitante fora) na temporada atual: gols marcados e sofridos por jogo e a média de gols de mandantes e visitantes da liga. Fonte principal fora do Sofascore (SoccerStats, FBref, FootyStats, 365Scores); confira com uma 2ª.
 2) Rode: python3 ferramentas/prob.py gols --casa-marcados A --casa-sofridos B --fora-marcados C --fora-sofridos D --liga-mandante E --liga-visitante F --mercados under${linhaDe(c)} --json
    (com xG na condição de uma fonte confiável, acrescente --xg-casa e --xg-fora). Copie o comando em comando_prob e a prob. do under em p_independente.
@@ -253,7 +256,7 @@ const ev = (p, odd) => p * (odd - 1) - (1 - p)
 const oddMin = (p, evMin) => Math.ceil((1 + (evMin + 1 - p) / p) * 100 - 1e-9) / 100
 const limita = x => Math.max(-5, Math.min(5, x))
 const base = (c, e) => {
-  const ps = [c.p_modelo, e && e.p_independente].filter(x => typeof x === 'number' && x > 0 && x <= 1)
+  const ps = [c.p_modelo, e && e.p_independente, c.confere && c.confere.p_365].filter(x => typeof x === 'number' && x > 0 && x <= 1)
   return ps.length ? Math.min(...ps) : null   // duas contas: vale a menor
 }
 
@@ -282,6 +285,9 @@ function veredito(c, e, p, k) {
   if (evf == null || evf < crit.ev_minimo) avisos.push(`EV ${evf == null ? 'N/D' : pct(evf)} < ${pct(crit.ev_minimo)} (só registro)`)
   if (gap != null && gap > regra8) avisos.push(`regra 8: ${(100 * gap).toFixed(1)} p.p. acima do mercado`)
   if (diverg != null && diverg > 0.1) avisos.push(`fontes divergem: modelo ${pct(c.p_modelo)} x independente ${pct(e.p_independente)}`)
+  const conf365 = c.confere ? c.confere.status : null
+  if (conf365 === 'DIVERGENTE') avisos.push(`Sofascore x 365Scores: ${(c.confere.motivos || []).join('; ')}`)
+  if (conf365 === 'NAO_ACHADO') avisos.push('não confirmado no 365Scores')
 
   // selo elite (docs/metodo-under.md, seção 5)
   if (pf == null || pf < eliteMin) elite.push(`chance ${pct(pf)} < ${pct(eliteMin)}`)
@@ -294,7 +300,9 @@ function veredito(c, e, p, k) {
   if (p && p.odd_under_subindo) elite.push('odd do under subindo')
   if (gap != null && gap > 0.08) elite.push(`mercado ${(100 * gap).toFixed(1)} p.p. abaixo`)
   if (diverg != null && diverg > 0.1) elite.push('fontes divergem mais de 10 p.p.')
-  if (usarEstatistico && fontesInd < 2) elite.push(`só ${fontesInd} fonte(s) fora do Sofascore`)
+  if (conf365 === 'DIVERGENTE') elite.push('dados do Sofascore e do 365Scores divergem')
+  const confirmado = conf365 === 'CONFIRMADO' || conf365 === 'SO_365'
+  if (usarEstatistico && fontesInd < (confirmado ? 1 : 2)) elite.push(`só ${fontesInd} fonte(s) fora do Sofascore`)
   if (motivos.length) elite.push('não passou no veredito')
 
   return {

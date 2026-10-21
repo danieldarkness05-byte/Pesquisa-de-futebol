@@ -44,9 +44,13 @@ sem nada, "Nenhum under com 70%+ amanhã".
 2. `python3 ferramentas/under.py --data <D>`: grava `peneira-<D>-under.json` só com os unders que passam nos
    requisitos (e `caidos` com o motivo).
 3. Sem candidato: responda "Nenhum under com 70%+ amanhã" e salve a análise.
-4. **Sofascore fora do ar** (403, peneira com 0 jogos e falhas, mesmo depois de 1 nova tentativa): não pare. Pule para
-   o passo 3 no **modo web**: `args = {data, modo: "web", criterios: {prob_minima: 0.70, ev_minimo: 0.03}}`. Um agente
-   descobridor acha os unders do dia em 365Scores, SoccerStats, FootyStats e outras fontes (`docs/metodo-under.md`).
+4. **Confirme em outra plataforma (de graça):** `python3 ferramentas/plataformas.py confere --data <D>`. Cada under é
+   refeito no **365Scores**, que tem as mesmas informações do Sofascore: hora, estádio, médias casa/fora, cauda, cauda na
+   condição, H2H na linha e a prob. Sai CONFIRMADO, DIVERGENTE ou NAO_ACHADO.
+5. **Sofascore fora do ar** (403, peneira com 0 jogos e falhas, mesmo depois de 1 nova tentativa): não pare.
+   `python3 ferramentas/plataformas.py mapa --data <D> --json > <scratchpad>/dossie-365-<D>.json` monta o mapa de unders
+   pelo 365Scores no formato do dossiê. Pule o passo 2 e use esse arquivo no passo 3. Se o 365Scores também falhar,
+   chame o workflow no **modo web**: `args = {data, modo: "web", criterios: {prob_minima: 0.70, ev_minimo: 0.03}}`.
 
 ## 2. Dossiê
 
@@ -55,6 +59,8 @@ Entram na pesquisa os unders que passaram nos requisitos, **com ou sem valor** (
 
 `python3 ferramentas/dossie.py --data <D> --sufixo under --prob-min 0.70 --max 5 --json > <scratchpad>/dossie-under-<D>.json`.
 Um pick por jogo: se o mesmo jogo tem 2.5 e 3.5, fica a linha `principal` do `under.py` (maior EV).
+Depois: `python3 ferramentas/plataformas.py anexa --dossie <scratchpad>/dossie-under-<D>.json`, que põe a conferência
+do 365Scores em cada candidato. O workflow usa a menor prob. entre as plataformas e marca as divergências.
 
 ## 3. Workflow
 
