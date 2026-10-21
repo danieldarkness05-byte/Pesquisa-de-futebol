@@ -328,6 +328,14 @@ faixa e registre aqui.
     - Antes de uma 12 ou de uma vitória, compare o λ de cada time com os gols reais dele na temporada (lição 39 para
       o resultado).
 
+59. **Liga de estádio compartilhado: o recorte casa/fora vira ruído** (Hamrun x Balzan, Malta, 21/10).
+    - Em Malta, todos os jogos são em 3 ou 4 estádios compartilhados, e o visitante marca mais que o mandante
+      (1,44 contra 1,33). Com 3 e 4 jogos na condição, a conta deu 71% para o under 4.5; com as médias gerais, deu
+      88%, e o empírico da liga era 89,6%.
+    - Mesma ideia da lição 43 (Nicarágua). Nessas ligas, use as médias gerais e o empírico da liga.
+    - *Candidato a automático:* lista de ligas de estádio compartilhado no `plataformas.py` e no `under.py`, com a
+      variante "geral".
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |

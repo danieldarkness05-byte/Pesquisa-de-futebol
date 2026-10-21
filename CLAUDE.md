@@ -18,7 +18,9 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 - **`/under-top`** (pedido de 21/10): só os **melhores** under do dia. Usa o mesmo mapa do `/under`, mas aplica o
   selo elite (chance final ≥ 80%, folga para a linha, cauda limpa, mercado a favor, cético confiante) e entrega no
   máximo 3 (`analise: "under_top"`).
-- `/defesa-fraca`, `/azarao-forte`, `/setenta` e `/fortes` estão **suspensos**. A rotina das 06:52 e 17:52 roda o `/under`.
+- **Exceção (Daniel, 21/10): `/favorito`.** Num chat próprio, ele pediu os jogos em que o favorito PRECISA vencer e vai
+  com todos os titulares (vitória ou dupla chance). Só nesse modo, e quando ele pedir; a rotina continua só under.
+- `/defesa-fraca`, `/azarao-forte`, `/setenta` e `/fortes` estão **suspensos**. A rotina (só duas vezes ao dia, 06:52 e 17:52; Daniel, 21/10) roda o `/under-top`.
 - "Continuar evoluindo": cada resultado de under vira lição em `docs/licoes.md`, e lição que se repete vira filtro no
   `under.py` (com teste).
 
@@ -67,6 +69,7 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/defesa.py [--data D] [--curto] [--json]` | defesa fraca do azarão x ataque forte do favorito em **todas** as ligas do Sofascore: triagem, estatística, alertas, prob. conservadora e odd mínima |
 | `python3 ferramentas/azarao.py [--data D] [--curto]` | azarão forte: jogos em que o azarão tem boa chance de não perder (dupla chance, empate anula, vitória) com valor, em todas as ligas |
 | `python3 ferramentas/under.py [--data D]` | especialista em under: filtra os "menos de X.5 gols" da peneira `--todas` pelos requisitos de under (cauda, taxa da liga, temporada atual, xG somado, favorito goleador) |
+| `python3 ferramentas/plataformas.py confere/mapa/anexa [--data D]` | 2ª plataforma com os mesmos dados do Sofascore (365Scores): confirma os unders (CONFIRMADO/DIVERGENTE) e monta o mapa de under sem o Sofascore |
 | `python3 ferramentas/previsoes.py add-json/resolver/resumo` | registro de TODA previsão entregue (apostada ou não), resultado automático pelo Sofascore e calibração |
 
 Cada script tem `--help` com exemplos. Use `--json` quando for processar a saída.

@@ -25,7 +25,9 @@ Um under só é bom quando as cinco respostas apontam para ele:
 |---|---|---|
 | 0. Aprender | script | `previsoes.py resolver` + `resumo`; lições novas em `docs/licoes.md` |
 | 1. Mapa | script | `varredura.py --todas --prob-min 0.70` + `under.py --varrer` (Sofascore) |
-| 1b. Mapa web | agente **descobridor** | só se o Sofascore falhar: acha os unders do dia em 365Scores, SoccerStats etc. |
+| 1a. Conferência | script | `plataformas.py confere`: refaz cada under no 365Scores e marca CONFIRMADO ou DIVERGENTE |
+| 1b. Mapa sem Sofascore | script | `plataformas.py mapa`: o mapa de unders inteiro pelo 365Scores |
+| 1c. Mapa web | agente **descobridor** | só se o 365Scores também falhar |
 | 2. Estatística independente | agente **estatístico** | números de fontes fora do Sofascore → `prob.py gols` → `p_independente` |
 | 3. Contexto | agente **pesquisador** | escalação, desfalques, estilo, motivação, árbitro, clima, mercado |
 | 4. Cético | agente **cético** | confere as afirmações-chave em outra fonte e tenta derrubar o under |
@@ -39,7 +41,8 @@ Assim os agentes só gastam com quem ainda está vivo.
 - `p_modelo`: varredura/Sofascore (Poisson/Dixon-Coles, 7 variantes, incerteza).
 - `p_independente`: `python3 ferramentas/prob.py gols` rodado pelo estatístico com as médias de **outra fonte**
   (SoccerStats, FBref, FootyStats, 365Scores, Understat).
-- **Base = a menor das duas.** Se as duas diferirem em mais de 10 p.p., avise: alguma fonte está errada ou velha.
+- `p_365`: a mesma conta com os números do **365Scores** (`plataformas.py`, de graça).
+- **Base = a menor das três.** Se as duas diferirem em mais de 10 p.p., avise: alguma fonte está errada ou velha.
 - Ajuste qualitativo: pesquisador + cético, no máximo ±5 p.p., com o motivo escrito.
 - `p_final = base + ajuste`.
 
@@ -60,6 +63,9 @@ Assim os agentes só gastam com quem ainda está vivo.
 | Odds e movimento das linhas | Sofascore (bet365) | Betexplorer e Oddsportal (abrem por curl), 365Scores |
 | Clima | `clima.py` (Open-Meteo) | — |
 | Contexto e notícias | WebSearch na língua local | sites dos clubes, imprensa local, entrevistas do técnico |
+
+**Conferência automática:** `ferramentas/plataformas.py` lê do 365Scores a tabela casa/fora, os resultados de cada
+time, o H2H e o estádio, os mesmos dados do Sofascore, e compara. A divergência derruba o selo elite.
 
 **Bloqueadas por curl daqui** (21/10): FBref, FootyStats, WhoScored, Forebet, WorldFootball, ogol, zerozero, BeSoccer.
 Tente WebFetch ou use o trecho do WebSearch. Sites de palpite (Forebet, etc.) só servem como contraprova, nunca
@@ -85,7 +91,8 @@ Ganha o selo quem cumpre **tudo**:
 4. H2H na linha: no máximo 1 estouro nos últimos 5 (sem H2H, neutro).
 5. Nenhum goleiro ou zagueiro titular **confirmado** fora; nenhum motivo de jogo aberto.
 6. Mercado: até 8 p.p. acima da prob. sem margem; odd do under sem subir desde a abertura.
-7. Fontes: modelo e conta independente a até 10 p.p. uma da outra; pelo menos 2 fontes fora do Sofascore.
+7. Fontes: Sofascore e 365Scores não divergem (`plataformas.py confere`); modelo e conta independente a até 10 p.p.;
+   pelo menos 2 fontes fora do Sofascore (o 365Scores conta como uma).
 
 **Ranking:** chance final → folga (linha − gols esperados) → cauda mais limpa → EV. Máximo 3.
 

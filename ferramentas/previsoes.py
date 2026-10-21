@@ -184,9 +184,16 @@ def avisos_calibracao(r: dict, minimo: int = 30, folga: float = 0.05) -> list[st
 
 
 def _buscar_sofascore():
+    """Sofascore pelo id; evento "365-<id>" (registrado quando o Sofascore estava fora) vai ao 365Scores."""
+    import plataformas as pl
     import varredura as v
-    api = v.Sofascore(None, "")
-    return lambda evento: api.get(f"event/{evento}", cache=None)
+    api, p365 = v.Sofascore(None, ""), pl.S365("", pasta=None)
+
+    def buscar(evento):
+        if str(evento).startswith("365-"):
+            return pl.evento_sofascore(p365.detalhe(int(str(evento)[4:])))
+        return api.get(f"event/{evento}", cache=None)
+    return buscar
 
 
 def main() -> None:

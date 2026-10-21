@@ -14,6 +14,7 @@ import defesa as df  # noqa: E402
 import dossie  # noqa: E402
 import historico  # noqa: E402
 import nucleo as n  # noqa: E402
+import plataformas as pl  # noqa: E402
 import previsoes  # noqa: E402
 import registro  # noqa: E402
 import sistema  # noqa: E402
@@ -729,3 +730,55 @@ class TestUnder(unittest.TestCase):
         r = vr.mercados_robustos(info, cfg, 0.70)
         self.assertEqual([x["mercado"] for x in r], ["Double chance"])      # o over cai: 69% numa obrigatória
         self.assertFalse(r[0]["com_valor"])                                 # 0,78 × 1,30 → EV +1,4% < 3%: bate a prob., sem valor
+
+
+class TestPlataformas(unittest.TestCase):
+    """365Scores como 2ª plataforma (pedido do Daniel em 21/10: confirmar os dados fora do Sofascore)."""
+
+    def jogo(self, h, a, sh, sa, comp=11, ini="2026-10-10T16:00:00-03:00", nome="LaLiga"):
+        return {"homeCompetitor": {"id": h, "score": sh}, "awayCompetitor": {"id": a, "score": sa},
+                "competitionId": comp, "startTime": ini, "competitionDisplayName": nome}
+
+    def test_placar_e_amistoso(self):
+        self.assertEqual(pl.placar(self.jogo(1, 2, 2.0, 1.0)), (2, 1))
+        self.assertIsNone(pl.placar(self.jogo(1, 2, -1.0, -1.0)))           # jogo ainda não começou
+        self.assertTrue(pl.amistoso(self.jogo(1, 2, 0, 0, nome="Club Friendly Games")))
+
+    def test_mesmo_time(self):
+        self.assertTrue(pl.mesmo_time("Athletic Club", "Athletic Bilbao"))
+        self.assertTrue(pl.mesmo_time("Club Atlético Belgrano", "Belgrano"))
+        self.assertFalse(pl.mesmo_time("Real Madrid", "Real Sociedad"))
+
+    def test_medias_liga_e_condicao(self):
+        casa = {1: {"for": 10, "gamePlayed": 5}, 2: {"for": 5, "gamePlayed": 5}}
+        fora = {1: {"for": 4, "gamePlayed": 5}, 2: {"for": 6, "gamePlayed": 5}}
+        self.assertEqual(pl.medias_liga(casa, fora), (1.5, 1.0))
+        js = [self.jogo(1, 2, 2, 0), self.jogo(3, 1, 1, 1), self.jogo(1, 4, 0, 1), self.jogo(1, 5, 3, 3, comp=99)]
+        em_casa = pl.condicao(js, 1, True, 11, 10)
+        self.assertEqual(len(em_casa), 2)                                   # o jogo da copa (99) e o de fora ficam de fora
+        self.assertEqual(pl.medias_de(em_casa, True), (1.0, 0.5, 2))
+        self.assertEqual(pl.acima([1, 2, 3, 5], 2.5), 2)
+
+    def test_status_confere(self):
+        st, mot = pl.status_confere(0.82, 0.80, 1, 2, 0)
+        self.assertEqual((st, mot), ("CONFIRMADO", []))
+        st, mot = pl.status_confere(0.82, 0.68, 1, 3, 45)
+        self.assertEqual(st, "DIVERGENTE")
+        self.assertEqual(len(mot), 3)                                       # prob., cauda e horário
+
+    def test_linha_e_nivel(self):
+        self.assertEqual(pl.linha_de({"chave": ["Match goals", "3.5", "Under"]}), 3.5)
+        self.assertEqual(pl.linha_de({"rotulo": "Menos de 2.5 gols"}), 2.5)
+        self.assertTrue(pl.nivel_base("Argentina · Liga Profesional - Reserva", ["River Plate Res."], ["Reserve"]))
+        self.assertFalse(pl.nivel_base("Malta · Premier League", ["Hamrun Spartans", "Balzan Youths FC"], ["Youth"]))
+
+    def test_evento_sofascore(self):
+        fim = {"statusGroup": 4, "statusText": "Ended", "homeCompetitor": {"score": 2.0}, "awayCompetitor": {"score": 1.0}}
+        e = pl.evento_sofascore(fim)["event"]
+        self.assertEqual((e["status"]["type"], e["homeScore"]["normaltime"], e["awayScore"]["normaltime"]), ("finished", 2, 1))
+        self.assertEqual(pl.evento_sofascore({"statusText": "Postponed"})["event"]["status"]["type"], "postponed")
+        self.assertEqual(pl.evento_sofascore({**fim, "statusText": "After ET"}), {})     # sem o placar dos 90 min
+        x = {"status": "pendente", "evento": "365-1", "mercado": "vence", "lado": "casa", "obs": ""}
+        feitos = previsoes.resolver([x], lambda ev: pl.evento_sofascore(fim))
+        self.assertEqual((feitos[0]["placar"], feitos[0]["acerto"]), ("2-1", "1"))
+
