@@ -9,6 +9,8 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 
 1. **Só recomende pick com probabilidade estimada ≥ 60% E com valor** (EV ≥ 3%).
    Os números ficam em `config.json` (`criterios`); leia de lá, não assuma.
+   *Exceção:* no `/fortes` a entrega é só pela probabilidade final (≥ 80%), sem odd, a pedido do Daniel (20/10:
+   "esquece a odd, só me passa os que têm muita chance de bater"). Odd e EV continuam registrados.
 2. **Nunca force entrada.** "Nenhuma oportunidade de ouro hoje" é uma resposta
    válida e honesta. Não rebaixe o critério para ter o que mostrar.
 3. **Exclua jogos com previsão de chuva no dia da partida** (`clima.py`). Se a
@@ -76,8 +78,11 @@ Detalhes dos modelos e limitações: `docs/metodologia.md`.
    → `under.py` (requisitos de under) → `dossie.py --sufixo under` → workflow `.claude/workflows/under.js` (checklist de
    under: desfalques no ataque e na defesa, estilo, motivação, H2H na linha certa, árbitro, mercado) → registra com
    `analise: "under"`.
-6. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
-7. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
+6. **`/fortes`** (modo principal desde 20/10): mapa de todo mercado com 70%+ (`varredura.py --mapa` + `under.py --varrer`)
+   → pesquisa a fundo dos mais fortes (cético em todos) → entrega **só os com prob. final ≥ 80%, sem odd** → registra
+   com `analise: "fortes"`. "Vamos manter nesse módulo e ir aprimorando" (Daniel, 20/10).
+7. **`/peneira`** (barata): só roda `varredura.py`. Não pesquisa notícias.
+8. **`/aprofundar`** (quando o Daniel mandar): dossiê + workflow só nos números pedidos.
 
 **Evolução diária:** toda previsão entregue vai para `dados/previsoes.csv` (`previsoes.py`). O resultado é
 resolvido no dia seguinte, e o que cada acerto ou erro ensina vai para `docs/licoes.md`. Esse arquivo é lido

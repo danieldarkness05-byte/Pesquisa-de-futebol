@@ -140,6 +140,12 @@
     "chuva": "informativa",
     "modelo_agentes": null
   },
+  "fortes": {
+    "_leia": "Modo /fortes (pedido do Daniel em 20/10): entrega só os jogos com prob. final >= prob_entrega depois da pesquisa, SEM odd na resposta (odd e EV continuam registrados para a calibração). prob_mapa = corte do mapa; max_pesquisa = quantos jogos vão para os agentes (1 mercado por jogo).",
+    "prob_entrega": 0.8,
+    "prob_mapa": 0.7,
+    "max_pesquisa": 10
+  },
   "under": {
     "_leia": "Especialista em under de gols (ferramentas/under.py + .claude/workflows/under.js, skill /under; pedido do Daniel em 17/10). Lê a peneira --todas com prob ≥ prob_min e confere: cauda (nos últimos cauda_jogos oficiais de cada time, estouro da linha acima de (1 − p) + cauda_folga derruba), taxa de under da liga (≥ p − liga_folga), amostra da temporada atual (≥ temporada_atual_min), xG somado perto da linha (alerta) e favorito com odd ≤ favorito_goleada_odd (alerta). max_pesquisa = quantos vão para os agentes.",
     "prob_min": 0.7,
