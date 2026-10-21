@@ -7,9 +7,9 @@ allowed-tools: Bash(python3 ferramentas/*) Bash(git *) Workflow Read Write Edit 
 
 Ouro do dia: **$ARGUMENTS** (vazio = hoje, candidatos automáticos).
 
-> **REGRA 0 (Daniel, 21/10): SÓ UNDER.** Esta rotina agora roda o `/under`: siga `.claude/skills/under/SKILL.md`
+> **REGRA 0 (Daniel, 21/10): SÓ UNDER, duas vezes ao dia.** Esta rotina agora roda o `/under-top`: siga `.claude/skills/under-top/SKILL.md`
 > para a data (de manhã, os jogos de HOJE que ainda não começaram; à tarde, os de AMANHÃ). **Não rode a peneira geral
-> nem o passo 7 (defesa fraca).** Notificação só com unders que passaram: "🧊 Under DD/MM: <jogo> menos de X.5 (NN%)".
+> nem o passo 7 (defesa fraca).** Notificação só com o top elite: "🏆 Under top DD/MM: <jogo> menos de X.5 (NN%) (+N)".
 > Sem under: não notifique. Os passos abaixo ficam só como referência.
 
 **Economia de créditos.** O trabalho pesado é Python, que não gasta créditos. Agentes só entram no
