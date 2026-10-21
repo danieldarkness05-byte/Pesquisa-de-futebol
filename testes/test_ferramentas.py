@@ -772,3 +772,13 @@ class TestPlataformas(unittest.TestCase):
         self.assertTrue(pl.nivel_base("Argentina · Liga Profesional - Reserva", ["River Plate Res."], ["Reserve"]))
         self.assertFalse(pl.nivel_base("Malta · Premier League", ["Hamrun Spartans", "Balzan Youths FC"], ["Youth"]))
 
+    def test_evento_sofascore(self):
+        fim = {"statusGroup": 4, "statusText": "Ended", "homeCompetitor": {"score": 2.0}, "awayCompetitor": {"score": 1.0}}
+        e = pl.evento_sofascore(fim)["event"]
+        self.assertEqual((e["status"]["type"], e["homeScore"]["normaltime"], e["awayScore"]["normaltime"]), ("finished", 2, 1))
+        self.assertEqual(pl.evento_sofascore({"statusText": "Postponed"})["event"]["status"]["type"], "postponed")
+        self.assertEqual(pl.evento_sofascore({**fim, "statusText": "After ET"}), {})     # sem o placar dos 90 min
+        x = {"status": "pendente", "evento": "365-1", "mercado": "vence", "lado": "casa", "obs": ""}
+        feitos = previsoes.resolver([x], lambda ev: pl.evento_sofascore(fim))
+        self.assertEqual((feitos[0]["placar"], feitos[0]["acerto"]), ("2-1", "1"))
+

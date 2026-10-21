@@ -194,6 +194,18 @@ def nivel_base(competicao: str, times: list[str], palavras: list[str]) -> bool:
             or any(re.search(r"\s(II|B|Res\.?|Reserves?)$", t or "", re.I) for t in times))
 
 
+def evento_sofascore(g: dict) -> dict:
+    """Jogo do 365Scores no formato que o previsoes.resolver espera (só tempo normal)."""
+    st = g.get("statusText") or ""
+    tipos = {"Postponed": "postponed", "Cancelled": "canceled", "Abandoned": "abandoned", "Suspended": "suspended"}
+    if st in tipos:
+        return {"event": {"status": {"type": tipos[st]}}}
+    if g.get("statusGroup") == FIM and st == "Ended" and placar(g):
+        h, a = placar(g)
+        return {"event": {"status": {"type": "finished"}, "homeScore": {"normaltime": h}, "awayScore": {"normaltime": a}}}
+    return {}  # em andamento, prorrogação ou pênaltis: o 365Scores não dá o placar dos 90 min; resolva à mão
+
+
 def hora_br(g: dict) -> str:
     return datetime.fromisoformat(g["startTime"]).astimezone(BRT).strftime("%H:%M")
 

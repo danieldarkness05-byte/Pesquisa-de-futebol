@@ -18,6 +18,8 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 - **`/under-top`** (pedido de 21/10): só os **melhores** under do dia. Usa o mesmo mapa do `/under`, mas aplica o
   selo elite (chance final ≥ 80%, folga para a linha, cauda limpa, mercado a favor, cético confiante) e entrega no
   máximo 3 (`analise: "under_top"`).
+- **Exceção (Daniel, 21/10): `/favorito`.** Num chat próprio, ele pediu os jogos em que o favorito PRECISA vencer e vai
+  com todos os titulares (vitória ou dupla chance). Só nesse modo, e quando ele pedir; a rotina continua só under.
 - `/defesa-fraca`, `/azarao-forte`, `/setenta` e `/fortes` estão **suspensos**. A rotina (só duas vezes ao dia, 06:52 e 17:52; Daniel, 21/10) roda o `/under-top`.
 - "Continuar evoluindo": cada resultado de under vira lição em `docs/licoes.md`, e lição que se repete vira filtro no
   `under.py` (com teste).
