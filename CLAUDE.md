@@ -12,6 +12,9 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
   ambas marcam, handicap, escanteios, cartões) vai para o Daniel, nem como condicional ou "quase".
 - O fluxo é o `/under` (`.claude/skills/under/SKILL.md`): mapa de unders → requisitos → pesquisa a fundo → entrega dos
   que passam na análise, **sem odd na resposta** (20/10: "esquece a odd"); odd e EV continuam registrados.
+- **`/under-top`** (pedido de 21/10): só os **melhores** under do dia. Usa o mesmo mapa do `/under`, mas aplica o
+  selo elite (chance final ≥ 80%, folga para a linha, cauda limpa, mercado a favor, cético confiante) e entrega no
+  máximo 3 (`analise: "under_top"`).
 - `/defesa-fraca`, `/azarao-forte`, `/setenta` e `/fortes` estão **suspensos**. A rotina das 06:52 e 17:52 roda o `/under`.
 - "Continuar evoluindo": cada resultado de under vira lição em `docs/licoes.md`, e lição que se repete vira filtro no
   `under.py` (com teste).
