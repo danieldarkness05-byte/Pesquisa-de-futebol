@@ -43,14 +43,17 @@ sem nada, "Nenhum under com 70%+ amanhã".
    (segundo plano; 10 a 30 min). Se já rodou para a data (`peneira-<D>-todas.json`), não rode de novo.
 2. `python3 ferramentas/under.py --data <D>`: grava `peneira-<D>-under.json` só com os unders que passam nos
    requisitos (e `caidos` com o motivo).
-3. Sem candidato: responda "Nenhum under com 70%+ e valor amanhã" e salve a análise.
+3. Sem candidato: responda "Nenhum under com 70%+ amanhã" e salve a análise.
+4. **Sofascore fora do ar** (403, peneira com 0 jogos e falhas, mesmo depois de 1 nova tentativa): não pare. Pule para
+   o passo 3 no **modo web**: `args = {data, modo: "web", criterios: {prob_minima: 0.70, ev_minimo: 0.03}}`. Um agente
+   descobridor acha os unders do dia em 365Scores, SoccerStats, FootyStats e outras fontes (`docs/metodo-under.md`).
 
 ## 2. Dossiê
 
 Entram na pesquisa os unders que passaram nos requisitos, **com ou sem valor** (`candidatos` + `sem_valor` do
 `under.py --varrer`), até `config.json → under.max_pesquisa`, por `p_min`.
 
-`python3 ferramentas/dossie.py --data <D> --sufixo under --prob-min 0.70 --max 8 --json > <scratchpad>/dossie-under-<D>.json`.
+`python3 ferramentas/dossie.py --data <D> --sufixo under --prob-min 0.70 --max 5 --json > <scratchpad>/dossie-under-<D>.json`.
 Um pick por jogo: se o mesmo jogo tem 2.5 e 3.5, fica a linha `principal` do `under.py` (maior EV).
 
 ## 3. Workflow
@@ -58,9 +61,15 @@ Um pick por jogo: se o mesmo jogo tem 2.5 e 3.5, fica a linha `principal` do `un
 `Workflow({scriptPath: ".claude/workflows/under.js", args: <dossiê>})` com `args.criterios.prob_minima = 0.70`,
 `args.aprofundar.modelo_agentes = null` e `args.under.max_pesquisa` (padrão `config.json → under.max_pesquisa`).
 
+É o **Método Under** (`docs/metodo-under.md`), com 3 agentes por jogo e parada assim que o under morre:
+**estatístico independente** (médias de fontes fora do Sofascore → `prob.py` → `p_independente`, cauda e H2H na
+linha) → **pesquisador de contexto** (imprensa, clubes, Transfermarkt, árbitro, clima, odds em 2+ casas) →
+**cético** (confere em outra fonte). Cada número-chave em 2 fontes independentes.
+
 ## 4. Veredito
 
-`p_final` = modelo + ajustes (±5). Se o cético escreveu uma leitura honesta menor, use a menor.
+`p_final` = **a menor entre o modelo e a conta independente** + ajustes (±5); o workflow já calcula. Se o cético
+escreveu uma leitura honesta menor, use a menor. Avisos de "fontes divergem" vão para o arquivo e pesam contra.
 **Passa se `p_final ≥ 0.70` e o cético não derrubou a tese esportiva** (refutado só por valor/odd continua valendo).
 Ordene pela chance; **≥ 80% = "mais fortes"** (a faixa que mais acerta). Odd e EV vão só para o registro.
 

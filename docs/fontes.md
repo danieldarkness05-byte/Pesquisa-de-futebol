@@ -1,5 +1,8 @@
 # Fontes de dados
 
+> **Under:** a tabela completa de fontes, o cruzamento obrigatório e o que abre ou é bloqueado daqui estão em
+> `docs/metodo-under.md` (seção 4).
+
 Ordem de preferência. Sempre registre de onde veio cada número e o recorte
 (temporada, últimos N jogos, casa/fora).
 

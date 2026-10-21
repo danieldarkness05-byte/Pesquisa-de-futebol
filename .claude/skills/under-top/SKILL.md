@@ -11,6 +11,9 @@ Pedido do Daniel (21/10): "um prompt de under especializado que separa somente o
 melhores oportunidades e as melhores chances de entrar". O `/under` entrega tudo o que passa com 70%+. O `/under-top`
 fica só com a **elite**: no máximo 3 jogos, e nenhum se ninguém merecer.
 
+O método completo (fontes, cruzamento, selo) está em **`docs/metodo-under.md`**. A pesquisa usa **todas as fontes
+da internet**, não só o Sofascore: cada número-chave precisa estar em 2 fontes independentes.
+
 **Regra 0 continua valendo:** só "menos de X.5 gols". Sem odd na resposta (20/10). Odd, odd mínima e EV vão só para o
 arquivo e o registro. **Nunca force:** "Nenhum under elite hoje." é resposta honesta.
 
@@ -28,6 +31,9 @@ Igual ao `/under`, passo 1. Se o mapa do dia já existe, reaproveite e não rode
 1. `python3 ferramentas/varredura.py --data <D> --todas --prob-min 0.70 --chuva-informativa --curto` (segundo plano,
    10 a 30 min), só se `dados/cache/sofascore/peneira-<D>-todas.json` não existir.
 2. `python3 ferramentas/under.py --data <D> --varrer --json > <scratchpad>/under-<D>.json`.
+3. **Sofascore fora do ar** (403, ou peneira com 0 jogos e falhas, mesmo depois de 1 nova tentativa): pule os passos 2 e 3.1
+   e chame o workflow no **modo web**: `args = {data, modo: "web", criterios: {prob_minima: 0.80, ev_minimo: 0.03},
+   under: {max_pesquisa: 5}}`. O descobridor acha os unders em 365Scores, SoccerStats, FootyStats e outras fontes.
 
 ## 2. Pré-filtro elite (de graça, antes de gastar agente)
 
@@ -55,20 +61,24 @@ Leia o JSON do `under.py`. Fica só o candidato que cumpre **tudo**:
 2. **Mercado a favor (corte):** sai quem tem a odd do under **subindo mais de 3%** desde a abertura sem notícia
    (lições 38 e 41), ou o modelo mais de **8 p.p.** acima do mercado sem margem.
 3. `Workflow({scriptPath: ".claude/workflows/under.js", args: <dossiê>})`, com `args.criterios.prob_minima = 0.80`,
-   `args.under.max_pesquisa = 5` e `args.aprofundar.modelo_agentes = null`. Pesquisador e cético em todos.
+   `args.under.max_pesquisa = 5` e `args.aprofundar.modelo_agentes = null`. Por jogo: estatístico independente →
+   pesquisador de contexto → cético. O workflow para no primeiro que derruba e devolve `top`, `selo_elite` e
+   `elite_falhas` de cada jogo.
 
 ## 4. Selo elite (veredito)
 
-`p_final` = modelo + ajustes (±5 p.p.). Se o cético escreveu uma leitura menor, use a menor. Ganha o selo quem cumpre
+`p_final` = a menor entre o modelo e a conta independente, mais os ajustes (±5 p.p.). O workflow calcula o selo
+(`selo_elite`) com as regras abaixo; confira o resultado. Se o cético escreveu uma leitura menor, use a menor. Ganha o selo quem cumpre
 **tudo**:
 
 1. `p_final ≥ 0,80`.
 2. Cético **não refutou** e com confiança `alta` ou `media`; pesquisa sem `derruba_pick`.
 3. **H2H na linha exata** (lição 34): no máximo 1 estouro nos últimos 5 confrontos.
 4. **Sem desfalque defensivo titular CONFIRMADO** (goleiro ou zagueiro).
-5. **Sem motivo de jogo aberto:** ninguém precisa vencer de qualquer jeito com ataque forte; sem técnico novo ofensivo;
+5. **Fontes concordam:** modelo e conta independente a até 10 p.p.; pelo menos 2 fontes fora do Sofascore.
+6. **Sem motivo de jogo aberto:** ninguém precisa vencer de qualquer jeito com ataque forte; sem técnico novo ofensivo;
    sem favorito goleador.
-6. **Escalação provável sem surpresa:** time misto ou reserva no ataque conta a favor; na defesa, contra.
+7. **Escalação provável sem surpresa:** time misto ou reserva no ataque conta a favor; na defesa, contra.
 
 ## 5. Ranking (as melhores chances e as melhores oportunidades)
 
