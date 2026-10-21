@@ -5,6 +5,9 @@ argument-hint: "[hoje | amanhã | AAAA-MM-DD]"
 allowed-tools: Bash(python3 ferramentas/*) Bash(git *) Workflow Read Write Edit
 ---
 
+> **SUSPENSO (Daniel, 21/10): só under.** Não rode nem mande este mercado; use o `/under`.
+
+
 Data: **$ARGUMENTS** (vazio = hoje). Pedido do Daniel em 16/10: "azarão forte, com muita chance de empatar
 ou ganhar, análise a fundo, resultados notáveis e com valor".
 

@@ -5,6 +5,9 @@ argument-hint: "[hoje | amanhã | hoje e amanhã | AAAA-MM-DD]"
 allowed-tools: Bash(python3 ferramentas/*) Bash(git *) Workflow Read Write Edit
 ---
 
+> **SUSPENSO (Daniel, 21/10): só under.** Não rode nem mande este mercado; use o `/under`.
+
+
 Datas: **$ARGUMENTS** (vazio = hoje e amanhã). Pedido do Daniel em 16/10: "analisamos muitos jogos e aprendemos com
 isso; qualquer mercado que chegue a 70% ou mais de chance; todos os jogos de hoje e amanhã; aprenda e evolua".
 

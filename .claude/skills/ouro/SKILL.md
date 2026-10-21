@@ -7,6 +7,11 @@ allowed-tools: Bash(python3 ferramentas/*) Bash(git *) Workflow Read Write Edit 
 
 Ouro do dia: **$ARGUMENTS** (vazio = hoje, candidatos automáticos).
 
+> **REGRA 0 (Daniel, 21/10): SÓ UNDER.** Esta rotina agora roda o `/under`: siga `.claude/skills/under/SKILL.md`
+> para a data (de manhã, os jogos de HOJE que ainda não começaram; à tarde, os de AMANHÃ). **Não rode a peneira geral
+> nem o passo 7 (defesa fraca).** Notificação só com unders que passaram: "🧊 Under DD/MM: <jogo> menos de X.5 (NN%)".
+> Sem under: não notifique. Os passos abaixo ficam só como referência.
+
 **Economia de créditos.** O trabalho pesado é Python, que não gasta créditos. Agentes só entram no
 passo 3, só nos candidatos **vivos**, e no máximo `config.json → aprofundar.max_candidatos` (padrão 3).
 Fora do workflow: sem WebSearch, sem subagentes avulsos e sem ler arquivos além do necessário.

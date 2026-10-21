@@ -157,7 +157,7 @@
     "xg_folga_linha": 0.6,
     "xg_margem_mercado": 0.02,
     "limite_frac_alerta": 0.35,
-    "max_pesquisa": 6
+    "max_pesquisa": 8
   },
   "azarao": {
     "_leia": "Análise azarão forte (ferramentas/azarao.py + .claude/workflows/azarao.js, skill /azarao-forte): jogos em que o azarão (odd de vitória >= odd_azarao_min) tem boa chance de NÃO perder. Triagem: pontos por jogo do azarão na condição >= os do favorito − ppg_folga, defesa do azarão na condição <= defesa_az_max × média e ataque >= ataque_az_min × média. O azarão precisa de forma_pontos_min nos últimos 5 oficiais. Probabilidade = menor entre tabela, médias gerais, λ gols, λ gols+xG e λ só xG (Poisson e Dixon-Coles; lição 24), limitada pela frequência real; valor contra a odd bet365; regra 8 contra o 1X2 sem margem. Pedido do Daniel em 16/10.",

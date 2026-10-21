@@ -5,6 +5,9 @@ argument-hint: "[hoje | amanhã | AAAA-MM-DD] [--config para só as ligas do con
 allowed-tools: Bash(python3 ferramentas/*) Bash(git *) Workflow Read Write Edit PushNotification
 ---
 
+> **SUSPENSO (Daniel, 21/10): só under.** Não rode nem mande este mercado; use o `/under`.
+
+
 Data: **$ARGUMENTS** (vazio = hoje; "amanhã" = data de amanhã em Brasília).
 
 O Daniel quer **esse tipo de análise todo dia, o mais analítica possível e evoluindo a cada pesquisa**.

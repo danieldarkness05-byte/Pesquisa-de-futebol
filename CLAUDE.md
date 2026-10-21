@@ -5,6 +5,17 @@ Repositório de pesquisa estatística de futebol do Daniel, focado em encontrar
 chutes) para apostas na Betano. Responda sempre em **português do Brasil**,
 de forma curta e direta: o Daniel costuma ler pelo celular.
 
+## Regra 0 — SÓ UNDER (Daniel, 21/10: vale acima de tudo)
+
+**"A partir de agora só me mande jogos under, nada mais. É proibido mandar qualquer outro mercado."**
+- Resposta, notificação e rotina: **só "menos de X.5 gols"**. Nenhum outro mercado (vitória, dupla chance, over,
+  ambas marcam, handicap, escanteios, cartões) vai para o Daniel, nem como condicional ou "quase".
+- O fluxo é o `/under` (`.claude/skills/under/SKILL.md`): mapa de unders → requisitos → pesquisa a fundo → entrega dos
+  que passam na análise, **sem odd na resposta** (20/10: "esquece a odd"); odd e EV continuam registrados.
+- `/defesa-fraca`, `/azarao-forte`, `/setenta` e `/fortes` estão **suspensos**. A rotina das 06:52 e 17:52 roda o `/under`.
+- "Continuar evoluindo": cada resultado de under vira lição em `docs/licoes.md`, e lição que se repete vira filtro no
+  `under.py` (com teste).
+
 ## Regras de ouro (sempre valem)
 
 1. **Só recomende pick com probabilidade estimada ≥ 60% E com valor** (EV ≥ 3%).
@@ -56,6 +67,8 @@ Cada script tem `--help` com exemplos. Use `--json` quando for processar a saíd
 Detalhes dos modelos e limitações: `docs/metodologia.md`.
 
 ## Fluxo diário (economia de esforço)
+
+> **Desde 21/10 vale a Regra 0: só under.** Os fluxos abaixo ficam como referência; na prática roda o `/under`.
 
 1. **`/ouro`** (rotina diária às 06:52 e às 17:52, só jogos que ainda não começaram): peneira (script) → dossiê (script) → workflow
    `.claude/workflows/aprofundar.js` só nos N melhores candidatos **vivos** → veredito pelas

@@ -5,6 +5,9 @@ argument-hint: "[hoje | amanhã | AAAA-MM-DD]"
 allowed-tools: Bash(python3 ferramentas/*) Bash(git *) Workflow Read Write Edit
 ---
 
+> **SUSPENSO (Daniel, 21/10): só under.** Não rode nem mande este mercado; use o `/under`.
+
+
 Data: **$ARGUMENTS** (vazio = amanhã se já passou das 18:00 de Brasília, senão hoje).
 
 **Pedido do Daniel (20/10):** "esquece a odd, só me passa os jogos que passaram na análise"; "só os que têm muita

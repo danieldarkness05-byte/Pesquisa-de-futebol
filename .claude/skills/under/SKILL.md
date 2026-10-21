@@ -9,8 +9,12 @@ Data: **$ARGUMENTS** (vazio = amanhã se já passou das 18:00 de Brasília, sen�
 "fica especialista em um mercado, veja todos os requisitos para ir no under... estatísticas, desfalques, tudo que
 comporta uma partida para possivelmente um under", com a porcentagem de 70%.
 
-**Regras:** prob ≥ 70% (variantes e veredito), EV ≥ `criterios.ev_minimo` na odd real ou odd mínima para a Betano,
-regra 8, chuva só informativa, profissional antes de amador (lição 14). Nunca force: sem nada, "Nenhum under com 70%+ hoje".
+**Regra 0 (21/10): este é o ÚNICO modo.** O Daniel só quer under: nenhum outro mercado vai na resposta.
+
+**Regras:** prob ≥ 70% (variantes e veredito), chuva só informativa, profissional antes de amador (lição 14).
+**Sem odd na resposta** (20/10: "esquece a odd, só me passa os que passaram na análise"): odd, odd mínima, EV e regra 8
+continuam calculados e registrados para a calibração e as lições, mas a entrega é pela **chance final**. Nunca force:
+sem nada, "Nenhum under com 70%+ amanhã".
 
 ## Os requisitos do under (o que o especialista confere)
 
@@ -43,6 +47,9 @@ regra 8, chuva só informativa, profissional antes de amador (lição 14). Nunca
 
 ## 2. Dossiê
 
+Entram na pesquisa os unders que passaram nos requisitos, **com ou sem valor** (`candidatos` + `sem_valor` do
+`under.py --varrer`), até `config.json → under.max_pesquisa`, por `p_min`.
+
 `python3 ferramentas/dossie.py --data <D> --sufixo under --prob-min 0.70 --max 8 --json > <scratchpad>/dossie-under-<D>.json`.
 Um pick por jogo: se o mesmo jogo tem 2.5 e 3.5, fica a linha `principal` do `under.py` (maior EV).
 
@@ -53,8 +60,9 @@ Um pick por jogo: se o mesmo jogo tem 2.5 e 3.5, fica a linha `principal` do `un
 
 ## 4. Veredito
 
-`p_final` = modelo + ajustes (±5). Passa com `veredito_previo = PASSA`, cético sem refutar e evidência como no /ouro
-(MUITO FORTE / FORTE / MODERADA; FRACA sai, ou vai como condicional se for só pelo valor). Confira com `valor.py`.
+`p_final` = modelo + ajustes (±5). Se o cético escreveu uma leitura honesta menor, use a menor.
+**Passa se `p_final ≥ 0.70` e o cético não derrubou a tese esportiva** (refutado só por valor/odd continua valendo).
+Ordene pela chance; **≥ 80% = "mais fortes"** (a faixa que mais acerta). Odd e EV vão só para o registro.
 
 ## 5. Salvar, registrar e evoluir
 
@@ -63,5 +71,5 @@ Um pick por jogo: se o mesmo jogo tem 2.5 e 3.5, fica a linha `principal` do `un
 
 ## 6. Resposta (curta)
 
-Tabela: jogo · hora · linha · prob. · odd mínima · bet365 · EV · evidência. Uma linha de motivo e risco por pick.
-Lembrete: escalação 1 h antes e odd na Betano ≥ mínima. Linha de calibração (geral e só dos unders).
+Só under. Tabela: jogo · hora · linha · chance (ordem decrescente; ≥ 80% marcados como mais fortes). Uma linha de
+motivo e risco por jogo. Lembrete: conferir a escalação 1 h antes. Uma linha de calibração dos unders.
