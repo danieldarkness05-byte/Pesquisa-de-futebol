@@ -360,3 +360,10 @@ faixa e registre aqui.
 | 19/10 | Jong Ajax x De Graafschap (/under) | menos de 5.5 | 82% | 2-1 | ✅ | Linha alta com folga. |
 | 19/10 | Waterford x Galway (/under) | menos de 4.5 | 77% | 3-2 | ❌ | A cauda na condição avisou (lição 50): o Waterford em casa tinha 5 de 10 com 4+ gols e precisava vencer. Modelo igual ao mercado, sem valor: não era pick de ouro. |
 | 20/10 | Uxbridge x Malvern Town | Uxbridge 1+ | 89% | 3-0 | ✅ | A pior defesa fora confirmou, mesmo com o ataque desfalcado; rebaixar o 2+ pela regra 8 (lição 54) foi conservador, mas o 1+ era a leitura certa. |
+| 21/10 | Reading x Leyton Orient (/fortes) | menos de 4.5 | 81% | 1-0 | ✅ | Linha alta com folga, mesmo com o mercado indo para gols e o Reading com 7 e 5 gols em casa. |
+| 21/10 | Omiya x Toyama (/setenta) | menos de 4.5 | 75% | 0-3 | ✅ | Os 2 melhores ataques da J2 fizeram 3, no limite da linha 3.5 e longe da 4.5: a linha alta salvou (lição 57). |
+| 21/10 | Nagoya x Cerezo (/setenta) | Nagoya 1X | 76% | 1-1 | ✅ | O empate serviu; o Cerezo sem os 2 suspensos não venceu. |
+| 21/10 | FC Tokyo x Kashiwa (/setenta) | mais de 1.5 | 84% | 0-0 | ❌ | O alerta estava escrito: o FC Tokyo vinha de 5 jogos sem sofrer gol. Over de gols contra defesa em sequência de jogos limpos pede o xG cedido, não a média de gols. |
+| 21/10 | Avispa x Gamba (/setenta) | mais de 1.5 | 77% | 1-2 | ✅ | Odd do over subindo (lição 38), mas o jogo de 6 pontos abriu. |
+| 21/10 | Kyoto x Kashima (/setenta) | 12 | 78% | 2-2 | ❌ | O cético já tinha refutado pelo valor; o Kyoto com 1 gol em 4 jogos marcou 2 e mesmo assim empatou. Na J1, 12 a 78% tinha pouca folga. |
+| 21/10 | Levante x Athletic (/setenta) | 12 | 74% | 3-1 | ✅ | Bateu com o Levante vencendo, apesar do λ inflado (lição 58). |
