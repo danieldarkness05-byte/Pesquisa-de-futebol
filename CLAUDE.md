@@ -12,6 +12,9 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
   ambas marcam, handicap, escanteios, cartões) vai para o Daniel, nem como condicional ou "quase".
 - O fluxo é o `/under` (`.claude/skills/under/SKILL.md`): mapa de unders → requisitos → pesquisa a fundo → entrega dos
   que passam na análise, **sem odd na resposta** (20/10: "esquece a odd"); odd e EV continuam registrados.
+- **Método Under** (`docs/metodo-under.md`, 21/10: "não foque só no Sofascore, use todas as ferramentas de pesquisa"):
+  por jogo, estatístico independente (outras fontes + `prob.py`) → pesquisador de contexto → cético; cada número-chave
+  em 2 fontes independentes; com o Sofascore fora do ar, o workflow roda no modo web (365Scores, SoccerStats etc.).
 - **`/under-top`** (pedido de 21/10): só os **melhores** under do dia. Usa o mesmo mapa do `/under`, mas aplica o
   selo elite (chance final ≥ 80%, folga para a linha, cauda limpa, mercado a favor, cético confiante) e entrega no
   máximo 3 (`analise: "under_top"`).
