@@ -345,6 +345,19 @@ faixa e registre aqui.
       que o limite zerar, começando pelo jogo mais próximo. O Liverpool x Cerro Largo (87,7% na conta, terminou 1-0)
       ficou sem cético e começou antes da retomada.
 
+## Favorito que precisa vencer (/favorito)
+
+61. **Volta de mata-mata com o favorito jogando pelo empate** (Palmeiras x Fluminense, 21/10).
+    - O Poisson das médias da temporada não mede o estado do jogo: o adversário é obrigado a atacar, e o favorito recua.
+    - Faça o teste de estresse (λ do azarão +25%, λ do favorito −15%). Se o modelo ficar acima do mercado sem margem, use o
+      mercado como teto da dupla chance.
+    - Confira quem poupou no fim de semana anterior: o Flu poupou 8 titulares.
+62. **"Todos os titulares" admite no máximo 2 desfalques** (Santa Fe x Jaguares, 21/10).
+    - Com 3 titulares fora (goleiro, zagueiro e artilheiro com 37% dos gols), o critério não fecha, mesmo sem rodízio.
+    - Conte quantos gols o time fez sem o artilheiro: o Santa Fe fez 0 em 2 jogos.
+    - Gramado em recuperação, criticado pelos jogadores e recebendo o 3º jogo em 5 dias, nivela o favorito
+      (−1 a −2 p.p.).
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
