@@ -82,8 +82,10 @@ Leia o JSON do `under.py`. Fica só o candidato que cumpre **tudo**:
 3. **H2H na linha exata** (lição 34): no máximo 1 estouro nos últimos 5 confrontos.
 4. **Sem desfalque defensivo titular CONFIRMADO** (goleiro ou zagueiro).
 5. **Fontes concordam:** modelo e conta independente a até 10 p.p.; pelo menos 2 fontes fora do Sofascore.
-6. **Sem motivo de jogo aberto:** ninguém precisa vencer de qualquer jeito com ataque forte; sem técnico novo ofensivo;
-   sem favorito goleador.
+6. **Sem motivo de jogo aberto:** ninguém precisa vencer de qualquer jeito com ataque forte; ninguém precisa de
+   saldo; sem técnico novo ofensivo; sem favorito goleador.
+6b. **1X2 sem despencar:** nenhum time com a odd caindo 10% ou mais desde a abertura (lição 67). Confira de novo 1 a 2 h
+   antes do jogo e avise o Daniel se cair.
 7. **Escalação provável sem surpresa:** time misto ou reserva no ataque conta a favor; na defesa, contra.
 
 ## 5. Ranking (as melhores chances e as melhores oportunidades)

@@ -17,7 +17,9 @@ Um under só é bom quando as cinco respostas apontam para ele:
 3. **O confronto confirma, na linha exata?** H2H dos últimos 5 a 10 contados na linha do pick (lição 34).
 4. **Algo abre o jogo hoje?** Zagueiro ou goleiro titular fora, time que precisa vencer, técnico novo ofensivo,
    favorito goleador, árbitro de pênalti ou expulsão, gramado.
-5. **O mercado concorda?** Odd do under estável ou caindo desde a abertura, em mais de uma casa (lições 38 e 41).
+5. **O mercado concorda?** Odd do under estável ou caindo desde a abertura, em mais de uma casa (lições 38, 41 e 64).
+   **E o 1X2 não despenca para um lado:** odd de um time caindo 10% ou mais desde a abertura derruba o under, mesmo
+   com a linha de gols parada (lição 67: Dayrout 1-5 e San Antonio 3-3). Time que precisa vencer por saldo também.
 
 ## 2. Fluxo
 

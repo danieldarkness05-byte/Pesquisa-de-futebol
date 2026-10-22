@@ -377,9 +377,8 @@ faixa e registre aqui.
       "mercado a favor" caiu. Releia a linha perto do início; se voltou à abertura, o ajuste é zero.
     - Al Garaf: o under 2.5 subiu de 1.41 para 1.51 só no 365Scores; nas outras 5 casas do Flashscore, ficou parado.
       Antes de tirar ponto ou selo por "mercado contra", confira 5 ou mais casas (lição 41).
-    - Dayrout: o 1X2 foi de 2.00 para 1.73 no favorito, mas a linha de gols ficou parada. Pelo método da potência, o
-      total implícito continuou em ~2,03: o mercado só passou gols de um time para o outro. O under segue; o risco a
-      olhar é o favorito golear sozinho (lição 33).
+    - ~~Dayrout: o 1X2 foi de 2.00 para 1.73 no favorito, mas a linha de gols ficou parada; o under segue.~~
+      **Errado: terminou 1-5** (ver lição 67).
 65. **Time fraco com amostra curta: use o λ do mercado, e não o do modelo** (22/10: Kigezi, Tractor e KCC; reforça a
     lição 63).
     - Kigezi (recém-promovido, 5 jogos): o modelo encolheu o λ dele para 0,35; o 1X2 de 4 casas dá 0,55–0,6.
@@ -397,6 +396,19 @@ faixa e registre aqui.
       seguinte.
     - *Candidato a automático:* `plataformas.py` calcular o teto (máximo de gols marcados e sofridos num jogo) e os
       jogos com exatamente a linha − 0,5, por time e na condição.
+
+67. **1X2 que despenca para um lado no dia do jogo derruba o under** (22/10: Dayrout x El Sekka 1-5 e San Antonio x
+    9 de Octubre 3-3; os 2 erros do dia).
+    - Nos dois, a odd de um time caiu 13% ou mais desde a abertura: El Sekka de 2.00 para 1.73 e 9 de Octubre de 2.00
+      para 1.57. Nos 5 acertos do dia, o 1X2 mexeu 3% ou menos ou voltou à abertura.
+    - O mercado sabia algo: o Dayrout com salários atrasados e o 9 de Octubre precisando vencer por saldo, em jogos
+      simultâneos. A linha de gols parada não protege: o gol a mais vem do lado que o mercado está comprando (lição 33).
+    - A defesa do "teto de gols" (lição 66) falhou nos dois: o El Sekka nunca tinha feito 5, e o San Antonio nunca
+      tinha sofrido mais de 3 em casa.
+    - **Regra:** 1X2 de um time caindo 10% ou mais desde a abertura, sem notícia que explique a favor do under → o jogo
+      sai do under. Time que precisa vencer por saldo → `jogo_aberto = true`, e o under sai.
+    - *Candidato a automático:* `plataformas.py` comparar a odd 1X2 de abertura com a atual (o 365Scores dá as duas) e
+      cortar com queda de 10% ou mais; repetir a checagem 1 a 2 h antes do jogo.
 
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
@@ -440,3 +452,10 @@ faixa e registre aqui.
 | 21/10 | Llaneros x Deportivo Cali (/under) | menos de 3.5 | 76% | 0-3 | ✅ | No limite (3 gols, todos do Cali; lição 48). O Llaneros, que precisava vencer, não marcou: o "jogo aberto" da lição 60 veio de um lado só. |
 | 21/10 | FC Cincinnati x DC United (/setenta) | ambas marcam | 77% | 2-1 | ✅ | Condicional pela odd; bateu. |
 | 21/10 | Palmeiras x Fluminense (/setenta e /favorito) | Palmeiras 1X | 82–83% | 0-1 (pênaltis) | ❌ | A lição 61 já previa: na volta, o favorito jogando pelo empate recua e o adversário é obrigado a atacar. O Poisson da temporada não mede isso. |
+| 22/10 | Maleyeit x Kahrbaa (/under-top) | menos de 4.5 | 94% | 0-0 | ✅ | Folga total. O movimento de odd a favor tinha se desfeito (lição 64), sem prejuízo. |
+| 22/10 | Dayrout x El Sekka (/under-top) | menos de 4.5 | 87% | 1-5 | ❌ | O El Sekka fez 5 sozinho. O 1X2 tinha despencado para ele (2.00 → 1.73) e o Dayrout estava com salários atrasados: o mercado sabia (lição 67). Erro do selo elite. |
+| 22/10 | Kigezi x Entebbe (/under) | menos de 3.5 | 85% | 0-1 | ✅ | O pior ataque da liga não marcou; o "lanterna desesperado" não abriu o jogo. |
+| 22/10 | Tractor x Sanat Naft (/under) | menos de 4.5 | 88% | 3-0 | ✅ | Os 3 gols do Tractor teriam ficado no limite da 3.5: trocar para a 4.5 (lição 63) foi certo. |
+| 22/10 | Bunyodkor x Mash'al (/under) | menos de 4.5 | 81% | 2-1 | ✅ | O teto do Bunyodkor (nunca fez 4) segurou (lição 66). |
+| 22/10 | Al Garaf x Al Naft (/under) | menos de 3.5 | 85% | 0-0 | ✅ | O pior ataque da liga e o mercado neutro em 6 casas (lição 64). |
+| 22/10 | San Antonio x 9 de Octubre (/under) | menos de 4.5 | 89% | 3-3 | ❌ | Quem precisa vencer por saldo abre o jogo dos dois lados. O 1X2 tinha ido de 2.00 para 1.57 (lição 67), e o "teto" não protegeu. |
