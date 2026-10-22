@@ -79,6 +79,19 @@ como fonte de número.
 
 **SoccerStats:** `https://www.soccerstats.com/latest.asp?league=<liga>` (tabelas casa/fora e over/under por time).
 
+**Ligas pequenas** (achadas pelos céticos em 22/10; todas abrem daqui):
+- **LiveScore API** (`prod-cdn-public-api.livescore.com`, endpoint de stage): resultados e tabelas casa/fora até da 2ª
+  divisão do Egito. É a 3ª fonte quando o FotMob não cobre a liga.
+- **Flashscore** (feed de resultados e comparador de odds em `global.ds.lsapp.eu/odds/pq_graphql`, `geoIpCode` GB, DE
+  ou NG): abertura e odd atual em 5 ou mais casas (lição 64); cobre o Iraque.
+- **Pinnacle** (`guest.api.arcadia.pinnacle.com`, casa sharp): linhas asiáticas 2.5, 3.0 e 3.25 e o total de gols de
+  cada time. Com elas sai o under 3.5 sem margem e o λ de cada lado, mesmo sem a linha 3.5 (lição 65).
+- **4score.ru**: 1X2 de 4 casas com o movimento desde a abertura, tabelas casa/fora e estádio.
+
+**Linha de entrega (lições 63 e 65):** o Daniel não olha a odd. Se o 3.5 fica abaixo de 80% (com o λ honesto ou o do
+mercado) e o 4.5 do mesmo jogo passa com folga (85% ou mais), entregue o 4.5. Com o 3.5 entre 80% e 86%, entregue o 3.5
+e mostre o 4.5 como "linha mais segura".
+
 Use sempre um navegador no User-Agent do curl.
 
 ## 5. Selo elite (`/under-top`)

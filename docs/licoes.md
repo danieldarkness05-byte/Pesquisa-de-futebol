@@ -371,6 +371,33 @@ faixa e registre aqui.
     - *Candidato a automático:* no `under.py`, alerta "λ total > 2,3 na linha 3.5" e uma sugestão de linha segura.
       Reavaliar com 15 ou mais unders 3.5 resolvidos.
 
+64. **Mercado: só vale o movimento que se repete em várias casas e que não se desfaz** (22/10: Maleyeit, Dayrout e
+    Al Garaf).
+    - Maleyeit: o over 1.5 da Stake foi de 1.50 para 1.64 e voltou para 1.49 até o jogo. O +1 do pesquisador por
+      "mercado a favor" caiu. Releia a linha perto do início; se voltou à abertura, o ajuste é zero.
+    - Al Garaf: o under 2.5 subiu de 1.41 para 1.51 só no 365Scores; nas outras 5 casas do Flashscore, ficou parado.
+      Antes de tirar ponto ou selo por "mercado contra", confira 5 ou mais casas (lição 41).
+    - Dayrout: o 1X2 foi de 2.00 para 1.73 no favorito, mas a linha de gols ficou parada. Pelo método da potência, o
+      total implícito continuou em ~2,03: o mercado só passou gols de um time para o outro. O under segue; o risco a
+      olhar é o favorito golear sozinho (lição 33).
+65. **Time fraco com amostra curta: use o λ do mercado, e não o do modelo** (22/10: Kigezi, Tractor e KCC; reforça a
+    lição 63).
+    - Kigezi (recém-promovido, 5 jogos): o modelo encolheu o λ dele para 0,35; o 1X2 de 4 casas dá 0,55–0,6.
+    - Tractor: o favorito passou de 3.5 em 6 de 26 jogos em casa nas 2 temporadas anteriores, e a Stake ficou 9 a
+      18 p.p. abaixo do modelo. A temporada travada (10 jogos) vale mais, mas não anula o histórico: o 3.5 não passa de
+      ~80%, e a linha de entrega vira a 4.5.
+    - KCC: o total de gols do favorito em casa (over 1.5 a ~1.5, λ ~2) prende o under 3.5 em ~72%, mesmo com 12 de 12
+      jogos da temporada abaixo. O mercado estava certo em mudar.
+66. **Linha alta (4.5 e 5.5): olhe o teto de gols de cada time** (22/10: Bunyodkor e San Antonio).
+    - Para estourar o 4.5, o placar precisa ser 3-2 ou 4-1. Se o mandante nunca fez 4 (Bunyodkor, 24 jogos) e o
+      visitante quase nunca faz 2, o 1X2 curto infla o λ do favorito. A leitura honesta fica entre o mercado e o
+      empírico.
+    - Time que precisa vencer por saldo (9 de Octubre): se ele nunca fez 4 ou mais e o adversário nunca sofreu mais de
+      3 em casa, a pressão vale −2 a −4 p.p. e não derruba o pick. Confira também se a briga continua na rodada
+      seguinte.
+    - *Candidato a automático:* `plataformas.py` calcular o teto (máximo de gols marcados e sofridos num jogo) e os
+      jogos com exatamente a linha − 0,5, por time e na condição.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
