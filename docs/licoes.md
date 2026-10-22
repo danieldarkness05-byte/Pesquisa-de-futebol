@@ -358,6 +358,19 @@ faixa e registre aqui.
     - Gramado em recuperação, criticado pelos jogadores e recebendo o 3º jogo em 5 dias, nivela o favorito
       (−1 a −2 p.p.).
 
+## Método Under: o que os resultados mostram (22/10)
+
+63. **No menos de 3.5, os acertos vieram colados na linha** (17 a 21/10, 5 picks, 5 acertos).
+    - 4 dos 5 terminaram com exatamente 3 gols: Carrarese 2-1, Pérez Zeledón 0-3, Parma 0-3 e Llaneros 0-3. Com a
+      chance prevista de ~78%, o esperado seria ~1,4 jogo no limite. Ver 4 ou mais tem ~2% de chance.
+    - O total médio realizado foi 2,8 gols. Com λ 2,8, o under 3.5 vale ~69%, e não ~78%: o λ dos unders 3.5 parece
+      subestimado em 0,3 a 0,4 gol (a mesma família das lições 39 e 48).
+    - **Regra de entrega:** o Daniel não olha a odd. Se a 3.5 fica abaixo de 80% e a 4.5 do mesmo jogo passa com
+      folga (≥ 85%), mande a 4.5. Nos unders 4.5 e 5.5, a sobra média para a linha foi de 1,7 gol (5 de 6
+      bateram).
+    - *Candidato a automático:* no `under.py`, alerta "λ total > 2,3 na linha 3.5" e uma sugestão de linha segura.
+      Reavaliar com 15 ou mais unders 3.5 resolvidos.
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
@@ -397,3 +410,6 @@ faixa e registre aqui.
 | 21/10 | Avispa x Gamba (/setenta) | mais de 1.5 | 77% | 1-2 | ✅ | Odd do over subindo (lição 38), mas o jogo de 6 pontos abriu. |
 | 21/10 | Kyoto x Kashima (/setenta) | 12 | 78% | 2-2 | ❌ | O cético já tinha refutado pelo valor; o Kyoto com 1 gol em 4 jogos marcou 2 e mesmo assim empatou. Na J1, 12 a 78% tinha pouca folga. |
 | 21/10 | Levante x Athletic (/setenta) | 12 | 74% | 3-1 | ✅ | Bateu com o Levante vencendo, apesar do λ inflado (lição 58). |
+| 21/10 | Llaneros x Deportivo Cali (/under) | menos de 3.5 | 76% | 0-3 | ✅ | No limite (3 gols, todos do Cali; lição 48). O Llaneros, que precisava vencer, não marcou: o "jogo aberto" da lição 60 veio de um lado só. |
+| 21/10 | FC Cincinnati x DC United (/setenta) | ambas marcam | 77% | 2-1 | ✅ | Condicional pela odd; bateu. |
+| 21/10 | Palmeiras x Fluminense (/setenta e /favorito) | Palmeiras 1X | 82–83% | 0-1 (pênaltis) | ❌ | A lição 61 já previa: na volta, o favorito jogando pelo empate recua e o adversário é obrigado a atacar. O Poisson da temporada não mede isso. |
