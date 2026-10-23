@@ -88,6 +88,11 @@ Leia o JSON do `under.py`. Fica só o candidato que cumpre **tudo**:
    antes do jogo e avise o Daniel se cair.
 7. **Escalação provável sem surpresa:** time misto ou reserva no ataque conta a favor; na defesa, contra.
 
+## 4b. Recheca do 1X2 (Daniel, 23/10)
+
+`python3 ferramentas/plataformas.py recheca --dossie <dossiê>` logo antes de entregar. CORTA sai do top (lição 67).
+Repita 1 a 2 h antes de cada jogo e avise o Daniel se um entregue virar CORTA.
+
 ## 5. Ranking (as melhores chances e as melhores oportunidades)
 
 1. Maior `p_final`.

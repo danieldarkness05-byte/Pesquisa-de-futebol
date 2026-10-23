@@ -8,7 +8,10 @@ jogos do dia, tabela casa/fora, resultados de cada time, H2H, estádio, escalaç
            casa/fora, cauda, cauda na condição, H2H na linha e a prob. do under refeita com os números do
            365Scores. Marca CONFIRMADO, DIVERGENTE ou NAO_ACHADO e grava confere-<D>.json.
   mapa     sem o Sofascore: todos os jogos do dia no 365Scores, under 2.5/3.5/4.5 com prob. ≥ prob_min e cauda
-           limpa, no formato do dossiê (entra direto no workflow under.js).
+           limpa, no formato do dossiê (entra direto no workflow under.js). Under com o 1X2 de um time caindo
+           10% ou mais desde a abertura sai (status "caiu"; lição 67, Daniel 22/10: "tirar o under da lista").
+  recheca  relê o 1X2 de agora (sem cache) dos unders do dossiê ou das previsões pendentes da data e diz OK ou
+           CORTA pela mesma régua. Rode antes de entregar e de novo 1 a 2 h antes de cada jogo.
 
 Probabilidade: método de força (nucleo) com as médias casa/fora da temporada e da liga do 365Scores,
 encolhidas para a média da liga, e matriz com a incerteza da varredura. Vale a menor entre a tabela da
@@ -18,6 +21,8 @@ Exemplos:
   python3 ferramentas/plataformas.py confere --data 2026-10-21
   python3 ferramentas/plataformas.py mapa --data 2026-10-21 --json > dossie-365.json
   python3 ferramentas/plataformas.py anexa --dossie dossie-under.json   # põe a conferência em cada candidato
+  python3 ferramentas/plataformas.py recheca --data 2026-10-22            # previsões pendentes da data
+  python3 ferramentas/plataformas.py recheca --dossie dossie-under.json   # candidatos do dossiê
 
 Só Python padrão. Cache em dados/cache/365scores/<data>/.
 """
@@ -49,6 +54,7 @@ SOFA = RAIZ / "dados" / "cache" / "sofascore"
 BRT = timezone(timedelta(hours=-3))
 LINHAS = (2.5, 3.5, 4.5)
 FIM, AGENDADO = 4, 2
+QUEDA_1X2_MAX = 0.10   # lição 67: odd de vitória de um time caindo 10%+ desde a abertura tira o under
 
 
 class S365:
@@ -122,6 +128,30 @@ class S365:
 # ---------------------------------------------------------------------------
 # Funções puras (testadas)
 # ---------------------------------------------------------------------------
+
+def queda_1x2(odds: dict | None) -> dict | None:
+    """Maior queda da odd de vitória (1 ou 2) desde a abertura: {"lado", "de", "para", "queda"}; None sem odds.
+
+    Queda = 1 − agora/abertura. Lição 67: El Sekka 2.00 → 1.73 (13,5%) e 9 de Octubre 2.00 → 1.55 (22,5%) no
+    dia do jogo, e os dois unders perderam (1-5 e 3-3)."""
+    melhor = None
+    for o in (odds or {}).get("options") or []:
+        lado = {"1": "casa", "2": "fora"}.get(str(o.get("name")))
+        de, para = (o.get("originalRate") or {}).get("decimal"), (o.get("rate") or {}).get("decimal")
+        if not lado or not de or not para or de <= 1 or para <= 1:
+            continue
+        q = 1 - para / de
+        if melhor is None or q > melhor["queda"]:
+            melhor = {"lado": lado, "de": de, "para": para, "queda": round(q, 4)}
+    return melhor
+
+
+def corta_1x2(mov: dict | None, maximo: float) -> str | None:
+    """Motivo do corte se a odd de um time caiu `maximo` ou mais desde a abertura (lição 67)."""
+    if mov and mov["queda"] >= maximo:
+        return f"1X2 do time de {mov['lado']} caiu {mov['queda']:.0%} desde a abertura ({mov['de']} → {mov['para']}; lição 67)"
+    return None
+
 
 def placar(g: dict) -> tuple[int, int] | None:
     h, a = (g.get("homeCompetitor") or {}).get("score"), (g.get("awayCompetitor") or {}).get("score")
@@ -352,6 +382,7 @@ def cmd_mapa(a: argparse.Namespace, cfg: dict) -> dict:
     api = S365(a.data)
     agora = datetime.now(BRT)
     palavras = {**df.DEFESA_PADRAO, **cfg.get("defesa", {})}["palavras_base"]
+    maximo = cfg["under"].get("queda_1x2_max", QUEDA_1X2_MAX)
     cands, vistos = [], 0
     for g in api.jogos():
         if g.get("statusGroup") != AGENDADO or not g.get("hasStandings"):
@@ -367,21 +398,52 @@ def cmd_mapa(a: argparse.Namespace, cfg: dict) -> dict:
             continue
         linha, x = min(passam, key=lambda t: t[0])  # a menor linha que passa: mais odd com a mesma régua
         base = nivel_base(r["competicao"], r["jogo"].split(" x "), palavras)
+        mov = queda_1x2(g.get("odds"))
+        corte = corta_1x2(mov, maximo)
         cands.append({
             "id": r["id_365"], "jogo": r["jogo"], "competicao": r["competicao"], "hora": r["hora"],
-            "mercado": f"Menos de {linha} gols", "chave": ["Match goals", str(linha), "Under"], "status": "vivo",
+            "mercado": f"Menos de {linha} gols", "chave": ["Match goals", str(linha), "Under"],
+            "status": "caiu" if corte else "vivo", **({"motivo_queda": corte} if corte else {}), "mov_1x2": mov,
             "nivel": "base" if base else "pro", "p_modelo": x["p"], "prob_mercado_sem_margem": None, "odd_agora": None,
             "gols_esperados": r["lambdas"]["tabela"],
             "under": {"cauda": x["cauda"], "cauda_cond": x["cauda_cond"], "h2h": x["h2h"], "fonte": "365Scores"},
             "confere": {"status": "SO_365", "p_365": x["p"], "totais_365": r["totais"], "medias_365": r["tabela"], "liga_365": r["liga"]},
         })
-    cands.sort(key=lambda c: (c["nivel"] == "base", -c["p_modelo"]))
+    cands.sort(key=lambda c: (c["status"] != "vivo", c["nivel"] == "base", -c["p_modelo"]))
     for i, c in enumerate(cands, 1):
         c["n"] = i
     return {"data": a.data, "consultado": agora.strftime("%H:%M"), "fonte": "365Scores", "jogos_vistos": vistos,
             "falhas": api.falhas, "criterios": {**cfg["criterios"], "prob_minima": a.prob_min},
             "under": {"max_pesquisa": cfg["under"].get("max_pesquisa", 5)}, "aprofundar": {"modelo_agentes": None},
             "candidatos": cands}
+
+
+def cmd_recheca(a: argparse.Namespace, cfg: dict) -> dict:
+    """1X2 de agora (sem cache) dos unders do dossiê ou das previsões pendentes da data → OK ou CORTA (lição 67)."""
+    maximo = cfg["under"].get("queda_1x2_max", QUEDA_1X2_MAX)
+    if a.dossie:
+        dos = json.loads(Path(a.dossie).read_text(encoding="utf-8"))
+        alvos = [{"id_365": c.get("id_365") or (c.get("confere") or {}).get("id_365") or c.get("id"), "jogo": c.get("jogo"),
+                  "hora": c.get("hora")} for c in dos.get("candidatos", []) if c.get("status", "vivo") == "vivo"]
+        a.data = dos.get("data") or a.data
+    else:
+        import previsoes as pv
+        alvos = [{"id_365": int(x["evento"][4:]) if str(x["evento"]).startswith("365-") else None, "jogo": x["jogo"],
+                  "hora": x["hora"]} for x in pv.ler() if x["status"] == "pendente" and x["data"] == a.data
+                 and x["mercado"].startswith("under")]
+    jogos = S365(a.data, pasta=None).jogos()
+    por_id = {g["id"]: g for g in jogos}
+    itens = []
+    for x in alvos:
+        g = por_id.get(x["id_365"]) or achar(jogos, x["jogo"], x["hora"])
+        if not g:
+            itens.append({**x, "status": "NAO_ACHADO", "motivo": "jogo não achado no 365Scores"})
+            continue
+        mov = queda_1x2(g.get("odds"))
+        corte = corta_1x2(mov, maximo)
+        itens.append({**x, "id_365": g["id"], "status": "CORTA" if corte else ("OK" if mov else "SEM_ODD"),
+                      "motivo": corte or "", "mov_1x2": mov})
+    return {"data": a.data, "consultado": datetime.now(BRT).strftime("%H:%M"), "queda_max": maximo, "itens": itens}
 
 
 def cmd_anexa(a: argparse.Namespace) -> dict:
@@ -399,8 +461,8 @@ def cmd_anexa(a: argparse.Namespace) -> dict:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("modo", choices=["confere", "mapa", "anexa"])
-    p.add_argument("--dossie", help="anexa: dossiê (JSON) que recebe o bloco confere de cada candidato")
+    p.add_argument("modo", choices=["confere", "mapa", "anexa", "recheca"])
+    p.add_argument("--dossie", help="anexa: dossiê (JSON) que recebe o bloco confere; recheca: dossiê a reconferir")
     p.add_argument("--data", default=datetime.now(BRT).strftime("%Y-%m-%d"))
     p.add_argument("--prob-min", type=float, default=0.70)
     p.add_argument("--json", action="store_true")
@@ -412,6 +474,19 @@ def main() -> None:
         print(f"conferência anexada em {r['anexados']} de {r['candidatos']} candidatos")
         return
     cfg = config()
+    if a.modo == "recheca":
+        saida = cmd_recheca(a, cfg)
+        if a.json:
+            print(json.dumps(saida, ensure_ascii=False, indent=1))
+            return
+        print(f"🔁 1X2 de agora no 365Scores {saida['data']} ({saida['consultado']}) — corte com queda de "
+              f"{saida['queda_max']:.0%} ou mais (lição 67)")
+        for x in saida["itens"]:
+            m = x.get("mov_1x2")
+            mov = (f" · {m['lado']} {m['de']} → {m['para']} ("
+                   + (f"caiu {m['queda']:.0%}" if m["queda"] > 0 else "não caiu") + ")") if m else ""
+            print(f"- {x.get('hora') or '?'} {x['jogo']} · {x['status']}{mov}")
+        return
     saida = cmd_confere(a, cfg) if a.modo == "confere" else cmd_mapa(a, cfg)
     if a.json:
         print(json.dumps(saida, ensure_ascii=False, indent=1))
@@ -423,9 +498,13 @@ def main() -> None:
             print(f"- {x['hora']} {x['jogo']} · menos de {x['linha']} · {x['status']}{extra}"
                   + (f" — {'; '.join(x['motivos'])}" if x["motivos"] else ""))
     else:
+        vivos = [c for c in saida["candidatos"] if c["status"] == "vivo"]
         print(f"🗺️ Mapa de under pelo 365Scores {a.data} ({saida['consultado']}) — {saida['jogos_vistos']} jogos vistos, "
-              f"{len(saida['candidatos'])} com {a.prob_min:.0%}+ e cauda limpa")
+              f"{len(vivos)} com {a.prob_min:.0%}+ e cauda limpa")
         for c in saida["candidatos"]:
+            if c["status"] != "vivo":
+                print(f"✂️ {c['hora']} {c['jogo']} · {c['mercado']} — {c['motivo_queda']}")
+                continue
             u = c["under"]
             print(f"{c['n']}) {c['hora']} {c['jogo']} [{c['competicao']}{' · base' if c['nivel'] == 'base' else ''}] · "
                   f"{c['mercado']} · {c['p_modelo']:.0%} · cauda {u['cauda']['casa']['acima']}/{u['cauda']['casa']['n']} e "

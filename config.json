@@ -147,7 +147,7 @@
     "max_pesquisa": 10
   },
   "under": {
-    "_leia": "Especialista em under de gols (ferramentas/under.py + .claude/workflows/under.js, skill /under; pedido do Daniel em 17/10). Lê a peneira --todas com prob ≥ prob_min e confere: cauda (nos últimos cauda_jogos oficiais de cada time, estouro da linha acima de (1 − p) + cauda_folga derruba), taxa de under da liga (≥ p − liga_folga), amostra da temporada atual (≥ temporada_atual_min), xG somado perto da linha (alerta) e favorito com odd ≤ favorito_goleada_odd (alerta). max_pesquisa = quantos vão para os agentes.",
+    "_leia": "Especialista em under de gols (ferramentas/under.py + .claude/workflows/under.js, skill /under; pedido do Daniel em 17/10). Lê a peneira --todas com prob ≥ prob_min e confere: cauda (nos últimos cauda_jogos oficiais de cada time, estouro da linha acima de (1 − p) + cauda_folga derruba), taxa de under da liga (≥ p − liga_folga), amostra da temporada atual (≥ temporada_atual_min), xG somado perto da linha (alerta) e favorito com odd ≤ favorito_goleada_odd (alerta). queda_1x2_max: odd de vitória de um time caindo essa fração ou mais desde a abertura tira o under (plataformas.py mapa/recheca; lição 67, Daniel 22/10). max_pesquisa = quantos vão para os agentes.",
     "prob_min": 0.7,
     "cauda_jogos": 7,
     "cauda_folga": 0.15,
@@ -157,6 +157,7 @@
     "xg_folga_linha": 0.6,
     "xg_margem_mercado": 0.02,
     "limite_frac_alerta": 0.35,
+    "queda_1x2_max": 0.1,
     "max_pesquisa": 5
   },
   "azarao": {

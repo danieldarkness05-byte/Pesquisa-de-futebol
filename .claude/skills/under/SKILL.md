@@ -79,6 +79,12 @@ escreveu uma leitura honesta menor, use a menor. Avisos de "fontes divergem" vã
 **Passa se `p_final ≥ 0.70` e o cético não derrubou a tese esportiva** (refutado só por valor/odd continua valendo).
 Ordene pela chance; **≥ 80% = "mais fortes"** (a faixa que mais acerta). Odd e EV vão só para o registro.
 
+## 4b. Recheca do 1X2 (Daniel, 23/10: "tira o under da lista")
+
+`python3 ferramentas/plataformas.py recheca --dossie <dossiê>` (ou `--data <D>` para as previsões pendentes).
+CORTA (odd de vitória de um time caindo 10% ou mais desde a abertura; lição 67) sai da resposta, mesmo aprovado.
+Repita 1 a 2 h antes de cada jogo; se um entregue virar CORTA, avise o Daniel na hora ("tira o X da lista").
+
 ## 5. Salvar, registrar e evoluir
 
 `analises/AAAA-MM-DD-under.md`; `previsoes.py add-json` com `analise: "under"`, `mercado: "under_X.5"`; lições novas

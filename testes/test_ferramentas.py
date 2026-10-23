@@ -768,6 +768,20 @@ class TestPlataformas(unittest.TestCase):
 
     def test_linha_e_nivel(self):
         self.assertEqual(pl.linha_de({"chave": ["Match goals", "3.5", "Under"]}), 3.5)
+
+    def test_queda_1x2(self):
+        op = lambda nome, de, para: {"name": nome, "originalRate": {"decimal": de}, "rate": {"decimal": para}}  # noqa: E731
+        # San Antonio x 9 de Octubre (22/10): o visitante foi de 2.00 para 1.55 e o jogo terminou 3-3 (lição 67)
+        mov = pl.queda_1x2({"options": [op("1", 3.49, 6.0), op("X", 2.99, 3.24), op("2", 2.0, 1.55)]})
+        self.assertEqual((mov["lado"], mov["queda"]), ("fora", 0.225))
+        self.assertIn("lição 67", pl.corta_1x2(mov, 0.10))
+        # Kigezi x Entebbe: 1X2 parado → fica
+        parado = pl.queda_1x2({"options": [op("1", 5.46, 5.46), op("X", 3.18, 3.18), op("2", 1.6, 1.6)]})
+        self.assertIsNone(pl.corta_1x2(parado, 0.10))
+        # queda de 3% (Al Naft 2.37 → 2.30) não corta; empate não conta; sem odds → None
+        self.assertIsNone(pl.corta_1x2(pl.queda_1x2({"options": [op("2", 2.37, 2.30), op("X", 4.0, 2.0)]}), 0.10))
+        self.assertIsNone(pl.queda_1x2(None))
+        self.assertIsNone(pl.queda_1x2({"options": [{"name": "1", "rate": {"decimal": 1.8}}]}))
         self.assertEqual(pl.linha_de({"rotulo": "Menos de 2.5 gols"}), 2.5)
         self.assertTrue(pl.nivel_base("Argentina · Liga Profesional - Reserva", ["River Plate Res."], ["Reserve"]))
         self.assertFalse(pl.nivel_base("Malta · Premier League", ["Hamrun Spartans", "Balzan Youths FC"], ["Youth"]))

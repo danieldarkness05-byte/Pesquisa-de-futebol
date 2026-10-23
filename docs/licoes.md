@@ -407,8 +407,9 @@ faixa e registre aqui.
       tinha sofrido mais de 3 em casa.
     - **Regra:** 1X2 de um time caindo 10% ou mais desde a abertura, sem notícia que explique a favor do under → o jogo
       sai do under. Time que precisa vencer por saldo → `jogo_aberto = true`, e o under sai.
-    - *Candidato a automático:* `plataformas.py` comparar a odd 1X2 de abertura com a atual (o 365Scores dá as duas) e
-      cortar com queda de 10% ou mais; repetir a checagem 1 a 2 h antes do jogo.
+    *(automático desde 23/10, a pedido do Daniel: `plataformas.py mapa` corta e `plataformas.py recheca` reconfere
+    antes do jogo; `config.json → under.queda_1x2_max` = 0,10; com teste. Com as odds finais de 22/10, o recheca
+    cortaria exatamente os 2 erros (Dayrout 12%, San Antonio 15%) e manteria os 5 acertos.)*
 
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 

@@ -21,6 +21,10 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 - **Exceção (Daniel, 21/10): `/favorito`.** Num chat próprio, ele pediu os jogos em que o favorito PRECISA vencer e vai
   com todos os titulares (vitória ou dupla chance). Só nesse modo, e quando ele pedir; a rotina continua só under.
 - `/defesa-fraca`, `/azarao-forte`, `/setenta` e `/fortes` estão **suspensos**. A rotina (só duas vezes ao dia, 06:52 e 17:52; Daniel, 21/10) roda o `/under-top`.
+- **1X2 despencando tira o under (Daniel, 23/10: "quando for assim, tira o under da lista"):** se a odd de vitória de
+  um time cair 10% ou mais desde a abertura, ou se alguém precisar vencer por saldo, o under sai (lição 67). O
+  `plataformas.py mapa` já corta; antes de entregar e de novo 1 a 2 h antes do jogo, rode `plataformas.py recheca` e
+  avise o Daniel se algum entregue virar CORTA.
 - "Continuar evoluindo": cada resultado de under vira lição em `docs/licoes.md`, e lição que se repete vira filtro no
   `under.py` (com teste).
 
