@@ -439,6 +439,9 @@ def cmd_recheca(a: argparse.Namespace, cfg: dict) -> dict:
         if not g:
             itens.append({**x, "status": "NAO_ACHADO", "motivo": "jogo não achado no 365Scores"})
             continue
+        if g.get("statusGroup") != AGENDADO:  # com bola rolando a odd é ao vivo: não serve para a régua
+            itens.append({**x, "id_365": g["id"], "status": "COMECOU", "motivo": "jogo já começou", "mov_1x2": None})
+            continue
         mov = queda_1x2(g.get("odds"))
         corte = corta_1x2(mov, maximo)
         itens.append({**x, "id_365": g["id"], "status": "CORTA" if corte else ("OK" if mov else "SEM_ODD"),
