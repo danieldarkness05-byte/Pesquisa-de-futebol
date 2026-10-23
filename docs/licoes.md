@@ -429,6 +429,16 @@ faixa e registre aqui.
     - Com o Trabelsi, a Shorta teve 1 jogo com 5+ gols em 12; com o técnico anterior, 6 em 38. Até o técnico novo ter
       3 ou mais jogos, misture com a temporada anterior e com o mercado (lições 2 e 45).
 
+70. **Balanço das duas regras novas depois de 2 dias** (22 e 23/10).
+    - **Troca de linha (lições 63 e 65):** o Almere x Roda terminou 2-3. O menos de 4.5 (82%, colado no mercado)
+      teria perdido; o menos de 5.5 (92%) bateu. Antes, o Tractor 3-0 já ficaria no limite da 3.5. São 2 de 2 a favor.
+    - **Corte pelo 1X2 (lições 67 e 68):** em 22/10 evitou os 2 erros (Dayrout 1-5, San Antonio 3-3). Em 23/10 tirou
+      2 jogos que teriam batido (Chernomorets 1-1, Widzew 1-1). Saldo: 2 erros evitados e 2 acertos perdidos.
+    - O que separa os casos (amostra pequena, só observação): nos erros evitados, a odd do time que fez os gols é a
+      que caiu (El Sekka e 9 de Octubre). Nos cortes de 23/10, caiu a do azarão (Sportist, 11 → 6,7) ou a do favorito
+      que só empatou (Górnik). A regra fica como o Daniel pediu. Reavaliar com 10 ou mais cortes, comparando "queda do
+      favorito" com "queda do azarão".
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
@@ -478,3 +488,11 @@ faixa e registre aqui.
 | 22/10 | Bunyodkor x Mash'al (/under) | menos de 4.5 | 81% | 2-1 | ✅ | O teto do Bunyodkor (nunca fez 4) segurou (lição 66). |
 | 22/10 | Al Garaf x Al Naft (/under) | menos de 3.5 | 85% | 0-0 | ✅ | O pior ataque da liga e o mercado neutro em 6 casas (lição 64). |
 | 22/10 | San Antonio x 9 de Octubre (/under) | menos de 4.5 | 89% | 3-3 | ❌ | Quem precisa vencer por saldo abre o jogo dos dois lados. O 1X2 tinha ido de 2.00 para 1.57 (lição 67), e o "teto" não protegeu. |
+| 23/10 | Aluminium x Zob Ahan (/under-top) | menos de 4.5 | 95% | 0-0 | ✅ | Teto de gols dos dois (máximo 1 e 2) e liga de 1,96 gol/jogo. |
+| 23/10 | Chadormalu x Esteghlal (/under-top) | menos de 4.5 | 93% | 1-1 | ✅ | A "queda" de 16% era abertura velha em 3 casas; pela mediana não havia queda (lição 68). |
+| 23/10 | IMT x Zeleznicar (/under-top) | menos de 4.5 | 90% | 0-1 | ✅ | Duas das 3 melhores defesas da liga; 1X2 parado em 33 casas. |
+| 23/10 | Almere x Roda (/under) | menos de 5.5 | 92% | 2-3 | ✅ | 5 gols: o menos de 4.5 teria perdido. A troca de linha salvou (lição 70). |
+| 23/10 | Al Zawraa x Al Shorta (/under) | menos de 4.5 | 91% | 0-2 | ✅ | O dérbi ficou travado, como nos 13 confrontos desde 2019. |
+| 23/10 | Chernomorets x Sportist (cortado pelo 1X2) | menos de 4.5 | — | 1-1 | (teria ✅) | O corte custou um acerto: caiu a odd do azarão, que marcou 1 (lição 70). |
+| 23/10 | Widzew x Górnik (cortado pelo 1X2) | menos de 4.5 | — | 1-1 | (teria ✅) | O corte custou um acerto: o favorito que o mercado comprou só empatou. |
+| 23/10 | Metalist x Pheniks (começou antes do cético) | menos de 4.5 | — | 0-2 | (teria ✅) | Perdido pelo limite de uso. |
