@@ -411,6 +411,24 @@ faixa e registre aqui.
     antes do jogo; `config.json → under.queda_1x2_max` = 0,10; com teste. Com as odds finais de 22/10, o recheca
     cortaria exatamente os 2 erros (Dayrout 12%, San Antonio 15%) e manteria os 5 acertos.)*
 
+68. **A régua do 1X2 (lição 67) se mede pela mediana das casas, e o 365Scores sozinho não basta** (23/10:
+    Chernomorets, Chadormalu, Widzew e Almere).
+    - Chernomorets x Sportist: no 365Scores e na bet365 (via 365Scores), a odd do Sportist SUBIU (11 → 13). Nas 8 casas
+      do Flashscore e na Pinnacle, CAIU de 23% a 39% (mediana 32%). O `recheca` não teria cortado; a pesquisa em várias
+      casas cortou.
+    - Chadormalu x Esteghlal: queda de 14–16% só em 3 casas com abertura velha (o 1X2 não batia com o handicap que
+      elas mesmas abriram); a mediana de 17 casas subiu 2%. Não é movimento de mercado: o jogo ficou.
+    - Almere x Roda: um grupo de 4 casas clonadas (BetVictor, Betano.uk, Parimatch.uk, Talksport) mostrava 10,5%. Casas
+      clonadas contam como uma só.
+    - Widzew x Górnik: 8% de mediana às 04h e 14,5% às 07h45. A queda cresce durante a manhã. Queda de 7% a 10% de
+      madrugada fica "em observação" até o recheca perto do jogo.
+    - **Regra:** a queda é a mediana das casas (Flashscore + Pinnacle), com clones contando uma vez. O 365Scores é só
+      a primeira triagem. Reconferir 1 a 2 h antes do jogo.
+    - *Candidato a automático:* o `recheca` ler o comparador do Flashscore e a Pinnacle, e não só o 365Scores.
+69. **Amostra travada do técnico que saiu não limpa a cauda** (Al Zawraa x Al Shorta, 23/10).
+    - Com o Trabelsi, a Shorta teve 1 jogo com 5+ gols em 12; com o técnico anterior, 6 em 38. Até o técnico novo ter
+      3 ou mais jogos, misture com a temporada anterior e com o mercado (lições 2 e 45).
+
 ## Resultados (preenchido pelo `previsoes.py resolver` + revisão)
 
 | Data | Jogo | Pick | Prob. | Placar | Bateu? | Lição |
