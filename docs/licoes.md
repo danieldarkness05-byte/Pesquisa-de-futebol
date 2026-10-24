@@ -481,6 +481,7 @@ faixa e registre aqui.
 | 21/10 | Llaneros x Deportivo Cali (/under) | menos de 3.5 | 76% | 0-3 | ✅ | No limite (3 gols, todos do Cali; lição 48). O Llaneros, que precisava vencer, não marcou: o "jogo aberto" da lição 60 veio de um lado só. |
 | 21/10 | FC Cincinnati x DC United (/setenta) | ambas marcam | 77% | 2-1 | ✅ | Condicional pela odd; bateu. |
 | 21/10 | Palmeiras x Fluminense (/setenta e /favorito) | Palmeiras 1X | 82–83% | 0-1 (pênaltis) | ❌ | A lição 61 já previa: na volta, o favorito jogando pelo empate recua e o adversário é obrigado a atacar. O Poisson da temporada não mede isso. |
+| 23/10 | Cruzeiro x Remo (/favorito) | Cruzeiro vence | 67% | 1-0 | ✅ | O elenco 8 vezes maior e o XI completo confirmados bateram, mas por 1 gol: o Remo retrancado com Carpini segurou o placar, como o risco previa. |
 | 22/10 | Maleyeit x Kahrbaa (/under-top) | menos de 4.5 | 94% | 0-0 | ✅ | Folga total. O movimento de odd a favor tinha se desfeito (lição 64), sem prejuízo. |
 | 22/10 | Dayrout x El Sekka (/under-top) | menos de 4.5 | 87% | 1-5 | ❌ | O El Sekka fez 5 sozinho. O 1X2 tinha despencado para ele (2.00 → 1.73) e o Dayrout estava com salários atrasados: o mercado sabia (lição 67). Erro do selo elite. |
 | 22/10 | Kigezi x Entebbe (/under) | menos de 3.5 | 85% | 0-1 | ✅ | O pior ataque da liga não marcou; o "lanterna desesperado" não abriu o jogo. |
