@@ -64,7 +64,7 @@ def main() -> None:
         if "prob_casa_sem_margem" in r:
             print(f"Probabilidade da casa sem margem: {n.pct(r['prob_casa_sem_margem'])}")
     print(f"Odd justa: {n.fmt_odd(r['odd_justa'])} | odd mínima p/ EV ≥ {crit['ev_minimo'] * 100:.0f}%: "
-          f"{n.fmt_odd(r['odd_minima'])}")
+          f"{n.fmt_odd_min(r['odd_minima'])}")
     print(f"EV: {r['ev'] * 100:+.1f}% | Kelly cheio: {max(0.0, r['kelly']) * 100:.1f}% da banca")
     if r["stake_sugerida"]:
         print(f"Stake sugerida (Kelly {cfg['banca']['kelly_fracao']:.0%}, teto "
@@ -78,7 +78,7 @@ def main() -> None:
     elif v == "abaixo do corte":
         print(f"Abaixo do corte de {n.pct(crit['prob_minima'])}. Não entra.")
     else:
-        print(f"Sem valor nesta odd. Só entraria a partir de {n.fmt_odd(r['odd_minima'])}.")
+        print(f"Sem valor nesta odd. Só entraria a partir de {n.fmt_odd_min(r['odd_minima'])}.")
 
 
 if __name__ == "__main__":
