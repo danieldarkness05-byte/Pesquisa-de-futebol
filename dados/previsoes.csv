@@ -65,5 +65,5 @@ id,data,hora,evento,jogo,competicao,nivel,analise,mercado,lado,prob,odd_minima,o
 64,2026-10-25,14:45,365-4752278,Gimnastic x Hercules CF,Spain · Primera Division RFEF,pro,casa,under_3.5,casa,0.783,,1.2,odd 1.29 → 1.2; margem 6.4%,pendente,,,365Scores: menos de 3.5 gols
 65,2026-10-25,12:15,365-4750817,Celta Vigo x Real Betis,Spain · LaLiga,pro,casa,over_1.5,casa,0.7802,,1.22,odd 1.3 → 1.22; margem 5.1%,pendente,,,365Scores: mais de 1.5 gols
 66,2026-10-25,08:00,365-4742575,Odra Opole x Pogon Siedlce,Poland · I Liga,pro,casa,under_3.5,casa,0.7663,,1.22,odd 1.29 → 1.22; margem 7.0%,pendente,,,365Scores: menos de 3.5 gols
-67,2026-10-25,12:00,365-4740711,Club Brugge x STVV,Belgium · Jupiler Pro League,pro,casa,over_2.5,casa,0.7619,,1.25,odd 1.33 → 1.25; margem 5.0%,pendente,,,365Scores: mais de 2.5 gols
+67,2026-10-25,12:00,365-4740711,Club Brugge x STVV,Belgium · Jupiler Pro League,pro,casa,over_2.5,casa,0.7619,,1.25,odd 1.33 → 1.25; margem 5.0%,anulada,,,"365Scores: mais de 2.5 gols | retirada às 05:00: odd voltou de 1.25 para 1.28 (casa 74%, queda de 3,8% desde a abertura) e modelo 66–76% abaixo da casa"
 68,2026-10-25,17:00,365-4750514,Barcelona x Real Madrid,Spain · LaLiga,pro,casa,ambas_sim,casa,0.75,,1.25,odd 1.4 → 1.25; margem 6.7%,pendente,,,365Scores: ambas marcam
