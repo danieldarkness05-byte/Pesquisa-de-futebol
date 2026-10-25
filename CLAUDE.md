@@ -20,6 +20,9 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
   máximo 3 (`analise: "under_top"`).
 - **Exceção (Daniel, 21/10): `/favorito`.** Num chat próprio, ele pediu os jogos em que o favorito PRECISA vencer e vai
   com todos os titulares (vitória ou dupla chance). Só nesse modo, e quando ele pedir; a rotina continua só under.
+- **Exceção (Daniel, 25/10): `/casa`.** No mesmo chat do `/favorito`, ele trocou para "os mercados em que a casa acredita
+  que vai acertar", em qualquer mercado: `casa.py` (só script, sem agentes) fica com o que a bet365 dá 75%+ e com a odd
+  caindo 5%+ desde a abertura. Só quando ele pedir; a rotina continua só under.
 - `/defesa-fraca`, `/azarao-forte`, `/setenta` e `/fortes` estão **suspensos**. A rotina (só duas vezes ao dia, 06:52 e 17:52; Daniel, 21/10) roda o `/under-top`.
 - **1X2 despencando tira o under (Daniel, 23/10: "quando for assim, tira o under da lista"):** se a odd de vitória de
   um time cair 10% ou mais desde a abertura (pela mediana das casas, com clones contando uma vez; lição 68), ou se
@@ -74,6 +77,7 @@ de forma curta e direta: o Daniel costuma ler pelo celular.
 | `python3 ferramentas/defesa.py [--data D] [--curto] [--json]` | defesa fraca do azarão x ataque forte do favorito em **todas** as ligas do Sofascore: triagem, estatística, alertas, prob. conservadora e odd mínima |
 | `python3 ferramentas/azarao.py [--data D] [--curto]` | azarão forte: jogos em que o azarão tem boa chance de não perder (dupla chance, empate anula, vitória) com valor, em todas as ligas |
 | `python3 ferramentas/under.py [--data D]` | especialista em under: filtra os "menos de X.5 gols" da peneira `--todas` pelos requisitos de under (cauda, taxa da liga, temporada atual, xG somado, favorito goleador) |
+| `python3 ferramentas/casa.py [--data D] [--registrar]` | o que a casa acredita: seleções com 75%+ na bet365 sem margem e odd caindo desde a abertura, em todos os jogos do dia |
 | `python3 ferramentas/plataformas.py confere/mapa/anexa [--data D]` | 2ª plataforma com os mesmos dados do Sofascore (365Scores): confirma os unders (CONFIRMADO/DIVERGENTE) e monta o mapa de under sem o Sofascore |
 | `python3 ferramentas/previsoes.py add-json/resolver/resumo` | registro de TODA previsão entregue (apostada ou não), resultado automático pelo Sofascore e calibração |
 

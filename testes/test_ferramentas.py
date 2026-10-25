@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ferramentas"))
 
 import clima  # noqa: E402
 import azarao as azr  # noqa: E402
+import casa as cs  # noqa: E402
 import defesa as df  # noqa: E402
 import dossie  # noqa: E402
 import historico  # noqa: E402
@@ -201,6 +202,7 @@ class TestDossie(unittest.TestCase):
         self.assertIn("regra 8", motivo)
         self.assertEqual(base["odd"], 1.8)
         self.assertIn("não está mais", dossie.motivo_queda(info, ("Double chance", None, "1X"), cfg)[0])
+
 
 
 if __name__ == "__main__":
@@ -796,3 +798,53 @@ class TestPlataformas(unittest.TestCase):
         feitos = previsoes.resolver([x], lambda ev: pl.evento_sofascore(fim))
         self.assertEqual((feitos[0]["placar"], feitos[0]["acerto"]), ("2-1", "1"))
 
+class TestCasa(unittest.TestCase):
+    """O que a casa acredita (pedido do Daniel em 25/10): prob. da casa sem margem e movimento desde a abertura."""
+
+    def linha(self, tipo, nome, ops, opcao=None):
+        ln = {"lineTypeId": tipo, "lineType": {"name": nome}, "options": [
+            {"name": k, "rate": {"decimal": agora}, "originalRate": {"decimal": abre}} for k, agora, abre in ops]}
+        if opcao is not None:
+            ln["internalOption"] = opcao
+        return ln
+
+    def test_sem_margem(self):
+        ps = cs.sem_margem([1.53, 4.1, 6.5])
+        self.assertAlmostEqual(sum(ps), 1.0, places=9)
+        self.assertAlmostEqual(ps[0], (1 / 1.53) / (1 / 1.53 + 1 / 4.1 + 1 / 6.5), places=9)
+
+    def test_selecoes_1x2_e_dupla_chance(self):
+        s = cs.selecoes(self.linha(1, "Full Time Result", [("1", 1.53, 1.67), ("X", 4.1, 3.5), ("2", 6.5, 5.25)]), "A", "B")
+        self.assertEqual([(x["mercado"], x["lado"]) for x in s], [("vence", "casa"), ("vence", "fora")])  # empate não entra
+        self.assertAlmostEqual(s[0]["queda"], 1 - 1.53 / 1.67, places=4)
+        self.assertAlmostEqual(s[0]["queda_contra"], max(1 - 4.1 / 3.5, 1 - 6.5 / 5.25), places=4)  # X e 2 subiram
+        d = cs.selecoes(self.linha(14, "Double Chance", [("1X", 1.11, 1.17), ("12", 1.22, 1.29), ("X2", 2.38, 2.15)]), "A", "B")
+        self.assertEqual([(x["mercado"], x["lado"]) for x in d],
+                         [("dupla_chance", "casa"), ("sem_empate", "casa"), ("dupla_chance", "fora")])
+
+    def test_selecoes_gols_handicap_ambas(self):
+        g = cs.selecoes(self.linha(3, "Total Goals In Match", [("Under", 1.22, 1.22), ("Over", 4.33, 4.33)], "3.5 Goals"), "A", "B")
+        self.assertEqual([x["mercado"] for x in g], ["under_3.5", "over_3.5"])
+        self.assertEqual(g[0]["rotulo"], "menos de 3.5 gols")
+        h = cs.selecoes(self.linha(11, "Asian Handicap", [("Home", 1.9, 1.9), ("Away", 1.9, 1.9)], "-1.5"), "A", "B")
+        self.assertEqual([(x["mercado"], x["lado"]) for x in h], [("handicap_-1.5", "casa"), ("handicap_+1.5", "fora")])
+        self.assertEqual(cs.selecoes(self.linha(11, "Asian Handicap", [("Home", 1.9, 1.9), ("Away", 1.9, 1.9)], "-0.75"), "A", "B"), [])
+        b = cs.selecoes(self.linha(12, "Both Teams To Score", [("Yes", 2.25, 2.2), ("No", 1.57, 1.62)]), "A", "B")
+        self.assertEqual([x["mercado"] for x in b], ["ambas_sim", "ambas_nao"])
+        self.assertEqual(cs.selecoes(self.linha(7, "First To Score", [("Home", 1.4, 1.5), ("No Goal", 8, 8), ("Away", 3, 3)]), "A", "B"), [])
+        for x in g + h + b:  # tudo que sai precisa ser resolvível pelo previsoes.py
+            self.assertIsNotNone(previsoes.avaliar(x["mercado"], x["lado"], 1, 0))
+
+    def test_motivo_fora_e_melhor(self):
+        c = dict(cs.CASA_PADRAO)
+        boa = {"p_casa": 0.78, "odd": 1.2, "odd_abertura": 1.29, "queda": 0.07, "queda_contra": 0.0, "margem": 0.05}
+        self.assertIsNone(cs.motivo_fora(boa, c))
+        self.assertIn("< 75%", cs.motivo_fora({**boa, "p_casa": 0.7}, c))
+        self.assertIn("abaixo", cs.motivo_fora({**boa, "odd": 1.1}, c))
+        self.assertIn("subiu", cs.motivo_fora({**boa, "queda": -0.05}, c))
+        self.assertIn("não caiu", cs.motivo_fora({**boa, "queda": 0.02}, c))   # 1 tique (1.29 → 1.25) é ruído
+        self.assertIn("outro lado", cs.motivo_fora({**boa, "queda_contra": 0.12}, c))
+        self.assertIn("margem", cs.motivo_fora({**boa, "margem": 0.10}, c))
+        a, b = {**boa, "p_casa": 0.80}, {**boa, "p_casa": 0.76, "queda": 0.2}
+        self.assertIs(cs.melhor_do_jogo([b, a]), a)
+        self.assertIsNone(cs.melhor_do_jogo([]))

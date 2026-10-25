@@ -172,5 +172,16 @@
     "max_pesquisa": 4,
     "max_resposta": 4,
     "regra8_pp": 0.1
+  },
+  "casa": {
+    "_leia": "O que a casa acredita (ferramentas/casa.py, skill /casa; pedido do Daniel em 25/10). Varre todos os jogos do dia com as odds da bet365 no 365Scores (com a de abertura) e fica com a seleção de cada jogo em que a probabilidade da casa sem margem é ≥ prob_min, a odd é ≥ odd_min, a odd caiu pelo menos queda_min desde a abertura (a casa ficou mais confiante; 3% é 1 tique), o outro lado não caiu queda_contra_max e a margem do mercado é ≤ margem_max. Sem agentes.",
+    "prob_min": 0.75,
+    "odd_min": 1.15,
+    "queda_min": 0.05,
+    "subida_max": 0.03,
+    "queda_contra_max": 0.10,
+    "margem_max": 0.08,
+    "minutos_antes": 30,
+    "max_entrega": 10
   }
 }

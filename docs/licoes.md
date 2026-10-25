@@ -357,6 +357,14 @@ faixa e registre aqui.
     - Conte quantos gols o time fez sem o artilheiro: o Santa Fe fez 0 em 2 jogos.
     - Gramado em recuperação, criticado pelos jogadores e recebendo o 3º jogo em 5 dias, nivela o favorito
       (−1 a −2 p.p.).
+71. **A odd do favorito caindo desde a abertura separou os acertos** (/favorito de 24/10: 4 de 7).
+    - Venceram por 5 gols os 3 com a odd caindo a favor: Rapid (−6,5%, 5-1), AEK (casas gregas −4 a −6%, 5-0) e DAC
+      (−4,4%, 5-0).
+    - Não venceram os que tinham a odd parada ou subindo: Djurgården (+3%, 2-2), Slavia (+2 a +3%, com o azarão encurtando
+      8–15%, 1-1) e Bodø (parada, com rodízio, 0-1). Nos 3, o risco escrito na análise aconteceu: mandante irregular,
+      ataque sem o centroavante e fadiga com rodízio.
+    - Exceção: Dortmund (+8 a +13%) venceu por 1-0.
+    - Daí o `/casa` (Daniel, 25/10): só entra seleção com a odd caindo 5%+ desde a abertura.
 
 ## Método Under: o que os resultados mostram (22/10)
 
@@ -497,3 +505,10 @@ faixa e registre aqui.
 | 23/10 | Chernomorets x Sportist (cortado pelo 1X2) | menos de 4.5 | — | 1-1 | (teria ✅) | O corte custou um acerto: caiu a odd do azarão, que marcou 1 (lição 70). |
 | 23/10 | Widzew x Górnik (cortado pelo 1X2) | menos de 4.5 | — | 1-1 | (teria ✅) | O corte custou um acerto: o favorito que o mercado comprou só empatou. |
 | 23/10 | Metalist x Pheniks (começou antes do cético) | menos de 4.5 | — | 0-2 | (teria ✅) | Perdido pelo limite de uso. |
+| 24/10 | Rapid Viena x Lustenau (/favorito) | Rapid vence | 82% | 5-1 | ✅ | Odd caindo 6,5% desde a abertura e XI repetido (lição 71). |
+| 24/10 | AEK x Panetolikos (/favorito) | AEK vence | 82% | 5-0 | ✅ | O Panetolikos sem goleiro e zaga não resistiu, mesmo com o AEK cansado da UCL. |
+| 24/10 | Djurgården x Örgryte (/favorito) | Djurgården vence | 81% | 2-2 | ❌ | O mandante irregular (5 derrotas em 12 em casa) tropeçou de novo; a odd tinha subido 3% (lição 71). |
+| 24/10 | DAC x Ružomberok (/favorito) | DAC vence | 75% | 5-0 | ✅ | XI base completo e odd caindo 4,4% (lição 71). |
+| 24/10 | Slavia x Mladá Boleslav (/favorito) | Slavia vence | 69% | 1-1 | ❌ | Sem o Chorý, o ataque seguiu travado em casa; o mercado comprou o azarão (lição 71). |
+| 24/10 | Dortmund x Frankfurt (/favorito) | Dortmund vence | 66% | 1-0 | ✅ | Venceu por 1 gol, apesar da odd subindo 8–13%. |
+| 24/10 | Bodø x Vålerenga (/favorito) | Bodø vence | 80% | 0-1 | ❌ | 4º jogo em 11 dias e 2 zagueiros poupados: a fadiga apontada como risco pesou (lição 71). |
