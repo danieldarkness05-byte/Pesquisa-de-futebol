@@ -365,6 +365,12 @@ faixa e registre aqui.
       ataque sem o centroavante e fadiga com rodízio.
     - Exceção: Dortmund (+8 a +13%) venceu por 1-0.
     - Daí o `/casa` (Daniel, 25/10): só entra seleção com a odd caindo 5%+ desde a abertura.
+72. **`/casa` de 25/10: 3 de 6 (50%) para 78% prometidos.** Amostra pequena, mas o alerta fica.
+    - Os 2 "fortes" pela estatística perderam feio: Talleres x Dock Sud (menos de 3.5) terminou 4-0 e Celta x Betis
+      (mais de 1.5) terminou 0-0. Os dois estavam sem o centroavante (Celta e Betis), e isso pesava contra o over.
+    - Acertaram Odra (menos de 3.5, 0-1), Atlético Madrileño (mais de 1.5, 1-1) e Barça x Real (ambas, 1-2).
+    - Mercado de gols com odd ~1.20 fica perto do limite: 1 gol a mais ou a menos decide. Na dupla chance de um time
+      muito superior, a folga é maior (por isso o `/superior` de 27/10).
 
 ## Método Under: o que os resultados mostram (22/10)
 
@@ -512,3 +518,9 @@ faixa e registre aqui.
 | 24/10 | Slavia x Mladá Boleslav (/favorito) | Slavia vence | 69% | 1-1 | ❌ | Sem o Chorý, o ataque seguiu travado em casa; o mercado comprou o azarão (lição 71). |
 | 24/10 | Dortmund x Frankfurt (/favorito) | Dortmund vence | 66% | 1-0 | ✅ | Venceu por 1 gol, apesar da odd subindo 8–13%. |
 | 24/10 | Bodø x Vålerenga (/favorito) | Bodø vence | 80% | 0-1 | ❌ | 4º jogo em 11 dias e 2 zagueiros poupados: a fadiga apontada como risco pesou (lição 71). |
+| 25/10 | Atlético Madrileño x Real Jaén (/casa) | mais de 1.5 | 79% | 1-1 | ✅ | Bateu no limite (2 gols). |
+| 25/10 | Talleres RE x Dock Sud (/casa) | menos de 3.5 | 79% | 4-0 | ❌ | Liga de 2 gols por jogo, mas o Talleres goleou (lição 72). |
+| 25/10 | Gimnàstic x Hércules (/casa) | menos de 3.5 | 78% | 4-2 | ❌ | O modelo já ficava abaixo da casa (70–75%). |
+| 25/10 | Celta x Betis (/casa) | mais de 1.5 | 78% | 0-0 | ❌ | Os dois sem o centroavante; H2H de 6/6 não segurou (lição 72). |
+| 25/10 | Odra Opole x Pogoń Siedlce (/casa) | menos de 3.5 | 77% | 0-1 | ✅ | Os dois marcam pouco, como a estatística mostrava. |
+| 25/10 | Barcelona x Real Madrid (/casa) | ambas marcam | 75% | 1-2 | ✅ | A zaga desfalcada do Barça cedeu; a odd caindo 11% acertou. |

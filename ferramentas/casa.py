@@ -88,10 +88,12 @@ def selecoes(ln: dict, casa: str, fora: str) -> list[dict]:
         return []
     odds = [o["rate"]["decimal"] for o in ops]
     abert = [(o.get("originalRate") or {}).get("decimal") or o["rate"]["decimal"] for o in ops]
-    ps = sem_margem(odds)
-    margem = sum(1 / o for o in odds) - 1
-    nome = (ln.get("lineType") or {}).get("name") or ""
     tipo = ln.get("lineTypeId")
+    vezes = 2 if tipo == 14 else 1  # dupla chance: as 3 opções se sobrepõem e somam 200%
+    ps = [vezes * x for x in sem_margem(odds)]
+    pa = [vezes * x for x in sem_margem(abert)]
+    margem = sum(1 / o for o in odds) / vezes - 1
+    nome = (ln.get("lineType") or {}).get("name") or ""
     linha = _linha_num(ln)
     quedas = [1 - o / a for o, a in zip(odds, abert)]
     saida = []
@@ -122,7 +124,7 @@ def selecoes(ln: dict, casa: str, fora: str) -> list[dict]:
             continue
         contra = max((q for j, q in enumerate(quedas) if j != i), default=0.0)
         saida.append({"mercado": merc, "lado": lado, "rotulo": rot, "tipo": nome, "odd": odds[i], "odd_abertura": abert[i],
-                      "p_casa": round(ps[i], 4), "p_abertura": round(sem_margem(abert)[i], 4), "margem": round(margem, 4),
+                      "p_casa": round(ps[i], 4), "p_abertura": round(pa[i], 4), "margem": round(margem, 4),
                       "queda": round(quedas[i], 4), "queda_contra": round(contra, 4)})
     return saida
 

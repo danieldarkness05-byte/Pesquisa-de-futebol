@@ -821,6 +821,9 @@ class TestCasa(unittest.TestCase):
         d = cs.selecoes(self.linha(14, "Double Chance", [("1X", 1.11, 1.17), ("12", 1.22, 1.29), ("X2", 2.38, 2.15)]), "A", "B")
         self.assertEqual([(x["mercado"], x["lado"]) for x in d],
                          [("dupla_chance", "casa"), ("sem_empate", "casa"), ("dupla_chance", "fora")])
+        self.assertAlmostEqual(sum(x["p_casa"] for x in d), 2.0, places=3)        # as 3 opções somam 200%
+        self.assertAlmostEqual(d[0]["margem"], (1 / 1.11 + 1 / 1.22 + 1 / 2.38) / 2 - 1, places=3)
+        self.assertAlmostEqual(d[0]["p_casa"], 2 * (1 / 1.11) / (1 / 1.11 + 1 / 1.22 + 1 / 2.38), places=3)
 
     def test_selecoes_gols_handicap_ambas(self):
         g = cs.selecoes(self.linha(3, "Total Goals In Match", [("Under", 1.22, 1.22), ("Over", 4.33, 4.33)], "3.5 Goals"), "A", "B")
