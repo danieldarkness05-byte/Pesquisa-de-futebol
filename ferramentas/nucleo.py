@@ -305,6 +305,15 @@ def fmt_odd(x: float) -> str:
     return "—" if x == float("inf") else f"{x:.2f}"
 
 
+def odd_acima(x: float) -> float:
+    """Odd mínima com 2 casas, sempre para cima: 1.585 vira 1.59 (com 1.58 o EV não chega ao mínimo)."""
+    return x if x == float("inf") else math.ceil(x * 100 - 1e-9) / 100
+
+
+def fmt_odd_min(x: float) -> str:
+    return fmt_odd(odd_acima(x))
+
+
 def tabela(cabecalho: list[str], linhas: list[list[str]]) -> str:
     """Tabela em Markdown (fica legível no terminal e no app)."""
     out = ["| " + " | ".join(cabecalho) + " |",

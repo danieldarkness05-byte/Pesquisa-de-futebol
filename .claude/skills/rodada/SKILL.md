@@ -25,7 +25,7 @@ Varredura: **$ARGUMENTS** (sem data = hoje; sem competição = todas de `config.
    também tiverem ataque forte (regra 4 do CLAUDE.md).
 7. **Resultado:** só OURO (≥ 60% e EV ≥ mínimo, ou ≥ 60% aguardando conferência da odd),
    ranqueado por probabilidade e depois EV. Nenhum? Diga claramente: "nenhuma oportunidade
-   de ouro hoje". Em seguida, uma linha por jogo descartado com o motivo.
+   de ouro hoje". Descartados não vão na resposta (pedido do Daniel); ficam só no arquivo.
 8. **Salve** o resumo em `analises/<data>-rodada.md`.
 
 Mantenha a resposta curta (celular): tabela de ouros + lista de descartes + fontes.

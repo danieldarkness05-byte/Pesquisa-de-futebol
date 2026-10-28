@@ -14,9 +14,12 @@ Digite no Claude Code (ou peça com suas palavras, ele entende):
 
 | Comando | Exemplo |
 |---|---|
+| `/peneira` | `/peneira` · `/peneira amanhã`: triagem barata, só jogos com valor |
+| `/aprofundar` | `/aprofundar` · `/aprofundar 1,3`: análise completa só dos candidatos |
 | `/rodada` | `/rodada hoje` · `/rodada amanhã Série B` |
 | `/analisar-jogo` | `/analisar-jogo Bahia x Vitória` (pode colar as odds da Betano junto) |
-| `/defesa-fraca` | `/defesa-fraca hoje` |
+| `/azarao-forte` | `/azarao-forte` · `/azarao-forte amanhã`: azarão forte com chance de empatar ou ganhar e valor |
+| `/defesa-fraca` | `/defesa-fraca` · `/defesa-fraca amanhã`: azarão com defesa muito vazada x favorito que ataca forte, em todas as ligas do Sofascore (roda todo dia às 06:52) |
 | `/sistema` | `/sistema duplas 5` |
 | `/registrar-aposta` | `/registrar-aposta Bahia x Vitória under 2.5 @1.72 R$10` |
 | `/balanco` | `/balanco desde 2026-10-01` |
@@ -68,9 +71,14 @@ ferramentas/              cálculos em Python (sem instalar nada)
   clima.py                previsão de chuva (Open-Meteo)
   sistema.py              simulação de Duplas/Triplas
   registro.py             registro de apostas, ROI, CLV e calibração
+  varredura.py            peneira do dia (Sofascore + modelos + testes de robustez)
+  defesa.py               defesa fraca x ataque forte em todas as ligas (triagem + estatística + alertas)
+  azarao.py               azarão forte que pode empatar ou ganhar, com valor (todas as ligas)
+  previsoes.py            registro de toda previsão entregue, resultado automático e calibração
 analises/                 análises salvas (uma por jogo/rodada)
 dados/registro-apostas.csv  seu histórico de apostas
-docs/                     metodologia e fontes
+dados/previsoes.csv       previsões das análises (apostadas ou não) e se bateram
+docs/                     metodologia, fontes e licoes.md (o que cada acerto/erro ensinou)
 testes/                   python3 -m unittest discover testes
 ```
 
